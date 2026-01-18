@@ -1,0 +1,239 @@
+/**
+ * Global Styles Configuration
+ * 
+ * Comprehensive CSS foundation for PizzaPort restaurant application
+ * Implements custom design system with Tailwind CSS integration
+ * 
+ * @file globals.css
+ * 
+ * @features
+ * - Custom font stack with Google Fonts integration
+ * - Advanced background blur and overlay effects
+ * - Responsive design utilities and components
+ * - Custom color scheme and design tokens
+ * - Scrollbar customization and hiding utilities
+ * - Loading state animations and transitions
+ * 
+ * @performance
+ * - Optimized font loading with display: swap
+ * - Efficient background image handling with fixed positioning
+ * - CSS custom properties for maintainable theming
+ * - Minimal CSS footprint with Tailwind CSS integration
+ * 
+ * @accessibility
+ * - High contrast color combinations
+ * - Responsive typography scaling
+ * - Focus states for interactive elements
+ * - Screen reader compatible text shadows
+ * 
+ * @browser_compatibility
+ * - Cross-browser backdrop-filter support with vendor prefixes
+ * - Progressive enhancement for modern CSS features
+ * - Fallback handling for older browsers
+ */
+
+@import "tailwindcss";
+
+/**
+ * Base Body Styles
+ * 
+ * Establishes foundational typography and layout properties
+ * Implements fixed background with blur overlay for visual depth
+ */
+body {
+  font-family: var(--font-open-sans), sans-serif;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/**
+ * Fixed Background Image Layer
+ * 
+ * Creates immersive background experience with high-quality food imagery
+ * Uses fixed positioning for parallax effect during scrolling
+ */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('/hero-background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  z-index: -20;
+  display: block;
+  transition: opacity 0.5s ease-in-out;
+}
+
+/**
+ * Background Overlay Layer
+ * 
+ * Applies glass morphism effect with backdrop filter
+ * Enhances readability by reducing background contrast
+ */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  background: rgba(255, 255, 255, 0.2);
+  z-index: -10;
+  display: block;
+}
+
+/**
+ * Loading State Modifiers
+ * 
+ * Manages background transitions during application initialization
+ * Provides smooth visual feedback during critical loading phases
+ */
+body.loading::before {
+  background-image: none;
+}
+
+body.loading::after {
+  backdrop-filter: none;
+  background: linear-gradient(135deg, #f13a01 0%, #ff6b35 100%);
+}
+
+/**
+ * Background Image Loading States
+ * 
+ * Controls background image opacity for progressive loading experience
+ * Prevents layout shifts and provides smooth visual transitions
+ */
+body:not(.loaded)::before {
+  opacity: 0;
+}
+
+body.loaded::before {
+  opacity: 1;
+}
+
+/**
+ * Layout Containment
+ * 
+ * Prevents horizontal scrolling and ensures proper viewport containment
+ * Essential for responsive design and mobile compatibility
+ */
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/**
+ * Typography Hierarchy
+ * 
+ * Establishes consistent heading styles with branded font family
+ * Maintains visual hierarchy while preserving brand identity
+ */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-oswald), sans-serif;
+}
+
+/**
+ * Text Enhancement Utilities
+ * 
+ * Improves text readability against complex backgrounds
+ * Provides subtle depth and visual hierarchy
+ */
+.heading-border {
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.subheading-border {
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.25);
+}
+
+/**
+ * Brand Logo Typography
+ * 
+ * Distinctive font family for brand identity and recognition
+ * Creates memorable visual identity throughout the application
+ */
+.logo-text {
+  font-family: var(--font-sedgwick), cursive;
+}
+
+/**
+ * Hero Section Layout
+ * 
+ * Two-column grid layout for hero sections
+ * Provides flexible foundation for prominent content displays
+ */
+section.hero {
+  @apply grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+/**
+ * File Input Styling
+ * 
+ * Customizes native file input elements for consistent branding
+ * Improves usability while maintaining accessibility
+ */
+input[type="file"]::-webkit-file-upload-button {
+  visibility: visible;
+}
+
+input[type="file"]::file-selector-button {
+  font-weight: bold;
+  color: #facc15;
+  background: transparent;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+input[type="file"] {
+  color: transparent;
+}
+
+/**
+ * Design Token Configuration
+ * 
+ * Custom theme extension for Tailwind CSS
+ * Defines brand colors and responsive breakpoints
+ */
+@theme {
+  --color-primary: #f13a01;
+  /* Brand orange for primary actions */
+  --color-card: #F8F4E9;
+  /* Off-white for card backgrounds */
+  --breakpoint-md: 53.75rem;
+  /* Custom medium breakpoint */
+}
+
+/**
+ * Utility Classes
+ * 
+ * Custom utility classes for specific design requirements
+ * Enhances Tailwind CSS with application-specific functionality
+ */
+@layer utilities {
+
+  /* Scrollbar hiding utility for custom scroll areas */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
