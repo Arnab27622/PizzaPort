@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import clientPromise from '@/lib/mongoConnect';
-import path from 'path';
-import fs from 'fs/promises';
+import { v2 as cloudinary } from 'cloudinary';
 import { authOptions } from '../auth/[...nextauth]/authOptions';
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 /**
  * Force dynamic rendering for this API route
@@ -101,35 +106,23 @@ export async function POST(req: Request) {
 
         /**
          * Profile Picture Upload Handling
-         * Processes image file if provided and valid
+         * Uploads image to Cloudinary if provided and valid
          */
         if (file && typeof file.arrayBuffer === 'function') {
-            // Convert file to buffer for storage
+            // Convert file to buffer
             const buffer = Buffer.from(await file.arrayBuffer());
-
-            // Extract file extension from original filename
-            const ext = file.name.split('.').pop();
-
-            // Generate unique filename using timestamp
-            const filename = `${Date.now()}.${ext}`;
-
-            // Construct full file system path
-            const filePath = path.join(
-                process.cwd(),
-                'public',
-                'uploads',
-                filename
-            );
-
-            /**
-             * Write file to uploads directory
-             * Note: Directory must exist or this will throw an error
-             * Consider adding directory creation logic if needed
-             */
-            await fs.writeFile(filePath, buffer);
-
-            // Store relative URL for database and client access
-            update.image = `/uploads/${filename}`;
+            
+            // Convert to base64
+            const base64 = buffer.toString('base64');
+            const dataURI = `data:${file.type};base64,${base64}`;
+            
+            // Upload to Cloudinary
+            const result = await cloudinary.uploader.upload(dataURI, {
+                resource_type: 'auto',
+                folder: 'pizza-delivery/profiles',
+            });
+            
+            update.image = result.secure_url;
         }
 
         /**

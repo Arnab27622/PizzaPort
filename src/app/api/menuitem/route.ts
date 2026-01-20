@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongoConnect';
 import { ObjectId } from 'mongodb';
-import path from 'path';
-import fs from 'fs';
+import { v2 as cloudinary } from 'cloudinary';
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/authOptions";
 
-/**
- * API Configuration
- * Disables Next.js default body parser to handle FormData with file uploads
- */
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 /**
  * Menu Item Database Interface
@@ -102,17 +102,18 @@ export async function POST(req: NextRequest) {
         // Handle image upload if present
         if (file && file.size > 0) {
             const buffer = Buffer.from(await file.arrayBuffer());
-            const uploadDir = path.join(process.cwd(), 'public/uploads');
-
-            // Ensure upload directory exists
-            if (!fs.existsSync(uploadDir)) {
-                fs.mkdirSync(uploadDir, { recursive: true });
-            }
-
-            // Generate unique filename with timestamp and file extension
-            const filename = `${Date.now()}-${file.type.replace('/', '.')}`;
-            fs.writeFileSync(path.join(uploadDir, filename), buffer);
-            imageUrl = `/uploads/${filename}`;
+            
+            // Convert to base64
+            const base64 = buffer.toString('base64');
+            const dataURI = `data:${file.type};base64,${base64}`;
+            
+            // Upload to Cloudinary
+            const result = await cloudinary.uploader.upload(dataURI, {
+                resource_type: 'auto',
+                folder: 'pizza-delivery/menuitems',
+            });
+            
+            imageUrl = result.secure_url;
         }
 
         // Construct menu item object
@@ -180,15 +181,18 @@ export async function PUT(req: NextRequest) {
         // Handle new image upload if provided
         if (file && file.size > 0) {
             const buffer = Buffer.from(await file.arrayBuffer());
-            const uploadDir = path.join(process.cwd(), 'public/uploads');
-
-            if (!fs.existsSync(uploadDir)) {
-                fs.mkdirSync(uploadDir, { recursive: true });
-            }
-
-            const filename = `${Date.now()}-${file.type.replace('/', '.')}`;
-            fs.writeFileSync(path.join(uploadDir, filename), buffer);
-            update.imageUrl = `/uploads/${filename}`;
+            
+            // Convert to base64
+            const base64 = buffer.toString('base64');
+            const dataURI = `data:${file.type};base64,${base64}`;
+            
+            // Upload to Cloudinary
+            const result = await cloudinary.uploader.upload(dataURI, {
+                resource_type: 'auto',
+                folder: 'pizza-delivery/menuitems',
+            });
+            
+            update.imageUrl = result.secure_url;
         }
 
         const col = await getCollection();
@@ -214,7 +218,7 @@ export async function PUT(req: NextRequest) {
 
 /**
  * DELETE /api/menu-items
- * Removes a menu item from the database
+ * Removes a menu item from the database and deletes its image from Cloudinary
  * @param {NextRequest} req - Request object containing JSON with item ID
  * @returns {Promise<NextResponse>} Success confirmation or error response
  */
@@ -238,6 +242,30 @@ export async function DELETE(req: NextRequest) {
         }
 
         const col = await getCollection();
+        
+        // Get the menu item to retrieve its image URL before deletion
+        const item = await col.findOne({ _id: new ObjectId(id) });
+        
+        if (!item) {
+            return NextResponse.json({ error: 'Menu item not found' }, { status: 404 });
+        }
+
+        // Delete image from Cloudinary if it exists
+        if (item.imageUrl) {
+            try {
+                // Extract public ID from Cloudinary URL
+                const urlParts = item.imageUrl.split('/');
+                const filename = urlParts[urlParts.length - 1];
+                const publicId = `pizza-delivery/menuitems/${filename.split('.')[0]}`;
+                
+                await cloudinary.uploader.destroy(publicId);
+            } catch (cloudinaryError) {
+                console.error('Error deleting image from Cloudinary:', cloudinaryError);
+                // Continue with deletion even if Cloudinary deletion fails
+            }
+        }
+
+        // Delete from database
         const { deletedCount } = await col.deleteOne({ _id: new ObjectId(id) });
 
         if (!deletedCount) {
