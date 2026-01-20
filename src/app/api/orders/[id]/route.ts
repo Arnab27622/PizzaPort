@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongoConnect";
 import mongoose from "mongoose";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/authOptions";
 
 /**
  * GET /api/orders/[id]
@@ -9,50 +11,33 @@ import mongoose from "mongoose";
  * This endpoint fetches a single order using the provided order ID from the URL parameters.
  * It converts MongoDB-specific types (ObjectId, Date) to serializable formats for JSON response.
  * 
- * @param {Request} req - The incoming request object (unused but required by Next.js)
+ * @param {Request} req - The incoming request object
  * @param {Object} context - Context object containing route parameters
  * @param {Promise<{id: string}>} context.params - Promise containing the route parameters
  * 
  * @returns {Promise<NextResponse>}
  *   Success: JSON object of the requested order with serialized fields
+ *   Unauthorized: 401 if not logged in
+ *   Forbidden: 403 if user is not authorized to see this order
  *   Not Found: 404 status with error message
  *   Error: 500 status with generic server error message
  * 
- * @example
- * // Successful response
- * GET /api/orders/67a1b2c3d4e5f67890123456 → 200
- * {
- *   "_id": "67a1b2c3d4e5f67890123456",
- *   "items": [...],
- *   "total": 29.99,
- *   "createdAt": "2024-01-15T10:30:00.000Z",
- *   "canceledAt": null,
- *   ...
- * }
- * 
- * @example
- * // Order not found
- * GET /api/orders/invalid_id → 404
- * {
- *   "error": "Order not found"
- * }
- * 
- * @example
- * // Server error
- * GET /api/orders/67a1b2c3d4e5f67890123456 → 500
- * {
- *   "error": "Server error"
- * }
+ * @security Admins can access any order. Regular users can only access their own orders.
  */
 export async function GET(
     req: Request,
     context: { params: Promise<{ id: string }> }
 ) {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     /**
      * Extract order ID from route parameters
-     * Note: In Next.js App Router, params is a Promise that needs to be awaited
      */
-    const { id } = await context.params; // await params first!
+    const { id } = await context.params;
 
     try {
         // Establish database connection
@@ -73,6 +58,17 @@ export async function GET(
             return NextResponse.json(
                 { error: "Order not found" },
                 { status: 404 } // Not Found
+            );
+        }
+
+        // Authorization check: Admin or Order Owner
+        const isAdmin = session.user?.admin;
+        const isOwner = order.userEmail === session.user?.email;
+
+        if (!isAdmin && !isOwner) {
+            return NextResponse.json(
+                { error: "Forbidden" },
+                { status: 403 }
             );
         }
 

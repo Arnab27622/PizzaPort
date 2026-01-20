@@ -3,12 +3,13 @@ import clientPromise from '@/lib/mongoConnect';
 import { ObjectId } from 'mongodb';
 import path from 'path';
 import fs from 'fs';
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/authOptions";
 
 /**
  * API Configuration
  * Disables Next.js default body parser to handle FormData with file uploads
  */
-export const config = { api: { bodyParser: false } };
 
 /**
  * Menu Item Database Interface
@@ -71,6 +72,16 @@ export async function GET() {
  * @returns {Promise<NextResponse>} Newly created menu item with _id
  */
 export async function POST(req: NextRequest) {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!session.user?.admin) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     try {
         const form = await req.formData();
         const col = await getCollection();
@@ -134,6 +145,16 @@ export async function POST(req: NextRequest) {
  * @returns {Promise<NextResponse>} Updated menu item or error response
  */
 export async function PUT(req: NextRequest) {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!session.user?.admin) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     try {
         const form = await req.formData();
         const id = form.get('id')?.toString() || '';
@@ -198,6 +219,16 @@ export async function PUT(req: NextRequest) {
  * @returns {Promise<NextResponse>} Success confirmation or error response
  */
 export async function DELETE(req: NextRequest) {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!session.user?.admin) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     try {
         const { id } = await req.json();
 

@@ -1,5 +1,6 @@
 import React from "react";
 import SectionHeader from "@/components/layout/SectionHeader";
+import { headers } from "next/headers";
 
 /**
  * Order Item Type Definition
@@ -128,37 +129,6 @@ const formatDate = (dateString: string): string => {
  * @async
  * @param {Object} props - Component properties
  * @param {Promise<{id: string}>} props.params - Route parameters containing order ID
- * 
- * @features
- * - Complete order financial breakdown (subtotal, tax, fees, total)
- * - Detailed item configuration display (sizes, extras, quantities)
- * - Real-time order status and payment status tracking
- * - Customer and delivery information display
- * - Responsive design for all device sizes
- * - Comprehensive error handling and loading states
- * 
- * @security
- * - Server-side data fetching prevents client-side data exposure
- * - Environment variable usage for API endpoint construction
- * - Input sanitization through Next.js route parameters
- * - No sensitive operations performed on client-side
- * 
- * @performance
- * - Static generation with incremental revalidation (ISR)
- * - Efficient data fetching with 30-second cache revalidation
- * - Optimized rendering with conditional display logic
- * - Minimal client-side JavaScript bundle
- * 
- * @user_experience
- * - Clear visual hierarchy with section-based layout
- * - Status-based color coding for quick scanning
- * - Comprehensive error states with recovery options
- * - Mobile-optimized responsive design
- * - Accessible color contrast and text sizing
- * 
- * @example
- * // Renders order details for order ID 'abc123'
- * <OrderDetailPage params={Promise.resolve({ id: 'abc123' })} />
  */
 export default async function OrderDetailPage({
     params,
@@ -167,37 +137,27 @@ export default async function OrderDetailPage({
 }) {
     /**
      * Route Parameter Extraction
-     * 
-     * Safely extracts order ID from URL parameters for data fetching
-     * Uses Next.js async params handling for App Router compatibility
      */
     const { id } = await params;
 
     /**
      * Data State Initialization
-     * 
-     * @variable order - Complete order data or null if not found
-     * @variable error - Error message for failed data fetching
      */
     let order: Order | null = null;
     let error: string | null = null;
 
     /**
      * Order Data Fetcher
-     * 
-     * Retrieves specific order details from API with comprehensive error handling
-     * Implements Incremental Static Regeneration for optimal performance
-     * 
-     * @async
-     * @function
-     * @throws {Error} When API response is not OK or network fails
      */
     try {
+        const headerList = await headers();
         const res = await fetch(
             `${process.env.NEXTAUTH_URL || ""}/api/orders/${id}`,
             {
+                headers: {
+                    cookie: headerList.get("cookie") || "",
+                },
                 next: {
-                    // Incremental Static Regeneration: Revalidate cache every 30 seconds
                     revalidate: 30,
                 },
             }
@@ -215,9 +175,6 @@ export default async function OrderDetailPage({
 
     /**
      * Error State Render
-     * 
-     * Displays user-friendly error message with recovery option
-     * Provides clear feedback and actionable next steps
      */
     if (error) {
         return (
@@ -226,12 +183,6 @@ export default async function OrderDetailPage({
                 <div className="bg-[#1a1108] p-6 rounded-lg shadow-lg text-center">
                     <p className="text-red-500 text-xl mb-4">Failed to load order details</p>
                     <p className="text-amber-300">{error}</p>
-                    <button
-                        onClick={() => window.location.reload()}
-                        className="mt-4 bg-primary text-white px-4 py-2 rounded hover:bg-amber-600 transition-colors"
-                    >
-                        Try Again
-                    </button>
                 </div>
             </div>
         );
@@ -239,9 +190,6 @@ export default async function OrderDetailPage({
 
     /**
      * Not Found State Render
-     * 
-     * Handles cases where order ID is valid but no order exists
-     * Prevents confusing empty states with clear messaging
      */
     if (!order) {
         return (
@@ -256,11 +204,6 @@ export default async function OrderDetailPage({
 
     /**
      * Item Total Calculator
-     * 
-     * Computes individual item totals including base price, size upgrades, and extras
-     * Ensures accurate price display matching original checkout calculations
-     * 
-     * @returns {number[]} Array of calculated totals for each cart item
      */
     const itemTotals = order.cart.map(item => {
         const sizePrice = item.size?.extraPrice || 0;
@@ -270,13 +213,6 @@ export default async function OrderDetailPage({
 
     /**
      * Main Component Render
-     * 
-     * Implements comprehensive order detail interface with:
-     * - Order header with metadata and total
-     * - Detailed item breakdown with customizations
-     * - Customer and delivery information
-     * - Complete financial summary
-     * - Status and payment tracking
      */
     return (
         <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100">

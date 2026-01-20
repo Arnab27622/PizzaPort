@@ -1,5 +1,7 @@
 import clientPromise from '@/lib/mongoConnect';
 import { NextResponse } from 'next/server';
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/authOptions";
 
 /**
  * GET /api/admin/users
@@ -10,10 +12,11 @@ import { NextResponse } from 'next/server';
  * 
  * @returns {Promise<NextResponse>} 
  *   Success: Array of user objects with projected fields
+ *   Unauthorized: 401 if not logged in
+ *   Forbidden: 403 if not an admin
  *   Error: Internal server error (handled by Next.js)
  * 
- * @security Admin access required (enforced by middleware or frontend)
- * @note Consider adding admin authentication middleware for production use
+ * @security Admin access required
  * 
  * @example
  * // Successful response
@@ -37,10 +40,19 @@ import { NextResponse } from 'next/server';
  * @performance Uses projection to limit returned fields and improve response time
  */
 export async function GET() {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!session.user?.admin) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   /**
    * Database Connection and Query
    * Establishes connection and retrieves all users with field projection
-   * Projection ensures only necessary fields are returned for security and performance
    */
   const db = (await clientPromise).db();
 

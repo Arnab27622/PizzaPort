@@ -1,5 +1,5 @@
 // User.ts
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 /**
@@ -32,7 +32,7 @@ export interface IUser {
  * @extends {Document}
  * @method comparePassword - Compares a candidate password with the user's hashed password.
  */
-export interface IUserDoc extends IUser, Document {
+export interface IUserDoc extends IUser {
     comparePassword(candidate: string): Promise<boolean>;
 }
 
@@ -54,16 +54,17 @@ const UserSchema = new Schema<IUserDoc>(
 );
 
 // Hash password before saving
-UserSchema.pre<IUserDoc>('save', async function (next) {
-    if (!this.isModified('password') || !this.password) return next();
+UserSchema.pre('save', async function () {
+    if (!this.isModified('password') || !this.password) {
+        return;
+    }
 
     try {
         const salt = await bcrypt.genSalt(10);
         const hash = await bcrypt.hash(this.password, salt);
         this.password = hash;
-        next();
     } catch (error: unknown) {
-        next(error as Error);
+        throw error as Error;
     }
 });
 

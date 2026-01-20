@@ -1,5 +1,5 @@
 // MenuItem.ts
-import mongoose, { Schema, Document, Model, ObjectId } from "mongoose";
+import mongoose, { Schema, Model } from "mongoose";
 
 /**
  * Represents an option entry with name and extra price.
@@ -27,8 +27,7 @@ interface OptionEntry {
  * @property {Date} createdAt - When the menu item was created.
  * @property {Date} updatedAt - When the menu item was last updated.
  */
-export interface IMenuItem extends Document {
-    _id: ObjectId;
+export interface IMenuItem {
     name: string;
     description: string;
     basePrice: number;
@@ -36,8 +35,8 @@ export interface IMenuItem extends Document {
     sizeOptions: OptionEntry[];
     extraIngredients: OptionEntry[];
     imageUrl?: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 /**

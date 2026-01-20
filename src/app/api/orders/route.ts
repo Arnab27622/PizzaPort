@@ -1,16 +1,22 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongoConnect";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/authOptions";
 
 /**
  * GET /api/orders
- * Retrieves all orders from the database
+ * Retrieves all orders from the database (Admin only)
  * 
  * This endpoint fetches all orders sorted by creation date (newest first)
  * and converts MongoDB ObjectId to string for client-side compatibility.
  * 
  * @returns {Promise<NextResponse>} 
  *   Success: JSON array of order objects with string _id
+ *   Unauthorized: 401 if not logged in
+ *   Forbidden: 403 if not an admin
  *   Error: JSON error response with 500 status code
+ * 
+ * @security Admin access required
  * 
  * @example
  * // Successful response
@@ -34,6 +40,16 @@ import clientPromise from "@/lib/mongoConnect";
  * }
  */
 export async function GET() {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!session.user?.admin) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     try {
         // Establish database connection
         const client = await clientPromise;

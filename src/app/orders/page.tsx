@@ -431,9 +431,11 @@ export default function AdminOrdersPage() {
                                                         }`}
                                                     disabled={isCompletedOrCanceled || isUpdating}
                                                 >
-                                                    {Object.entries(statusLabels).map(([value, label]) => (
-                                                        <option key={value} value={value}>{label}</option>
-                                                    ))}
+                                                    {Object.entries(statusLabels)
+                                                        .filter(([value]) => value !== "canceled" || order.status === "canceled")
+                                                        .map(([value, label]) => (
+                                                            <option key={value} value={value}>{label}</option>
+                                                        ))}
                                                 </select>
                                             </div>
                                         </td>
@@ -517,9 +519,11 @@ export default function AdminOrdersPage() {
                                                         }`}
                                                     disabled={isCompletedOrCanceled || isUpdating}
                                                 >
-                                                    {Object.entries(statusLabels).map(([value, label]) => (
-                                                        <option key={value} value={value}>{label}</option>
-                                                    ))}
+                                                    {Object.entries(statusLabels)
+                                                        .filter(([value]) => value !== "canceled" || order.status === "canceled")
+                                                        .map(([value, label]) => (
+                                                            <option key={value} value={value}>{label}</option>
+                                                        ))}
                                                 </select>
                                             </div>
                                         </div>
