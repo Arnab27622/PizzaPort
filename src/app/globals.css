@@ -237,3 +237,32 @@ input[type="file"] {
     scrollbar-width: none;
   }
 }
+
+
+/* Custom scrollbar */
+@layer base {
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: rgb(32, 32, 32);
+    /* track color */
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: rgb(60, 60, 60);
+    /* thumb color*/
+    @apply rounded-lg;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(80, 80, 80);
+  }
+
+  /* Firefox support */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(60, 60, 60) rgb(32, 32, 32);
+  }
+}

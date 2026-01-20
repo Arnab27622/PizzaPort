@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
      * Parse the JSON payload and handle different event types
      */
     const payload = JSON.parse(rawBody);
-    const client = await clientPromise.connect();
+    const client = await clientPromise;
     const db = client.db();
 
     /**

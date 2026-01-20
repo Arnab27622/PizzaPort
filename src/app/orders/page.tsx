@@ -170,13 +170,16 @@ export default function AdminOrdersPage() {
     const fetchOrders = useCallback(async () => {
         try {
             const response = await fetch("/api/orders");
-            if (!response.ok) throw new Error("Failed to fetch orders");
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || "Failed to fetch orders");
+            }
 
             const data = await response.json();
-            setOrders(data);
+            setOrders(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error("Error fetching orders:", error);
-            toast.error("Error fetching orders");
+            toast.error(error instanceof Error ? error.message : "Error fetching orders");
         } finally {
             setLoading(false);
         }

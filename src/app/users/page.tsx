@@ -36,7 +36,14 @@ interface User {
  * @param {string} url - API endpoint to fetch data from
  * @returns {Promise<User[]>} Array of user objects
  */
-const fetcher = (url: string) => fetch(url).then(r => r.json());
+const fetcher = async (url: string) => {
+    const res = await fetch(url);
+    if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to fetch data");
+    }
+    return res.json();
+};
 
 /**
  * UsersPage Component
@@ -92,7 +99,19 @@ function UsersPage() {
      * Intelligent data fetching with caching and automatic revalidation
      * Provides real-time user data synchronization
      */
-    const { data: users = [], isLoading: swrLoading, mutate } = useSWR<User[]>('/api/users', fetcher);
+    const { data, error: swrError, isLoading: swrLoading, mutate } = useSWR<User[]>('/api/users', fetcher);
+    const users = useMemo(() => Array.isArray(data) ? data : [], [data]);
+
+    /**
+     * Error Handling for Data Fetching
+     * 
+     * Displays a toast notification if the API request fails
+     */
+    useEffect(() => {
+        if (swrError) {
+            toast.error(swrError.message || "Failed to fetch users");
+        }
+    }, [swrError]);
 
     /**
      * Component State Management
@@ -331,7 +350,7 @@ function UsersPage() {
                         <div className="flex items-center gap-3 min-w-0">
                             {/* Profile Image */}
                             {u.image && (
-                                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-amber-700 flex-shrink-0">
+                                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-amber-700 shrink-0">
                                     <Image
                                         src={u.image}
                                         alt={u.name}

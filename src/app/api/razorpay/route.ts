@@ -82,7 +82,7 @@ export async function POST(req: Request) {
      * Establish database connection
      * Connection is established early to fail fast if database is unavailable
      */
-    const clientDB = await clientPromise.connect();
+    const clientDB = await clientPromise;
 
     /**
      * Parse request payload containing order details

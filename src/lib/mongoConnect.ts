@@ -1,38 +1,10 @@
 import { MongoClient, ServerApiVersion } from "mongodb"
 
-/**
- * MongoDB database connection utility
- * 
- * @module mongoConnect
- * @description 
- * - Provides a singleton MongoDB client instance for database operations
- * - Implements connection pooling and reuse across the application
- * - Uses global variable in development to preserve connection during hot reloads
- * - Supports both development and production environments
- * - Implements MongoDB server API versioning for compatibility
- * 
- * @throws {Error} When MONGO_URL environment variable is missing or invalid
- */
-
-// Validate required environment variable
 if (!process.env.MONGO_URL) {
     throw new Error('Invalid/Missing environment variable: "MONGO_URL"')
 }
 
-/**
- * MongoDB connection URI from environment variables
- * @constant {string}
- */
 const uri = process.env.MONGO_URL
-
-/**
- * MongoDB client options configuration
- * @constant {Object}
- * @property {Object} serverApi - MongoDB server API configuration
- * @property {string} serverApi.version - Server API version (v1)
- * @property {boolean} serverApi.strict - Enable strict mode
- * @property {boolean} serverApi.deprecationErrors - Enable deprecation errors
- */
 const options = {
     serverApi: {
         version: ServerApiVersion.v1,
@@ -41,53 +13,27 @@ const options = {
     },
 }
 
-/**
- * MongoDB client promise instance
- * @type {MongoClient}
- * 
- * @description
- * - Singleton client instance reused across the application
- * - In development: preserved across hot reloads using global variable
- * - In production: new instance created for each process
- */
-let clientPromise: MongoClient
+let client: MongoClient
+let clientPromise: Promise<MongoClient>
 
-/**
- * Connection strategy based on environment
- * @description
- * - Development: Uses global variable to prevent multiple connections during hot reload
- * - Production: Creates new connection for each process
- */
 if (process.env.NODE_ENV === "development") {
-    /**
-     * Extended global type definition for MongoDB client caching
-     * @type {typeof globalThis & { _mongoClient?: MongoClient }}
-     */
+    // In development mode, use a global variable so that the value
+    // is preserved across module reloads caused by HMR (Hot Module Replacement).
     const globalWithMongo = global as typeof globalThis & {
-        _mongoClient?: MongoClient
+        _mongoClientPromise?: Promise<MongoClient>
     }
 
-    // Create new client only if it doesn't exist in global scope
-    if (!globalWithMongo._mongoClient) {
-        globalWithMongo._mongoClient = new MongoClient(uri, options)
+    if (!globalWithMongo._mongoClientPromise) {
+        client = new MongoClient(uri, options)
+        globalWithMongo._mongoClientPromise = client.connect()
     }
-    clientPromise = globalWithMongo._mongoClient
+    clientPromise = globalWithMongo._mongoClientPromise
 } else {
-    // Production: create new client instance
-    clientPromise = new MongoClient(uri, options)
+    // In production mode, it's best to not use a global variable.
+    client = new MongoClient(uri, options)
+    clientPromise = client.connect()
 }
 
-/**
- * Exported MongoDB client instance
- * @default
- * @type {MongoClient}
- * 
- * @example
- * // Usage in API routes
- * import clientPromise from '@/lib/mongoConnect'
- * 
- * const client = await clientPromise
- * const db = client.db('pizzaport')
- * const collection = db.collection('menuItems')
- */
+// Export a module-scoped MongoClient promise. By doing this in a
+// separate module, the client can be shared across functions.
 export default clientPromise

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import LoadingSpinner from "@/components/icons/LoadingSpinner";
 import { useIsAdmin } from "../hook/useAdmin";
 import { confirm } from "@/components/layout/ConfirmDelete";
+import { toast } from "react-toastify";
 
 /**
  * Option Interface for Size and Ingredient Options
@@ -60,10 +61,14 @@ interface FormState {
  * Handles API requests for menu items with proper error handling
  * Used by SWR hook for data fetching and caching
  */
-const fetcher = (url: string) => fetch(url).then((res) => {
-  if (!res.ok) throw new Error('Failed to fetch menu items');
+const fetcher = async (url: string) => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.error || "Failed to fetch menu items");
+  }
   return res.json();
-});
+};
 
 /**
  * MenuPage Component - Admin Menu Management Interface
@@ -118,7 +123,7 @@ export default function MenuPage() {
    * Provides real-time data synchronization for admin operations
    */
   const {
-    data: items = [],
+    data,
     isLoading: swrLoading,
     mutate,
     error: swrError
@@ -126,6 +131,19 @@ export default function MenuPage() {
     revalidateOnFocus: false, // Prevents refetching on window focus
     onError: (err) => console.error("Failed to fetch menu items:", err)
   });
+
+  const items = useMemo(() => Array.isArray(data) ? data : [], [data]);
+
+  /**
+   * Error Handling for Data Fetching
+   * 
+   * Displays a toast notification if the API request fails
+   */
+  useEffect(() => {
+    if (swrError) {
+      toast.error(swrError.message || "Failed to fetch menu items");
+    }
+  }, [swrError]);
 
   /**
    * Component State Management
@@ -502,7 +520,7 @@ export default function MenuPage() {
         {items.map(item => (
           <div
             key={item._id}
-            className="bg-gradient-to-br from-[#2c1a0d] to-[#1a1108] border border-amber-900 rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+            className="bg-linear-to-br from-[#2c1a0d] to-[#1a1108] border border-amber-900 rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
           >
             {/* Item Image with Click Handler */}
             {item.imageUrl && (

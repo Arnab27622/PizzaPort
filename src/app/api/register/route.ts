@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
          * Establish connection to MongoDB using Mongoose
          * Connection is reused if already established
          */
-        mongoose.connect(mongoUrl);
+        await mongoose.connect(mongoUrl);
 
         /**
          * Request Data Parsing

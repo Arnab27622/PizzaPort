@@ -33,7 +33,7 @@ interface MenuItemDB {
  * @returns {Promise<Collection<MenuItemDB>>} MongoDB collection instance
  */
 async function getCollection() {
-    const client = await clientPromise.connect();
+    const client = await clientPromise;
     return client.db().collection<MenuItemDB>('menuitems');
 }
 
