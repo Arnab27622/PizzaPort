@@ -451,12 +451,10 @@ export default function AdminOrdersPage() {
                                                 <button
                                                     onClick={(e) => cancelOrder(order._id, e)}
                                                     disabled={isCanceling}
-                                                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed h-3 w-3 flex items-center justify-center"
                                                 >
                                                     {isCanceling ? (
-                                                        <div className="h-4 w-4 flex items-center justify-center">
-                                                            <LoadingSpinner />
-                                                        </div>
+                                                        <LoadingSpinner />
                                                     ) : 'Cancel'}
                                                 </button>
                                             )}
@@ -544,12 +542,10 @@ export default function AdminOrdersPage() {
                                                 <button
                                                     onClick={(e) => cancelOrder(order._id, e)}
                                                     disabled={isCanceling}
-                                                    className="w-full bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    className="w-full bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed h-10 flex items-center justify-center"
                                                 >
                                                     {isCanceling ? (
-                                                        <div className="h-4 w-4 flex items-center justify-center mx-auto">
-                                                            <LoadingSpinner />
-                                                        </div>
+                                                        <LoadingSpinner />
                                                     ) : 'Cancel Order'}
                                                 </button>
                                             )}

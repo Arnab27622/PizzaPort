@@ -176,6 +176,34 @@ export default function UserOrderPage() {
     );
 
     /**
+     * Group identical items by their configuration
+     * Creates a map of unique item configurations to their combined quantities
+     */
+    const groupedCartItems = useMemo(() => {
+        if (!order) return [];
+        
+        const grouped = order.cart.reduce((acc, item) => {
+            const extrasString = (item.extras ?? []).map(e => e.name).sort().join('|');
+            const key = `${item._id}|${item.name}|${item.size?.name || ''}|${extrasString}`;
+            
+            const existing = acc.find(g => g.key === key);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                acc.push({
+                    key,
+                    item,
+                    quantity: 1
+                });
+            }
+            
+            return acc;
+        }, [] as Array<{ key: string; item: OrderItem; quantity: number }>);
+        
+        return grouped;
+    }, [order]);
+
+    /**
      * Order Data Fetcher with Retry Logic
      * 
      * Retrieves specific order details with comprehensive error handling and retry mechanism
@@ -460,16 +488,16 @@ export default function UserOrderPage() {
                 <div className="mb-6 sm:mb-8">
                     <h2 className="text-xl sm:text-2xl font-bold mb-3 text-primary">Your Items</h2>
                     <div className="space-y-3">
-                        {order.cart.map((item, idx) => (
+                        {groupedCartItems.map((group) => (
                             <div
-                                key={`${item._id}-${idx}`}
+                                key={group.key}
                                 className="bg-[#2c1a0d] border border-amber-800 rounded-lg p-3 flex flex-col sm:flex-row justify-between gap-3"
                             >
                                 <div className="flex gap-3">
-                                    <div className="w-12 h-12 sm:w-16 sm:h-16 relative flex-shrink-0">
+                                    <div className="w-12 h-12 sm:w-16 sm:h-16 relative shrink-0">
                                         <Image
-                                            src={item.imageUrl || "/hero-pizza.png"}
-                                            alt={item.name}
+                                            src={group.item.imageUrl || "/hero-pizza.png"}
+                                            alt={group.item.name}
                                             fill
                                             className="object-cover rounded"
                                             sizes="(max-width: 768px) 100px, 150px"
@@ -477,24 +505,25 @@ export default function UserOrderPage() {
                                     </div>
                                     <div className="space-y-1">
                                         <h3 className="font-semibold text-sm sm:text-base">
-                                            {item.name}
+                                            {group.item.name}
+                                            {group.quantity > 1 && <span className="text-amber-300 ml-2">x{group.quantity}</span>}
                                         </h3>
-                                        {item.size && (
+                                        {group.item.size && (
                                             <p className="text-[0.65rem] sm:text-sm text-amber-200">
-                                                <strong>Size:</strong> {item.size.name}
+                                                <strong>Size:</strong> {group.item.size.name}
                                             </p>
                                         )}
-                                        {(item.extras?.length ?? 0) > 0 && (
+                                        {(group.item.extras?.length ?? 0) > 0 && (
                                             <p className="text-[0.65rem] sm:text-sm text-amber-200">
                                                 <strong>Toppings:</strong>{" "}
-                                                {item.extras?.map((e) => e.name).join(", ")}
+                                                {group.item.extras?.map((e) => e.name).join(", ")}
                                             </p>
                                         )}
                                     </div>
                                 </div>
                                 <div className="flex flex-col justify-between items-end mt-2 sm:mt-0">
                                     <p className="text-sm sm:text-base text-amber-300 font-semibold">
-                                        ₹{getItemTotal(item)}
+                                        ₹{getItemTotal(group.item) * group.quantity}
                                     </p>
                                 </div>
                             </div>

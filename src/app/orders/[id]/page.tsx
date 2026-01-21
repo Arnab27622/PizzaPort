@@ -212,6 +212,30 @@ export default async function OrderDetailPage({
     });
 
     /**
+     * Group identical items by their configuration
+     * Creates a map of unique item configurations to their combined quantities
+     */
+    const groupedItems = order.cart.reduce((acc, item, idx) => {
+        const extrasString = (item.extras ?? []).map(e => e.name).sort().join('|');
+        const key = `${item.name}|${item.size?.name || ''}|${extrasString}`;
+        
+        if (!acc[key]) {
+            acc[key] = {
+                item,
+                indices: [],
+                quantity: 0,
+                total: itemTotals[idx]
+            };
+        }
+        acc[key].indices.push(idx);
+        acc[key].quantity += item.quantity || 1;
+        
+        return acc;
+    }, {} as Record<string, { item: OrderItem; indices: number[]; quantity: number; total: number }>);
+
+    const groupedItemsArray = Object.values(groupedItems);
+
+    /**
      * Main Component Render
      */
     return (
@@ -241,26 +265,29 @@ export default async function OrderDetailPage({
                 {/* Order Items Section */}
                 <div className="space-y-4 mb-8">
                     <h2 className="text-xl font-semibold mb-4">Order Items</h2>
-                    {order.cart.map((item, idx) => (
+                    {groupedItemsArray.map((group, idx) => (
                         <div
-                            key={`${item.name}-${idx}-${item.size?.name || 'no-size'}`}
+                            key={`${group.item.name}-${idx}-${group.item.size?.name || 'no-size'}`}
                             className="bg-[#2c1a0d] p-4 rounded-lg flex flex-col sm:flex-row justify-between gap-4"
                         >
                             {/* Item Details */}
                             <div className="flex-1">
-                                <p className="font-semibold text-lg">{item.name}</p>
+                                <p className="font-semibold text-lg">
+                                    {group.item.name}
+                                    {group.quantity > 1 && <span className="text-amber-300 ml-2">x{group.quantity}</span>}
+                                </p>
                                 {/* Size Information */}
-                                {item.size && (
+                                {group.item.size && (
                                     <p className="text-amber-300">
-                                        Size: {item.size.name}
+                                        Size: {group.item.size.name}
                                     </p>
                                 )}
                                 {/* Extras/Toppings List */}
-                                {(item.extras?.length ?? 0) > 0 && (
+                                {(group.item.extras?.length ?? 0) > 0 && (
                                     <div className="mt-2">
                                         <p className="font-semibold text-amber-300">Toppings:</p>
                                         <ul className="list-disc list-inside ml-2 text-amber-200">
-                                            {item.extras!.map((extra, extraIdx) => (
+                                            {group.item.extras!.map((extra, extraIdx) => (
                                                 <li key={`${extra.name}-${extraIdx}`}>
                                                     {extra.name} ({formatCurrency(extra.extraPrice)})
                                                 </li>
@@ -268,16 +295,10 @@ export default async function OrderDetailPage({
                                         </ul>
                                     </div>
                                 )}
-                                {/* Quantity Display */}
-                                {item.quantity && item.quantity > 1 && (
-                                    <p className="text-amber-300 mt-2">
-                                        Quantity: {item.quantity}
-                                    </p>
-                                )}
                             </div>
                             {/* Item Total */}
                             <div className="font-semibold text-lg">
-                                {formatCurrency(itemTotals[idx] * (item.quantity || 1))}
+                                {formatCurrency(group.total * group.quantity)}
                             </div>
                         </div>
                     ))}

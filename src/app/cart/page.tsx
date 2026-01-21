@@ -191,6 +191,34 @@ export default function CartPage() {
     }, []);
 
     /**
+     * Group identical cart items by their configuration
+     * Creates a map of unique item configurations to their combined quantities and indices
+     */
+    const groupedCartItems = useMemo(() => {
+        const grouped = cartProducts.reduce((acc, item, index) => {
+            const extrasString = (item.extras ?? []).map(e => e.name).sort().join('|');
+            const key = `${item._id}|${item.name}|${item.size?.name || ''}|${extrasString}`;
+            
+            const existing = acc.find(g => g.key === key);
+            if (existing) {
+                existing.quantity += 1;
+                existing.indices.push(index);
+            } else {
+                acc.push({
+                    key,
+                    item,
+                    quantity: 1,
+                    indices: [index]
+                });
+            }
+            
+            return acc;
+        }, [] as Array<{ key: string; item: typeof cartProducts[0]; quantity: number; indices: number[] }>);
+        
+        return grouped;
+    }, [cartProducts]);
+
+    /**
      * Geolocation Address Fetcher
      * 
      * Uses browser geolocation API and OpenStreetMap to get user's address
@@ -431,37 +459,40 @@ export default function CartPage() {
                     <p className="text-gray-400">Your cart is empty.</p>
                 ) : (
                     <ul className="space-y-6">
-                        {cartProducts.map((item, index) => (
+                        {groupedCartItems.map((group) => (
                             <li
-                                key={`${item._id}-${JSON.stringify(item.extras)}-${item.size?.name || "no-size"}-${index}`}
+                                key={group.key}
                                 className="bg-[#2c1a0d] border border-amber-800 rounded-lg p-4 flex flex-col sm:flex-row justify-between gap-4"
                             >
                                 {/* Item Details */}
                                 <div className="flex gap-4">
-                                    <div className="w-24 h-24 relative flex-shrink-0">
+                                    <div className="w-24 h-24 relative shrink-0">
                                         <Image
-                                            src={item.imageUrl || "/hero-pizza.png"}
-                                            alt={item.name}
+                                            src={group.item.imageUrl || "/hero-pizza.png"}
+                                            alt={group.item.name}
                                             fill
                                             className="object-cover rounded"
                                             sizes="96px"
                                         />
                                     </div>
                                     <div className="space-y-1">
-                                        <h3 className="text-lg font-semibold">{item.name}</h3>
+                                        <h3 className="text-lg font-semibold">
+                                            {group.item.name}
+                                            {group.quantity > 1 && <span className="text-amber-300 ml-2">x{group.quantity}</span>}
+                                        </h3>
 
                                         {/* Size Information */}
-                                        {item.size?.name && (
+                                        {group.item.size?.name && (
                                             <p className="text-sm text-amber-200">
-                                                <strong>Size:</strong> {item.size.name}
+                                                <strong>Size:</strong> {group.item.size.name}
                                             </p>
                                         )}
 
                                         {/* Extra Ingredients */}
-                                        {(item.extras?.length ?? 0) > 0 && (
+                                        {(group.item.extras?.length ?? 0) > 0 && (
                                             <p className="text-sm text-amber-200">
                                                 <strong>Toppings:</strong>{" "}
-                                                {item.extras?.map((e) => e.name).join(", ")}
+                                                {group.item.extras?.map((e) => e.name).join(", ")}
                                             </p>
                                         )}
                                     </div>
@@ -470,13 +501,13 @@ export default function CartPage() {
                                 {/* Price and Actions */}
                                 <div className="flex flex-col justify-between items-end">
                                     <p className="text-sm text-amber-300 font-semibold">
-                                        ₹{getItemTotal(item)}
+                                        ₹{getItemTotal(group.item) * group.quantity}
                                     </p>
                                     <button
-                                        onClick={() => removeCartProduct(index)}
+                                        onClick={() => removeCartProduct(group.indices[0])}
                                         className="text-red-400 hover:text-red-600 cursor-pointer transition-colors"
-                                        title="Remove item"
-                                        aria-label={`Remove ${item.name} from cart`}
+                                        title={group.quantity > 1 ? "Remove one item" : "Remove item"}
+                                        aria-label={`Remove ${group.item.name} from cart`}
                                     >
                                         <TrashIcon />
                                     </button>
