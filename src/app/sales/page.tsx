@@ -216,7 +216,7 @@ export default function SalesPage() {
     if (error) {
         return (
             <div className="p-6 mt-20 text-card">
-                <h1 className="text-3xl font-bold heading-border mb-6">Sales Analytics</h1>
+                <h1 className="text-3xl font-bold heading-border underline mb-6">Sales Analytics</h1>
                 <div className="bg-red-900/30 border border-red-800 rounded-lg p-6 text-center">
                     <h2 className="text-xl text-red-300 mb-2">Failed to Load Sales Data</h2>
                     <p className="text-amber-200 mb-4">{error.message || 'Please try again later'}</p>
@@ -240,7 +240,7 @@ export default function SalesPage() {
     if (!report) {
         return (
             <div className="p-6 mt-20 text-card">
-                <h1 className="text-3xl font-bold heading-border mb-6">Sales Analytics</h1>
+                <h1 className="text-3xl font-bold heading-border underline mb-6">Sales Analytics</h1>
                 <div className="text-center py-12 text-amber-300">
                     No sales data available for the selected period.
                 </div>
@@ -261,7 +261,7 @@ export default function SalesPage() {
         <div className="p-6 mt-20 text-card">
             {/* Dashboard Header with Filter Controls */}
             <header className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-                <h1 className="text-3xl font-bold heading-border">Sales Analytics</h1>
+                <h1 className="text-3xl font-bold heading-border underline">Sales Analytics</h1>
                 <div className="flex flex-wrap gap-2">
                     {FILTERS.map(f => (
                         <button

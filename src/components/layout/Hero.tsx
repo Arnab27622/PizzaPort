@@ -47,7 +47,7 @@ function Hero() {
                     {/* Secondary CTA - View Menu */}
                     <Link
                         href="/menu"
-                        className="flex items-center gap-1 bg-transparent border-2 border-white text-white px-6 py-2 md:px-[30px] md:py-2
+                        className="flex items-center gap-1 bg-transparent border-2 border-white text-white px-6 py-2 md:px-7.5 md:py-2
                         rounded-full font-semibold hover:bg-white hover:text-black transition-all cursor-pointer hover:scale-105
                         text-sm md:text-base"
                         aria-label="View our menu"
@@ -61,7 +61,7 @@ function Hero() {
             {/* Hero Image Section */}
             <div className="relative flex justify-center w-full max-w-md lg:max-w-none">
                 {/* Responsive image container */}
-                <div className="w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[380px] lg:h-[380px] xl:w-[420px] xl:h-[420px]">
+                <div className="w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-95 lg:h-95 xl:w-105 xl:h-105">
                     <Image
                         src={"/hero-pizza.png"}
                         alt={"Delicious pizza from PizzaPort"}

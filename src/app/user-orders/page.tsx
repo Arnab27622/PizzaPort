@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import LoadingSpinner from "@/components/icons/LoadingSpinner";
+import BackButton from "@/components/layout/BackButton";
 
 /**
  * Order Item Interface
@@ -289,7 +290,7 @@ export default function OrdersPage() {
     if (error) {
         return (
             <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100">
-                <h1 className="text-3xl font-bold mb-8 text-primary heading-border">Your Orders</h1>
+                <h1 className="text-3xl font-bold heading-border underline mb-6">Your Orders</h1>
                 <div className="text-center py-12">
                     <p className="text-xl mb-4 text-red-400">{error}</p>
                     <button
@@ -314,8 +315,13 @@ export default function OrdersPage() {
      */
     return (
         <div className="max-w-7xl min-h-[83vh] mx-auto mt-10 px-4 py-12 text-amber-100">
+            {/* Back Button - Responsive positioning */}
+            <div className="mb-6">
+                <BackButton label="Back to Menu" />
+            </div>
+            
             {/* Page Header */}
-            <h1 className="text-3xl font-bold mb-8 text-primary heading-border">Your Orders</h1>
+            <h1 className="text-3xl font-bold heading-border underline mb-6">Your Orders</h1>
 
             {/* Empty State - No Orders */}
             {sortedOrders.length === 0 ? (

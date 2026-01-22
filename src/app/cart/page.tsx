@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { CartContext } from "@/components/AppContext";
 import TrashIcon from "@/components/icons/TrashIcon";
 import LocationIcon from "@/components/icons/LocationIcon";
+import BackButton from "@/components/layout/BackButton";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import LoadingSpinner from "@/components/icons/LoadingSpinner";
@@ -447,11 +448,14 @@ export default function CartPage() {
      */
     return (
         <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100 grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Back Button - Responsive positioning */}
+            <div className="col-span-1 lg:col-span-2 mb-6">
+                <BackButton label="Back to Menu" />
+            </div>
+            
             {/* Cart Items Section */}
             <div>
-                <h2 className="text-2xl font-bold mb-6 text-primary heading-border">
-                    Your Items
-                </h2>
+                <h1 className="text-2xl font-bold heading-border underline mb-6 text-card">Your Items</h1>
                 {cartProducts.length === 0 ? (
                     <p className="text-gray-400">Your cart is empty.</p>
                 ) : (

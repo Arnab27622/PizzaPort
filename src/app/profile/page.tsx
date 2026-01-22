@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '@/components/icons/LoadingSpinner';
 import LocationIcon from '@/components/icons/LocationIcon';
+import BackButton from '@/components/layout/BackButton';
 
 /**
  * Extended User Type Definition
@@ -324,6 +325,11 @@ function ProfilePage() {
      */
     return (
         <section className="max-w-xl mx-auto mt-20 mb-8 p-6 md:bg-[#1a1108]/60 md:rounded-2xl md:shadow-lg bg-transparent">
+            {/* Back Button */}
+            <div className="mb-6">
+                <BackButton label="Back" />
+            </div>
+            
             {/* Page Header */}
             <h1 className="text-3xl font-semibold text-primary mb-6 heading-border">Your Profile</h1>
 

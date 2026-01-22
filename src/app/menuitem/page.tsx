@@ -5,6 +5,7 @@ import useSWR from "swr";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import LoadingSpinner from "@/components/icons/LoadingSpinner";
+import BackButton from "@/components/layout/BackButton";
 import { useIsAdmin } from "../hook/useAdmin";
 import { confirm } from "@/components/layout/ConfirmDelete";
 import { toast } from "react-toastify";
@@ -613,12 +614,15 @@ export default function MenuPage() {
       {/* Page Header */}
       <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <h1 className="text-3xl font-bold heading-border">Manage Menu Items</h1>
-        <button
-          onClick={() => openModal()}
-          className="bg-[#FF5500] text-white px-5 py-2 rounded hover:bg-[#e14a00] transition cursor-pointer"
-        >
-          + New Item
-        </button>
+        <div className="flex flex-row justify-between items-center w-full sm:w-auto gap-4">
+          <BackButton label="Back" />
+          <button
+            onClick={() => openModal()}
+            className="bg-[#FF5500] text-white px-5 py-2 rounded hover:bg-[#e14a00] transition cursor-pointer"
+          >
+            + New Item
+          </button>
+        </div>
       </header>
 
       {/* Menu Items Grid */}

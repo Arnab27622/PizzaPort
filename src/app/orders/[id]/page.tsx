@@ -1,5 +1,6 @@
 import React from "react";
 import SectionHeader from "@/components/layout/SectionHeader";
+import BackButton from "@/components/layout/BackButton";
 import { headers } from "next/headers";
 
 /**
@@ -240,6 +241,11 @@ export default async function OrderDetailPage({
      */
     return (
         <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100">
+            {/* Back Button */}
+            <div className="mb-6">
+                <BackButton label="Back to Orders" />
+            </div>
+            
             {/* Page Header with Order Reference */}
             <SectionHeader
                 subHeader=""

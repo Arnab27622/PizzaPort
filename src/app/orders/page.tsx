@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useIsAdmin } from "../hook/useAdmin";
 import SectionHeader from "@/components/layout/SectionHeader";
+import BackButton from "@/components/layout/BackButton";
 import LoadingSpinner from "@/components/icons/LoadingSpinner";
 
 /**
@@ -359,7 +360,10 @@ export default function AdminOrdersPage() {
      */
     return (
         <div className="max-w-7xl min-h-[90vh] mx-auto mt-10 px-4 py-12 text-amber-100">
-            <SectionHeader subHeader="" mainHeader="Manage Orders" />
+            <div className="flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+                <h1 className="text-3xl font-bold heading-border underline">Manage Orders</h1>
+                <BackButton label="Back" />
+            </div>
 
             {/* Order Summary and Controls */}
             <div className="mb-4 flex justify-between items-center">
@@ -449,12 +453,10 @@ export default function AdminOrdersPage() {
                                                 <button
                                                     onClick={(e) => cancelOrder(order._id, e)}
                                                     disabled={isCanceling}
-                                                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center min-w-17.5 h-8.5"
+                                                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center h-8"
                                                 >
                                                     {isCanceling ? (
-                                                        <div className="h-4 w-4">
-                                                            <LoadingSpinner size="sm" color="text-white" />
-                                                        </div>
+                                                        <LoadingSpinner size="sm" color="text-white" />
                                                     ) : 'Cancel'}
                                                 </button>
                                             )}
@@ -545,9 +547,7 @@ export default function AdminOrdersPage() {
                                                     className="w-full bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center h-10"
                                                 >
                                                     {isCanceling ? (
-                                                        <div className="h-4 w-4">
-                                                            <LoadingSpinner size="sm" color="text-white" />
-                                                        </div>
+                                                        <LoadingSpinner size="sm" color="text-white" />
                                                     ) : 'Cancel Order'}
                                                 </button>
                                             )}

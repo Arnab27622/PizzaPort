@@ -301,7 +301,7 @@ function UsersPage() {
     return (
         <div className="min-h-[80vh] p-6 mt-16 text-card">
             {/* Page Header */}
-            <h1 className="text-3xl font-bold text-primary mb-4 heading-border">All Users</h1>
+            <h1 className="text-3xl font-bold heading-border underline mb-5">All Users</h1>
 
             {/* Search, Filter, and Sort Controls */}
             <div className="flex flex-col sm:flex-row gap-4 mb-4 items-start sm:items-center">

@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '@/components/icons/LoadingSpinner';
+import BackButton from '@/components/layout/BackButton';
 import { CartContext } from '@/components/AppContext';
 
 /**
@@ -425,6 +426,11 @@ export default function UserOrderPage() {
      */
     return (
         <div className="w-full mx-auto mt-15 px-4 sm:px-6 lg:px-8 py-8 text-amber-100">
+            {/* Back Button */}
+            <div className="mb-6">
+                <BackButton label="Back to My Orders" />
+            </div>
+            
             <div className="bg-[#1a1108] border border-amber-900 p-4 sm:p-6 rounded-lg shadow-lg">
                 {/* Order Header Section */}
                 <div className="flex flex-col md:flex-row justify-between items-center md:items-start mb-6 sm:mb-8">
