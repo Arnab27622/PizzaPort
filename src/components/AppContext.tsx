@@ -8,6 +8,8 @@ import React, {
     Dispatch,
     SetStateAction,
     useEffect,
+    useMemo,
+    useCallback,
 } from "react";
 
 /**
@@ -157,14 +159,14 @@ export default function AppContext({ children }: AppContextProps) {
      * - Appends the item to the current cart products array
      * - Automatically triggers localStorage sync via useEffect
      */
-    const addToCart = (
+    const addToCart = useCallback((
         product: CartProduct,
         size: CartProduct["size"] = null,
         extras: CartProduct["extras"] = []
     ) => {
         const cartItem: CartProduct = { ...product, size, extras };
         setCartProducts((prev) => [...prev, cartItem]);
-    };
+    }, []);
 
     /**
      * Removes all products from the shopping cart
@@ -176,10 +178,10 @@ export default function AppContext({ children }: AppContextProps) {
      * - Removes cart data from localStorage
      * - Typically used after successful order placement
      */
-    const clearCart = () => {
+    const clearCart = useCallback(() => {
         setCartProducts([]);
         localStorage.removeItem("cartProducts");
-    };
+    }, []);
 
     /**
      * Removes a specific product from the cart by index
@@ -192,21 +194,32 @@ export default function AppContext({ children }: AppContextProps) {
      * - Maintains the order of remaining products
      * - Automatically triggers localStorage sync via useEffect
      */
-    const removeCartProduct = (index: number) => {
+    const removeCartProduct = useCallback((index: number) => {
         setCartProducts((prev) => prev.filter((_, i) => i !== index));
-    };
+    }, []);
+
+    /**
+     * Memoized context value to prevent unnecessary re-renders
+     * @memo
+     * 
+     * @description
+     * - Prevents the entire application from re-rendering when context values are stable
+     * - Only recreates the value object when dependencies (functions or cart state) change
+     * - Improves performance by avoiding shallow equality checks on object recreation
+     */
+    const contextValue = useMemo(() => ({
+        cartProducts,
+        setCartProducts,
+        addToCart,
+        clearCart,
+        removeCartProduct
+    }), [cartProducts, addToCart, clearCart, removeCartProduct]);
 
     return (
         // NextAuth session provider for authentication state management
         <SessionProvider>
             {/* Cart context provider for global cart state management */}
-            <CartContext.Provider value={{
-                cartProducts,
-                setCartProducts,
-                addToCart,
-                clearCart,
-                removeCartProduct
-            }}>
+            <CartContext.Provider value={contextValue}>
                 {children}
             </CartContext.Provider>
         </SessionProvider>

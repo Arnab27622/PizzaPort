@@ -205,6 +205,8 @@ import { authOptions } from "./authOptions";
  * - Token refresh
  */
 
+export const dynamic = 'force-dynamic';
+
 // Create NextAuth handler with custom configuration
 const handler = NextAuth(authOptions);
 

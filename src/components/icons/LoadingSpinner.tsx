@@ -2,14 +2,51 @@
 
 import React from 'react'
 
-function LoadingSpinner() {
+interface LoadingSpinnerProps {
+    size?: 'sm' | 'md' | 'lg' | 'xl';
+    color?: string;
+    className?: string;
+}
+
+function LoadingSpinner({ size = 'md', color = 'text-primary', className = '' }: LoadingSpinnerProps) {
+    const sizeMap = {
+        sm: 'w-6 h-6',
+        md: 'w-12 h-12',
+        lg: 'w-16 h-16',
+        xl: 'w-40 h-40'
+    };
+
     return (
-        <svg className="animate-spin my-40 h-40 w-40 text-primary" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-            <path className="opacity-75" fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0
-             014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-        </svg>
+        <div className={`inline-flex items-center justify-center ${className}`}>
+            <svg 
+                className={`animate-spin ${sizeMap[size]} ${color}`}
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <style>{`
+                    .spinner_V8m1{
+                        transform-origin: center;
+                        animation: spinner_zKoa 2s linear infinite;
+                    }
+                    .spinner_V8m1 circle{
+                        stroke-linecap: round;
+                        animation: spinner_YpZS 1.5s ease-in-out infinite;
+                    }
+                    @keyframes spinner_zKoa{
+                        100%{transform:rotate(360deg)}
+                    }
+                    @keyframes spinner_YpZS{
+                        0%{stroke-dasharray:0 150;stroke-dashoffset:0}
+                        47.5%{stroke-dasharray:42 150;stroke-dashoffset:-16}
+                        95%,100%{stroke-dasharray:42 150;stroke-dashoffset:-59}
+                    }
+                `}</style>
+                <g className="spinner_V8m1">
+                    <circle cx="12" cy="12" r="9.5" fill="none" strokeWidth="3"></circle>
+                </g>
+            </svg>
+        </div>
     )
 }
 

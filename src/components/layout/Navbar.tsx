@@ -198,7 +198,7 @@ export default function Navbar() {
                             {/* Logout Button */}
                             <button
                                 onClick={() => signOut()}
-                                className="px-5 py-2 rounded-2xl border border-red-500 text-red-300 hover:bg-red-500/10 transition-colors"
+                                className="px-5 py-2 rounded-2xl border border-red-500 text-red-300 hover:bg-red-500/10 transition-colors cursor-pointer"
                                 aria-label="Sign out of account"
                             >
                                 Logout
@@ -227,14 +227,14 @@ export default function Navbar() {
 
                 {/* Mobile Menu Toggle Button (Hamburger) */}
                 <button
-                    className="md:hidden flex flex-col items-center justify-center w-10 h-10"
+                    className="md:hidden flex flex-col items-center justify-center w-10 h-10 cursor-pointer"
                     onClick={() => setIsOpen(!isOpen)}
                     aria-label={isOpen ? "Close menu" : "Open menu"}
                     aria-expanded={isOpen}
                 >
                     {/* Animated Hamburger Icon */}
                     <span
-                        className={`bg-white block h-[0.5px] w-6 rounded transition-transform duration-300 ease-out ${isOpen ? "rotate-45 translate-y-[5px]" : "translate-y-0"
+                        className={`bg-white block h-[0.5px] w-6 rounded transition-transform duration-300 ease-out ${isOpen ? "rotate-45 translate-y-1.25" : "translate-y-0"
                             }`}
                     />
                     <span
@@ -242,7 +242,7 @@ export default function Navbar() {
                             }`}
                     />
                     <span
-                        className={`bg-white block h-[0.5px] w-6 rounded transition-transform duration-300 ease-out ${isOpen ? "-rotate-45 -translate-y-[5px]" : "translate-y-0"
+                        className={`bg-white block h-[0.5px] w-6 rounded transition-transform duration-300 ease-out ${isOpen ? "-rotate-45 -translate-y-1.25" : "translate-y-0"
                             }`}
                     />
                 </button>

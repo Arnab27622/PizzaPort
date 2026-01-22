@@ -345,8 +345,8 @@ function ProfilePage() {
                             />
                             {/* Loading Overlay for Image Upload */}
                             {(saving || uploadingImage) && (
-                                <div className="absolute inset-0 bg-black bg-opacity-50 h-4 w-4 flex items-center justify-center">
-                                    <LoadingSpinner />
+                                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                                    <LoadingSpinner size="sm" color="text-white" />
                                 </div>
                             )}
                         </div>
@@ -429,7 +429,7 @@ function ProfilePage() {
                                 aria-label="Use current location"
                             >
                                 {isFetchingLocation ? (
-                                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-amber-400 mr-1"></div>
+                                    <LoadingSpinner size="sm" color="text-amber-400" className="mr-1" />
                                 ) : (
                                     <LocationIcon />
                                 )}
@@ -461,7 +461,7 @@ function ProfilePage() {
                 <button
                     type="submit"
                     disabled={isFormDisabled}
-                    className={`w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-xl font-semibold transition-colors ${isFormDisabled ? inputDisabledClass : 'cursor-pointer'}`}
+                    className={`w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-xl font-semibold transition-colors cursor-pointer ${isFormDisabled ? inputDisabledClass : ''}`}
                     aria-disabled={isFormDisabled}
                 >
                     {saving ? 'Saving...' : 'Save Changes'}

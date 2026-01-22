@@ -365,11 +365,10 @@ export default function UserOrderPage() {
      */
     if (authStatus === 'loading' || loadingOrder) {
         return (
-            <div className="max-w-7xl mx-auto mt-20 px-4 text-amber-100">
-                <h1 className="text-3xl font-bold text-primary heading-border">Your Order</h1>
-                <div className="flex justify-center items-center flex-col">
-                    <LoadingSpinner />
-                </div>
+            <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100 min-h-[80vh] flex flex-col items-center justify-center">
+                <h1 className="text-3xl font-bold mb-8 text-primary heading-border">Order Details</h1>
+                <LoadingSpinner size="lg" color="text-primary" className="mb-4" />
+                <p className="text-amber-300">Loading order details...</p>
             </div>
         );
     }

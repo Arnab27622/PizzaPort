@@ -134,7 +134,7 @@ function MenuItemCard({
     return (
         <>
             {/* Main Menu Item Card */}
-            <div className="bg-gradient-to-br from-[#2c1a0d] to-[#1a1108] border border-amber-900 rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+            <div className="bg-linear-to-br from-[#2c1a0d] to-[#1a1108] border border-amber-900 rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
                 {/* Image Section with Overlay */}
                 <div
                     className="relative h-56 overflow-hidden cursor-pointer"
@@ -144,7 +144,7 @@ function MenuItemCard({
                     tabIndex={0}
                 >
                     {/* Gradient overlay for better text readability */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#1a1108] to-transparent z-10"></div>
+                    <div className="absolute inset-0 bg-linear-to-t from-[#1a1108] to-transparent z-10"></div>
 
                     {/* Price Badge */}
                     <div className="absolute top-4 right-4 bg-amber-600 text-white text-sm font-bold px-3 py-1 rounded-full z-10">
@@ -172,7 +172,7 @@ function MenuItemCard({
 
                     {/* Add to Cart Button */}
                     <button
-                        className="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold py-3 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02]"
+                        className="w-full bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold py-3 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02]"
                         onClick={handleAdd}
                         aria-label={`Add ${item.name} to cart`}
                     >
@@ -272,7 +272,7 @@ function MenuItemCard({
                             <button
                                 type="button"
                                 onClick={() => setShowModal(false)}
-                                className="px-4 py-2 rounded border border-[#CFB54F] hover:bg-[#CFB54F]/10 text-amber-100"
+                                className="px-4 py-2 rounded border border-[#CFB54F] hover:bg-[#CFB54F]/10 text-amber-100 cursor-pointer"
                                 aria-label="Cancel customization"
                             >
                                 Cancel
@@ -283,7 +283,7 @@ function MenuItemCard({
                                 disabled={
                                     item.sizeOptions?.length ? selectedSize === null : false
                                 }
-                                className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark disabled:opacity-50 flex gap-2 items-center"
+                                className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark disabled:opacity-50 flex gap-2 items-center cursor-pointer"
                                 aria-label={`Add customized ${item.name} to cart`}
                             >
                                 <Cart />Add to Cart

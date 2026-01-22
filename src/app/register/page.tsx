@@ -282,7 +282,7 @@ function RegisterPage() {
 
                     {/* Registration Form Column */}
                     <div className="w-full lg:w-3/5">
-                        <div className="bg-gradient-to-br from-[#2c1a0d]/80 to-[#1a1108]/80 backdrop-blur-sm border border-amber-900/30 rounded-2xl p-8">
+                        <div className="bg-linear-to-br from-[#2c1a0d]/80 to-[#1a1108]/80 backdrop-blur-sm border border-amber-900/30 rounded-2xl p-8">
                             <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
                                 {/* Full Name Field */}
                                 <div>
@@ -341,7 +341,7 @@ function RegisterPage() {
                                     <button
                                         type="button"
                                         onClick={() => setShowPwd((s) => !s)}
-                                        className="absolute right-4 top-11 text-amber-400"
+                                        className="absolute right-4 top-11 text-amber-400 cursor-pointer"
                                         disabled={isSubmitting}
                                         aria-label={showPwd ? "Hide password" : "Show password"}
                                         aria-pressed={showPwd}
@@ -390,7 +390,7 @@ function RegisterPage() {
                                     <button
                                         type="button"
                                         onClick={() => setShowConfirm((s) => !s)}
-                                        className="absolute right-4 top-11 text-amber-400"
+                                        className="absolute right-4 top-11 text-amber-400 cursor-pointer"
                                         disabled={isSubmitting}
                                         aria-label={showConfirm ? "Hide password confirmation" : "Show password confirmation"}
                                         aria-pressed={showConfirm}

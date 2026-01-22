@@ -482,8 +482,8 @@ export default function MenuPage() {
     // Loading state
     if (swrLoading) {
       return (
-        <div className="flex justify-center items-center">
-          <LoadingSpinner />
+        <div className="flex flex-col items-center justify-center min-h-[60vh]">
+          <LoadingSpinner size="lg" color="text-primary" />
         </div>
       );
     }
@@ -585,8 +585,8 @@ export default function MenuPage() {
         <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-card p-6 lg:py-6 lg:px-15 mt-16">
           <h1 className="text-3xl font-bold heading-border">Manage Menu Items</h1>
         </header>
-        <div className="max-w-xl mx-auto flex items-center justify-center">
-          <LoadingSpinner />
+        <div className="max-w-xl mx-auto flex flex-col items-center justify-center min-h-[70vh]">
+          <LoadingSpinner size="lg" color="text-primary" className="mb-4" />
         </div>
       </>
     )

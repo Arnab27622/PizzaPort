@@ -245,6 +245,26 @@ export default function OrdersPage() {
     }, [orders]);
 
     /**
+     * Group identical items in an order by name
+     * Combines quantities of the same item name
+     * 
+     * @function groupOrderItems
+     * @param {OrderItem[]} cartItems - Items to group
+     * @returns {Array<{ name: string; quantity: number }>} Grouped items with quantities
+     */
+    const groupOrderItems = useCallback((cartItems: Order["cart"]) => {
+        return cartItems.reduce((acc, item) => {
+            const existing = acc.find(g => g.name === item.name);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                acc.push({ name: item.name, quantity: 1 });
+            }
+            return acc;
+        }, [] as Array<{ name: string; quantity: number }>);
+    }, []);
+
+    /**
      * Loading State
      * 
      * Displays loading spinner during authentication and data fetching
@@ -252,12 +272,10 @@ export default function OrdersPage() {
      */
     if (loading) {
         return (
-            <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100">
+            <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100 min-h-[80vh] flex flex-col items-center justify-center">
                 <h1 className="text-3xl font-bold mb-8 text-primary heading-border">Your Orders</h1>
-                <div className="flex flex-col items-center justify-center py-12">
-                    <LoadingSpinner />
-                    <p className="mt-4 text-amber-300">Loading your orders...</p>
-                </div>
+                <LoadingSpinner size="lg" color="text-primary" className="mb-4" />
+                <p className="text-amber-300">Loading your orders...</p>
             </div>
         );
     }
@@ -341,7 +359,7 @@ export default function OrdersPage() {
                                     <div className="flex items-center gap-4">
                                         {/* Primary Product Image */}
                                         {order.cart[0]?.imageUrl && (
-                                            <div className="w-16 h-16 relative flex-shrink-0">
+                                            <div className="w-16 h-16 relative shrink-0">
                                                 <Image
                                                     src={order.cart[0].imageUrl}
                                                     alt={order.cart[0].name}
@@ -371,17 +389,17 @@ export default function OrdersPage() {
                                     </div>
                                 </div>
 
-                                {/* Order Items Preview */}
+                                {/* Order Items Preview - Grouped by identical items */}
                                 <div className="mt-4 flex flex-wrap items-center gap-2">
-                                    {order.cart.slice(0, 3).map((item, idx) => (
+                                    {groupOrderItems(order.cart).slice(0, 3).map((item, idx) => (
                                         <span key={idx} className="text-sm bg-amber-900 px-2 py-1 rounded">
-                                            {item.name}
+                                            {item.name}{item.quantity > 1 && <span className="text-amber-300 ml-1">x{item.quantity}</span>}
                                         </span>
                                     ))}
                                     {/* Overflow Indicator */}
-                                    {order.cart.length > 3 && (
+                                    {groupOrderItems(order.cart).length > 3 && (
                                         <span className="text-sm bg-amber-900 px-2 py-1 rounded">
-                                            +{order.cart.length - 3} more
+                                            +{groupOrderItems(order.cart).length - 3} more
                                         </span>
                                     )}
                                 </div>

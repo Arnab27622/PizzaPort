@@ -122,8 +122,9 @@ function HomeMenu() {
             <section className='px-4'>
                 <div className='relative max-w-6xl mx-auto'>
                     <SectionHeader subHeader="Check out" mainHeader="Our Best Sellers" />
-                    <div className="max-w-xl mx-auto flex items-center justify-center h-30 w-30">
-                        <LoadingSpinner />
+                    <div className="max-w-xl mx-auto flex flex-col items-center justify-center h-96">
+                        <LoadingSpinner size="lg" color="text-primary" className="mb-4" />
+                        <p className="text-amber-300">Loading featured items...</p>
                     </div>
                 </div>
             </section>
@@ -141,7 +142,7 @@ function HomeMenu() {
                         <p className="text-red-600 text-sm mb-4">{error}</p>
                         <button
                             onClick={fetchMenuItems}
-                            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors cursor-pointer"
                             aria-label="Retry loading menu items"
                         >
                             Try Again

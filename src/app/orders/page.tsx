@@ -323,11 +323,9 @@ export default function AdminOrdersPage() {
      */
     if (isLoading) {
         return (
-            <div className="max-w-7xl mx-auto mt-22 px-4">
+            <div className="max-w-7xl mx-auto mt-22 px-4 min-h-[80vh] flex flex-col items-center justify-center">
                 <SectionHeader subHeader="" mainHeader="Manage Orders" />
-                <div className="flex justify-center">
-                    <LoadingSpinner />
-                </div>
+                <LoadingSpinner size="lg" color="text-primary" className="mt-12" />
             </div>
         );
     }
@@ -417,8 +415,8 @@ export default function AdminOrdersPage() {
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-2">
                                                 {isUpdating ? (
-                                                    <div className="h-4 w-4 flex items-center justify-center">
-                                                        <LoadingSpinner />
+                                                    <div className="h-4 w-4">
+                                                        <LoadingSpinner size="sm" color="text-primary" />
                                                     </div>
                                                 ) : (
                                                     <div className={`w-2 h-2 rounded-full ${statusColors[order.status as OrderStatus]}`} />
@@ -451,10 +449,12 @@ export default function AdminOrdersPage() {
                                                 <button
                                                     onClick={(e) => cancelOrder(order._id, e)}
                                                     disabled={isCanceling}
-                                                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed h-3 w-3 flex items-center justify-center"
+                                                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center min-w-17.5 h-8.5"
                                                 >
                                                     {isCanceling ? (
-                                                        <LoadingSpinner />
+                                                        <div className="h-4 w-4">
+                                                            <LoadingSpinner size="sm" color="text-white" />
+                                                        </div>
                                                     ) : 'Cancel'}
                                                 </button>
                                             )}
@@ -503,8 +503,8 @@ export default function AdminOrdersPage() {
                                             <div className="font-semibold mb-1">Status:</div>
                                             <div className="flex items-center gap-2">
                                                 {isUpdating ? (
-                                                    <div className="h-4 w-4 flex items-center justify-center">
-                                                        <LoadingSpinner />
+                                                    <div className="h-4 w-4">
+                                                        <LoadingSpinner size="sm" color="text-primary" />
                                                     </div>
                                                 ) : (
                                                     <div className={`w-2 h-2 rounded-full ${statusColors[order.status as OrderStatus]}`} />
@@ -542,10 +542,12 @@ export default function AdminOrdersPage() {
                                                 <button
                                                     onClick={(e) => cancelOrder(order._id, e)}
                                                     disabled={isCanceling}
-                                                    className="w-full bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed h-10 flex items-center justify-center"
+                                                    className="w-full bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center h-10"
                                                 >
                                                     {isCanceling ? (
-                                                        <LoadingSpinner />
+                                                        <div className="h-4 w-4">
+                                                            <LoadingSpinner size="sm" color="text-white" />
+                                                        </div>
                                                     ) : 'Cancel Order'}
                                                 </button>
                                             )}

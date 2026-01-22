@@ -37,7 +37,7 @@ type SectionHeaderProps = {
  */
 function SectionHeader({ subHeader, mainHeader }: SectionHeaderProps) {
     return (
-        <div className='text-center mb-12'>
+        <div className='text-center mb-9'>
             {/* Subtitle - uppercase with tracking for better readability */}
             <h3 className='uppercase font-bold tracking-wider text-primary heading-border'>
                 {subHeader}

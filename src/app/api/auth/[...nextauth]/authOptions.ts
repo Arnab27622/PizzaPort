@@ -6,6 +6,14 @@ import GoogleProvider from "next-auth/providers/google";
 import { MongoDBAdapter } from "@auth/mongodb-adapter"
 import clientPromise from "@/lib/mongoConnect";
 import mongoose from "mongoose";
+import { v2 as cloudinary } from 'cloudinary';
+
+// Configure Cloudinary for image uploads
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 /**
  * NextAuth Type Extensions
@@ -37,6 +45,38 @@ declare module "next-auth/jwt" {
         email?: string;   // User's email address
         image?: string;   // User's profile image URL
         admin?: boolean;  // User's admin status
+    }
+}
+
+/**
+ * Upload external image to Cloudinary
+ * Downloads image from URL and uploads to Cloudinary
+ * Used for Google OAuth profile pictures and other external images
+ * 
+ * @param {string} imageUrl - External image URL to download and upload
+ * @param {string} folder - Cloudinary folder path for organization
+ * @returns {Promise<string | null>} Cloudinary secure URL or null if failed
+ */
+async function uploadExternalImageToCloudinary(
+    imageUrl: string,
+    folder: string = 'pizza-delivery/profiles'
+): Promise<string | null> {
+    try {
+        if (!imageUrl || !imageUrl.startsWith('http')) {
+            return null;
+        }
+
+        // Upload directly from URL using Cloudinary's fetch functionality
+        const result = await cloudinary.uploader.upload(imageUrl, {
+            resource_type: 'auto',
+            folder,
+            type: 'fetch', // Use fetch type to download from URL
+        });
+
+        return result.secure_url;
+    } catch (error) {
+        console.error('Error uploading external image to Cloudinary:', error);
+        return null; // Fallback to original URL if upload fails
     }
 }
 
@@ -123,10 +163,11 @@ export const authOptions: NextAuthOptions = {
         /**
          * SignIn callback - handles user validation and database operations
          * - Checks if user is banned
+         * - Uploads Google OAuth images to Cloudinary
          * - Creates new user record for OAuth first-time login
          * - Updates last login timestamp
          */
-        async signIn({ user }) {
+        async signIn({ user, account }) {
             const db = (await clientPromise).db();
             const users = db.collection("users");
 
@@ -137,13 +178,22 @@ export const authOptions: NextAuthOptions = {
             }
 
             const now = new Date();
+            let imageUrl = user.image;
+
+            // Upload Google OAuth profile images to Cloudinary
+            if (account?.provider === 'google' && imageUrl) {
+                const cloudinaryUrl = await uploadExternalImageToCloudinary(imageUrl);
+                if (cloudinaryUrl) {
+                    imageUrl = cloudinaryUrl;
+                }
+            }
 
             if (!existingUser) {
                 // First-time OAuth login - create new user record
                 await users.insertOne({
                     name: user.name,
                     email: user.email,
-                    image: user.image,
+                    image: imageUrl,
                     createdAt: now,
                     updatedAt: now,
                     admin: false,    // Default non-admin

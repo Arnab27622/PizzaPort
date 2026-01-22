@@ -416,10 +416,9 @@ export default function CartPage() {
      */
     if (status === "loading") {
         return (
-            <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100">
-                <div className="flex justify-center items-center">
-                    <LoadingSpinner />
-                </div>
+            <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100 min-h-[80vh] flex flex-col items-center justify-center">
+                <LoadingSpinner size="lg" color="text-primary" />
+                <p className="mt-4 text-amber-300">Loading your cart...</p>
             </div>
         );
     }
@@ -432,11 +431,9 @@ export default function CartPage() {
      */
     if (!session) {
         return (
-            <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100">
-                <div className="flex justify-center items-center flex-col">
-                    <LoadingSpinner />
-                    <p className="mt-4 text-amber-300">Redirecting to login...</p>
-                </div>
+            <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100 min-h-[80vh] flex flex-col items-center justify-center">
+                <LoadingSpinner size="lg" color="text-primary" />
+                <p className="mt-4 text-amber-300">Redirecting to login...</p>
             </div>
         );
     }
@@ -557,14 +554,14 @@ export default function CartPage() {
                         placeholder="Enter your delivery address"
                         aria-required="true"
                     />
-                    <button
+                     <button
                         onClick={fetchUserLocation}
                         disabled={isFetchingLocation}
                         className="text-sm text-amber-400 hover:text-white flex gap-1 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         aria-label="Use current location"
                     >
                         {isFetchingLocation ? (
-                            <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-amber-400 mr-1"></div>
+                            <LoadingSpinner size="sm" color="text-amber-400" className="mr-1" />
                         ) : (
                             <LocationIcon />
                         )}
@@ -596,12 +593,12 @@ export default function CartPage() {
                 <button
                     onClick={handleSubmitOrder}
                     disabled={cartProducts.length === 0 || !address.trim() || isProcessing}
-                    className="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-white hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex justify-center items-center"
+                    className="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-white hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex justify-center items-center gap-2 cursor-pointer"
                     aria-label={isProcessing ? "Processing your order" : "Submit order"}
                 >
                     {isProcessing ? (
                         <>
-                            <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white mr-2"></div>
+                            <LoadingSpinner size="sm" color="text-white" />
                             Processing...
                         </>
                     ) : (

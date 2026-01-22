@@ -229,10 +229,10 @@ export default function UserMenuPage() {
      */
     if (status === "loading") {
         return (
-            <div className="max-w-7xl mt-5 mx-auto px-4 py-16 text-amber-100 min-h-[80vh]">
+            <div className="max-w-7xl mt-5 mx-auto px-4 py-16 text-amber-100 min-h-[80vh] flex flex-col items-center justify-center">
                 <SectionHeader mainHeader="Our Menu" subHeader="" />
-                <div className="max-w-xl mx-auto p-6 flex flex-col items-center justify-center">
-                    <LoadingSpinner />
+                <div className="flex flex-col items-center justify-center mt-12">
+                    <LoadingSpinner size="lg" color="text-primary" />
                     <p className="mt-4 text-amber-200">Checking authentication...</p>
                 </div>
             </div>
@@ -247,10 +247,10 @@ export default function UserMenuPage() {
      */
     if (!session) {
         return (
-            <div className="max-w-7xl mt-5 mx-auto px-4 py-16 text-amber-100 min-h-[80vh]">
+            <div className="max-w-7xl mt-5 mx-auto px-4 py-16 text-amber-100 min-h-[80vh] flex flex-col items-center justify-center">
                 <SectionHeader mainHeader="Our Menu" subHeader="" />
-                <div className="max-w-xl mx-auto p-6 flex flex-col items-center justify-center">
-                    <LoadingSpinner />
+                <div className="flex flex-col items-center justify-center mt-12">
+                    <LoadingSpinner size="lg" color="text-primary" />
                     <p className="mt-4 text-amber-200">Redirecting to login...</p>
                 </div>
             </div>
@@ -265,10 +265,10 @@ export default function UserMenuPage() {
      */
     if (isLoading) {
         return (
-            <div className="max-w-7xl mt-5 mx-auto px-4 py-16 text-amber-100 min-h-[80vh]">
+            <div className="max-w-7xl mt-5 mx-auto px-4 py-16 text-amber-100 min-h-[80vh] flex flex-col items-center justify-center">
                 <SectionHeader mainHeader="Our Menu" subHeader="" />
-                <div className="max-w-xl mx-auto p-6 flex flex-col items-center justify-center">
-                    <LoadingSpinner />
+                <div className="flex flex-col items-center justify-center mt-12">
+                    <LoadingSpinner size="lg" color="text-primary" />
                 </div>
             </div>
         );
@@ -289,7 +289,7 @@ export default function UserMenuPage() {
                         <h3 className="text-xl font-semibold text-red-300 mb-2">Failed to Load Menu</h3>
                         <p className="text-amber-200">We&apos;re having trouble loading our menu. Please try again later.</p>
                         <button
-                            className="mt-4 px-4 py-2 bg-primary rounded-lg hover:bg-amber-600 transition-colors"
+                            className="mt-4 px-4 py-2 bg-primary rounded-lg hover:bg-amber-600 transition-colors cursor-pointer"
                             onClick={() => window.location.reload()}
                         >
                             Try Again
@@ -335,7 +335,7 @@ export default function UserMenuPage() {
                     <button
                         key="all"
                         onClick={() => setActiveCategory("")}
-                        className={`px-4 py-2 rounded-full border border-amber-800 text-sm transition-all ${!activeCategory
+                        className={`px-4 py-2 rounded-full border border-amber-800 text-sm transition-all cursor-pointer ${!activeCategory
                             ? "bg-primary text-white"
                             : "bg-[#1a1108] text-amber-200 hover:bg-amber-900/60"
                             }`}
@@ -347,7 +347,7 @@ export default function UserMenuPage() {
                         <button
                             key={cat}
                             onClick={() => handleCategoryChange(cat)}
-                            className={`px-4 py-2 rounded-full border border-amber-800 text-sm transition-all ${activeCategory === cat
+                            className={`px-4 py-2 rounded-full border border-amber-800 text-sm transition-all cursor-pointer ${activeCategory === cat
                                 ? "bg-primary text-white"
                                 : "bg-[#1a1108] text-amber-200 hover:bg-amber-900/60"
                                 }`}
@@ -399,7 +399,7 @@ export default function UserMenuPage() {
                                 setSearch("");
                                 setActiveCategory("");
                             }}
-                            className="mt-4 px-4 py-2 bg-primary rounded-lg hover:bg-amber-600 transition-colors"
+                            className="mt-4 px-4 py-2 bg-primary rounded-lg hover:bg-amber-600 transition-colors cursor-pointer"
                         >
                             Clear Filters
                         </button>
