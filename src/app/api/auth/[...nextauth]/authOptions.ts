@@ -105,6 +105,25 @@ export const authOptions: NextAuthOptions = {
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID!,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+            async profile(profile) {
+                // Upload profile image to Cloudinary to avoid ephemeral storage issues
+                let imageUrl = profile.picture;
+                if (imageUrl) {
+                    const cloudinaryUrl = await uploadExternalImageToCloudinary(imageUrl);
+                    if (cloudinaryUrl) imageUrl = cloudinaryUrl;
+                }
+
+                return {
+                    id: profile.sub,
+                    name: profile.name,
+                    email: profile.email,
+                    image: imageUrl,
+                    admin: false,    // Default non-admin for new users
+                    banned: false,   // Default not banned for new users
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                };
+            },
         }),
 
         // Credentials provider for email/password login
@@ -167,39 +186,15 @@ export const authOptions: NextAuthOptions = {
             const db = (await clientPromise).db();
             const users = db.collection("users");
 
-
             // Check if user exists and is banned
             const existingUser = await users.findOne({ email: user.email });
             if (existingUser?.banned) {
                 throw new Error("UserBanned"); // Custom error for banned users
             }
 
-
             const now = new Date();
 
-                        let imageUrl = user.image;
-
-            // Upload Google OAuth profile images to Cloudinary
-            if (account?.provider === 'google' && imageUrl) {
-                const cloudinaryUrl = await uploadExternalImageToCloudinary(imageUrl);
-                if (cloudinaryUrl) {
-                    imageUrl = cloudinaryUrl;
-                }
-            }
-
-            if (!existingUser) {
-                // First-time OAuth login - create new user record
-                await users.insertOne({
-                    name: user.name,
-                    email: user.email,
-                    image: imageUrl,
-                    createdAt: now,
-                    updatedAt: now,
-                    admin: false,    // Default non-admin
-                    banned: false,   // Default not banned
-                });
-            } else {
-
+            if (existingUser) {
                 // Update last login timestamp for existing users
                 await users.updateOne(
                     { _id: existingUser._id },
@@ -207,8 +202,11 @@ export const authOptions: NextAuthOptions = {
                 );
             }
 
-            return true; // Allow sign in - Adapter will handle creation if needed
-
+            // Allow sign in - Adapter will handle creation for new users 
+            // using the data returned from the provider's profile() callback.
+            // This prevents the 'OAuthAccountNotLinked' error that occurs when 
+            // a user is manually created before NextAuth can link the account.
+            return true;
         },
 
         /**
