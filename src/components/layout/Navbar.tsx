@@ -7,12 +7,25 @@ import { useRouter } from "next/navigation";
 import { CartContext } from "../AppContext";
 import DesktopNav from "./DesktopNav";
 import MobileNav from "./MobileNav";
+import { ExtendedUser } from "@/types/user";
 
 export default function Navbar() {
     const { status, data: session } = useSession({ required: false });
     const router = useRouter();
-    const user = session?.user;
-    const isAdmin = user?.admin === true;
+    const user = session?.user as ExtendedUser;
+
+    // Persistent admin state to prevent flicker during session updates
+    const [lastKnownAdmin, setLastKnownAdmin] = useState<boolean | null>(null);
+
+    useEffect(() => {
+        if (status === 'authenticated' && user) {
+            setLastKnownAdmin(!!user.admin);
+        }
+    }, [status, user]);
+
+    const isAdmin = (status === 'loading' && lastKnownAdmin !== null)
+        ? lastKnownAdmin
+        : !!user?.admin;
 
     // Cart Context
     const { cartProducts } = useContext(CartContext);

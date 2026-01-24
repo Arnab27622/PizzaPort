@@ -54,7 +54,7 @@ export default function ProductCustomizationModal({
                             return (
                                 <label
                                     key={sz.name}
-                                    className="flex items-center gap-2 text-amber-100 cursor-pointer p-2 hover:bg-white/5 rounded transition-colors"
+                                    className="flex items-center gap-2 text-amber-100 cursor-pointer py-1 px-2 hover:bg-white/5 rounded transition-colors"
                                 >
                                     <input
                                         type="radio"
@@ -80,7 +80,7 @@ export default function ProductCustomizationModal({
                         {item.extraIngredients.map((ex) => (
                             <label
                                 key={ex.name}
-                                className="flex items-center gap-2 text-amber-100 cursor-pointer p-2 hover:bg-white/5 rounded transition-colors"
+                                className="flex items-center gap-2 text-amber-100 cursor-pointer py-1 px-2 hover:bg-white/5 rounded transition-colors"
                             >
                                 <input
                                     type="checkbox"

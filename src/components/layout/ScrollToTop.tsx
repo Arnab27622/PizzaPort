@@ -16,8 +16,11 @@ export default function ScrollToTop() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Scroll to top of the window on pathname change
-    window.scrollTo(0, 0);
+    // If there's a hash (e.g., #about), don't scroll to top 
+    // to allow the browser to jump to the anchor
+    if (!window.location.hash) {
+      window.scrollTo(0, 0);
+    }
   }, [pathname]);
 
   return null;

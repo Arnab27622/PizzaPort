@@ -52,6 +52,7 @@ export default function MobileNav({
                             </Link>
                         ))}
 
+                        {/* Authentication Section */}
                         {status === "authenticated" ? (
                             <div className="flex flex-col gap-4 mt-2">
                                 <Link
@@ -64,7 +65,7 @@ export default function MobileNav({
                                 >
                                     Hello, {userName}
                                     {isAdmin && (
-                                        <span className="inline-block ml-2 px-2 py-1 text-xs uppercase font-semibold text-red-400 bg-red-500/20 rounded-full">
+                                        <span className="inline-block ml-2 px-2 py-1 text-xs uppercase font-semibold text-red-100 bg-red-600 rounded-full text-[10px] leading-none">
                                             Admin
                                         </span>
                                     )}
@@ -93,7 +94,7 @@ export default function MobileNav({
                                     Logout
                                 </button>
                             </div>
-                        ) : (
+                        ) : status === "unauthenticated" ? (
                             <div className="flex flex-col gap-4 mt-2">
                                 <Link
                                     href="/login"
@@ -110,6 +111,9 @@ export default function MobileNav({
                                     Register
                                 </Link>
                             </div>
+                        ) : (
+                            /* Loading state - show a spacer */
+                            <div className="h-20 mt-2" />
                         )}
                     </div>
                 </motion.nav>

@@ -43,7 +43,7 @@ export default function DesktopNav({
                 </Link>
             ))}
 
-            {/* Authenticated User Section */}
+            {/* Authentication Section */}
             {status === "authenticated" ? (
                 <div className="flex items-center gap-4 ml-4">
                     <Link
@@ -53,7 +53,7 @@ export default function DesktopNav({
                     >
                         <span className="hover:underline">Hello, {userName}</span>
                         {isAdmin && (
-                            <span className="ml-1 px-2 py-1 text-xs uppercase font-semibold text-red-400 bg-red-500/20 rounded-full">
+                            <span className="ml-1 px-2 py-1 text-xs uppercase font-semibold text-red-100 bg-red-600 rounded-full text-[10px] leading-none">
                                 Admin
                             </span>
                         )}
@@ -76,7 +76,7 @@ export default function DesktopNav({
                         Logout
                     </button>
                 </div>
-            ) : (
+            ) : status === "unauthenticated" ? (
                 /* Authentication Buttons (Unauthenticated) */
                 <div className="flex gap-3 ml-4">
                     <Link
@@ -92,6 +92,9 @@ export default function DesktopNav({
                         Register
                     </Link>
                 </div>
+            ) : (
+                /* Loading state - show empty space to prevent flicker */
+                <div className="ml-4 w-48 h-10" />
             )}
         </nav>
     );

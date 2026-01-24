@@ -23,7 +23,7 @@ export default function ProfilePage() {
         handleSubmit
     } = useProfile();
 
-    if (status === 'loading') {
+    if (status === 'loading' && !session) {
         return (
             <div className="max-w-xl mx-auto mt-20 mb-8 p-6 flex items-center justify-center min-h-[50vh]">
                 <LoadingSpinner size="lg" color="text-primary" />
