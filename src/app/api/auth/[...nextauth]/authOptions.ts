@@ -216,27 +216,21 @@ export const authOptions: NextAuthOptions = {
          * - Updates token when session is updated
          */
         async jwt({ token, user, trigger, session }) {
-            // Add user info to token during initial authentication
+            // Initial sign in
             if (user) {
                 token.id = user.id;
                 token.name = user.name ?? undefined;
                 token.email = user.email ?? undefined;
                 token.image = user.image ?? undefined;
-                token.admin = user.admin ?? false;
+                token.admin = (user as any).admin ?? false;
             }
 
-            // Update token when session is manually updated
+            // Handle manual session updates
             if (trigger === "update" && session?.user) {
-                const u = session.user as {
-                    name?: string;
-                    email?: string;
-                    image?: string;
-                    admin?: boolean
-                };
-                if (u.name) token.name = u.name;
-                if (u.image) token.image = u.image;
-                if (u.email) token.email = u.email;
-                if (typeof u.admin === 'boolean') token.admin = u.admin;
+                if (session.user.name) token.name = session.user.name;
+                if (session.user.image) token.image = session.user.image;
+                if (session.user.email) token.email = session.user.email;
+                if (typeof session.user.admin === 'boolean') token.admin = session.user.admin;
             }
 
             return token;
@@ -249,36 +243,37 @@ export const authOptions: NextAuthOptions = {
          * - Checks for banned status on each session creation
          */
         async session({ session, token }) {
-            // Populate session with token data
-            if (session.user) {
-                session.user = {
-                    id: token.id as string,
-                    name: token.name ?? session.user.name,
-                    email: token.email ?? session.user.email,
-                    image: token.image,
-                    address: "",     // Placeholder, will be populated from DB
-                    gender: "",      // Placeholder, will be populated from DB
-                    admin: token.admin ?? false,
-                };
-            }
+            if (session.user && token) {
+                session.user.id = token.id as string;
+                session.user.name = (token.name as string) || session.user.name;
+                session.user.email = (token.email as string) || session.user.email;
+                session.user.image = (token.image as string) || session.user.image;
+                session.user.admin = (token.admin as boolean) ?? false;
+                session.user.address = "";
+                session.user.gender = "";
 
-            // Fetch additional user data from database
-            const db = (await clientPromise).db();
-            const found = await db.collection("users").findOne(
-                { email: token.email },
-                { projection: { address: 1, gender: 1, image: 1, admin: 1, banned: 1 } }
-            );
+                try {
+                    // Fetch fresh profile data from DB to ensure sync (admin status, banned, etc.)
+                    const db = (await clientPromise).db();
+                    const found = await db.collection("users").findOne(
+                        { email: session.user.email },
+                        { projection: { address: 1, gender: 1, image: 1, admin: 1, banned: 1 } }
+                    );
 
-            if (found) {
-                // Update session with database values
-                session.user!.address = found.address ?? "";
-                session.user!.gender = found.gender ?? "";
-                session.user!.image = found.image ?? session.user?.image;
-                session.user!.admin = found.admin ?? session.user?.admin;
+                    if (found) {
+                        session.user.address = found.address ?? "";
+                        session.user.gender = found.gender ?? "";
+                        session.user.image = found.image ?? session.user.image;
+                        session.user.admin = found.admin ?? session.user.admin;
 
-                // Terminate session if user is banned
-                if (found.banned) {
-                    return null!;
+                        // Security check: Terminate session if user was banned while logged in
+                        if (found.banned) {
+                            return null as any;
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error in session callback database fetch:", error);
+                    // Continue with token info if DB fetch fails to prevent breaking the session
                 }
             }
 
