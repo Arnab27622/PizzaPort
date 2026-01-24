@@ -317,9 +317,9 @@ export default function OrdersPage() {
         <div className="max-w-7xl min-h-[83vh] mx-auto mt-10 px-4 py-12 text-amber-100">
             {/* Back Button - Responsive positioning */}
             <div className="mb-6">
-                <BackButton label="Back to Menu" />
+                <BackButton />
             </div>
-            
+
             {/* Page Header */}
             <h1 className="text-3xl font-bold heading-border underline mb-6">Your Orders</h1>
 

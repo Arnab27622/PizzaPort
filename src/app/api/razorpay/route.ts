@@ -3,6 +3,14 @@ import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongoConnect";
 import crypto from 'crypto';
 import { CartProduct } from "@/components/AppContext";
+import { z } from "zod";
+
+const RazorpayOrderSchema = z.object({
+    name: z.string().min(1, 'Name is required'),
+    email: z.string().email('Invalid email address'),
+    address: z.string().min(5, 'Address is too short'),
+    cart: z.array(z.any()).min(1, 'Cart is empty'),
+});
 
 /**
  * Razorpay Order Response Interface
@@ -90,29 +98,22 @@ export async function POST(req: Request) {
      */
     const payload = await req.json();
 
-    // Destructure required fields from request payload
-    const {
-        name,
-        email,
-        cart,
-        address
-    } = payload;
 
     /**
      * Input Validation
-     * Check for required user identification fields
-     * Name and email are essential for order processing and communication
+     * Check for required user identification and order details
+     * Uses Zod for comprehensive schema validation
      */
-    if (!name || !email) {
-        console.error("Missing name or email in payload:", {
-            name,
-            email,
-        });
+    const validation = RazorpayOrderSchema.safeParse(payload);
+
+    if (!validation.success) {
         return NextResponse.json(
-            { success: false, error: "Missing user data" },
-            { status: 400 }, // Bad Request
+            { success: false, error: validation.error.issues[0].message },
+            { status: 400 },
         );
     }
+
+    const { name, email, cart, address } = validation.data;
 
     /**
      * Order Amount Calculation

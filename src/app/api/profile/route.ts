@@ -3,6 +3,13 @@ import { getServerSession } from 'next-auth';
 import clientPromise from '@/lib/mongoConnect';
 import { v2 as cloudinary } from 'cloudinary';
 import { authOptions } from '../auth/[...nextauth]/authOptions';
+import { z } from 'zod';
+
+const ProfileUpdateSchema = z.object({
+    name: z.string().min(1, 'Full Name is required').max(50, 'Name is too long'),
+    address: z.string().min(1, 'Address is required').max(200, 'Address is too long'),
+    gender: z.string().min(1, 'Gender is required'),
+});
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -81,10 +88,22 @@ export async function POST(req: Request) {
          */
         const formData = await req.formData();
 
-        // Extract required profile fields from form data
-        const name = formData.get('name') as string;
-        const address = formData.get('address') as string;
-        const gender = formData.get('gender') as string;
+        // Extract and validate profile fields
+        const rawData = {
+            name: formData.get('name') as string,
+            address: formData.get('address') as string,
+            gender: formData.get('gender') as string,
+        };
+
+        const validation = ProfileUpdateSchema.safeParse(rawData);
+        if (!validation.success) {
+            return NextResponse.json(
+                { error: validation.error.issues[0].message },
+                { status: 400 }
+            );
+        }
+
+        const { name, address, gender } = validation.data;
 
         // Extract optional profile picture file
         const file = formData.get('profilePic') as File | null;
@@ -111,17 +130,17 @@ export async function POST(req: Request) {
         if (file && typeof file.arrayBuffer === 'function') {
             // Convert file to buffer
             const buffer = Buffer.from(await file.arrayBuffer());
-            
+
             // Convert to base64
             const base64 = buffer.toString('base64');
             const dataURI = `data:${file.type};base64,${base64}`;
-            
+
             // Upload to Cloudinary
             const result = await cloudinary.uploader.upload(dataURI, {
                 resource_type: 'auto',
                 folder: 'pizza-delivery/profiles',
             });
-            
+
             update.image = result.secure_url;
         }
 

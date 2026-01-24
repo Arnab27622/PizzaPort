@@ -8,22 +8,7 @@ import LoadingSpinner from '../icons/LoadingSpinner';
 import Link from 'next/link';
 import Right from '../icons/Right';
 
-/**
- * Interface representing a menu item structure
- * @interface MenuItem
- * @property {string} _id - Unique identifier for the menu item
- * @property {string} name - Display name of the menu item
- * @property {string} description - Description of the menu item
- * @property {number} basePrice - Base price of the menu item
- * @property {string} imageUrl - URL to the menu item's image
- */
-interface MenuItem {
-    _id: string;
-    name: string;
-    description: string;
-    basePrice: number;
-    imageUrl: string;
-}
+import { MenuItem } from '@/types/menu';
 
 /**
  * Number of menu items to display in the home section
@@ -80,10 +65,12 @@ function HomeMenu() {
             const data = await response.json();
 
             // Transform data to ensure consistent structure
-            const transformedData = data.map((item: MenuItem) => ({
+            const transformedData = data.map((item: Partial<MenuItem>) => ({
                 ...item,
-                imageUrl: item.imageUrl || undefined
-            }));
+                imageUrl: item.imageUrl || undefined,
+                sizeOptions: item.sizeOptions || [],
+                extraIngredients: item.extraIngredients || []
+            })) as MenuItem[];
 
             // Fisher-Yates shuffle algorithm for random selection
             const shuffled = [...transformedData];

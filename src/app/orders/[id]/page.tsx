@@ -219,7 +219,7 @@ export default async function OrderDetailPage({
     const groupedItems = order.cart.reduce((acc, item, idx) => {
         const extrasString = (item.extras ?? []).map(e => e.name).sort().join('|');
         const key = `${item.name}|${item.size?.name || ''}|${extrasString}`;
-        
+
         if (!acc[key]) {
             acc[key] = {
                 item,
@@ -230,7 +230,7 @@ export default async function OrderDetailPage({
         }
         acc[key].indices.push(idx);
         acc[key].quantity += item.quantity || 1;
-        
+
         return acc;
     }, {} as Record<string, { item: OrderItem; indices: number[]; quantity: number; total: number }>);
 
@@ -243,9 +243,9 @@ export default async function OrderDetailPage({
         <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100">
             {/* Back Button */}
             <div className="mb-6">
-                <BackButton label="Back to Orders" />
+                <BackButton />
             </div>
-            
+
             {/* Page Header with Order Reference */}
             <SectionHeader
                 subHeader=""

@@ -15,14 +15,7 @@ import LoadingSpinner from "@/components/icons/LoadingSpinner";
  * Defines the structure of menu items fetched from the API
  * Matches the database schema for menu items
  */
-interface MenuItemType {
-    _id: string;              // Unique MongoDB identifier
-    name: string;             // Display name of the menu item
-    description: string;      // Item description for customers
-    basePrice: number;        // Base price without extras
-    imageUrl?: string;        // Optional product image URL
-    category?: string;        // Optional category for filtering
-}
+import { MenuItem } from "@/types/menu";
 
 /**
  * Data Fetcher Function for SWR
@@ -112,7 +105,7 @@ export default function UserMenuPage() {
      * - Background data synchronization
      * - Error retry mechanisms
      */
-    const { data: items = [], isLoading, error } = useSWR<MenuItemType[]>(
+    const { data: items = [], isLoading, error } = useSWR<MenuItem[]>(
         session ? "/api/menuitem" : null, // Only fetch when authenticated
         fetcher,
         {
@@ -156,7 +149,7 @@ export default function UserMenuPage() {
      * Applies search and category filters to menu items
      * Memoized to prevent recalculating on every render
      * 
-     * @returns {MenuItemType[]} Filtered array of menu items
+     * @returns {MenuItem[]} Filtered array of menu items
      * 
      * @filter_logic
      * - Search: Case-insensitive match against item name
