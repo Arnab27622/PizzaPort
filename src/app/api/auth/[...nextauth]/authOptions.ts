@@ -105,24 +105,7 @@ export const authOptions: NextAuthOptions = {
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID!,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-            /**
-             * Custom profile mapping for Google OAuth
-             * Handles initial user data and profile image upload to Cloudinary
-             */
-            async profile(profile) {
-                const imageUrl = profile.picture;
-                // Upload profile picture to Cloudinary on first sign-in
-                const cloudinaryUrl = await uploadExternalImageToCloudinary(imageUrl);
-
-                return {
-                    id: profile.sub,
-                    name: profile.name,
-                    email: profile.email,
-                    image: cloudinaryUrl || imageUrl,
-                    admin: false,  // Default admin status
-                    banned: false, // Default banned status
-                };
-            },
+            allowDangerousEmailAccountLinking: true, // Allows linking existing accounts with same email
         }),
 
         // Credentials provider for email/password login
@@ -182,33 +165,51 @@ export const authOptions: NextAuthOptions = {
          * - Updates last login timestamp for existing users
          */
         async signIn({ user, account }) {
-            try {
-                // Ensure we have a valid email to check against
-                if (!user.email) return false;
+            const db = (await clientPromise).db();
+            const users = db.collection("users");
 
-                const db = (await clientPromise).db();
-                const users = db.collection("users");
 
-                // Security check: Verify if the user is banned
-                const existingUser = await users.findOne({ email: user.email });
-                if (existingUser?.banned) {
-                    throw new Error("UserBanned");
-                }
-
-                // If user exists, update the last login timestamp
-                if (existingUser) {
-                    await users.updateOne(
-                        { _id: existingUser._id },
-                        { $set: { updatedAt: new Date() } }
-                    );
-                }
-
-                return true; // Allow NextAuth/Adapter to handle the rest
-            } catch (error) {
-                console.error("SignIn Callback Error:", error);
-                if (error instanceof Error && error.message === "UserBanned") throw error;
-                return false; // Block sign-in on unexpected DB errors
+            // Check if user exists and is banned
+            const existingUser = await users.findOne({ email: user.email });
+            if (existingUser?.banned) {
+                throw new Error("UserBanned"); // Custom error for banned users
             }
+
+
+            const now = new Date();
+
+                        let imageUrl = user.image;
+
+            // Upload Google OAuth profile images to Cloudinary
+            if (account?.provider === 'google' && imageUrl) {
+                const cloudinaryUrl = await uploadExternalImageToCloudinary(imageUrl);
+                if (cloudinaryUrl) {
+                    imageUrl = cloudinaryUrl;
+                }
+            }
+
+            if (!existingUser) {
+                // First-time OAuth login - create new user record
+                await users.insertOne({
+                    name: user.name,
+                    email: user.email,
+                    image: imageUrl,
+                    createdAt: now,
+                    updatedAt: now,
+                    admin: false,    // Default non-admin
+                    banned: false,   // Default not banned
+                });
+            } else {
+
+                // Update last login timestamp for existing users
+                await users.updateOne(
+                    { _id: existingUser._id },
+                    { $set: { updatedAt: now } }
+                );
+            }
+
+            return true; // Allow sign in - Adapter will handle creation if needed
+
         },
 
         /**
@@ -223,15 +224,23 @@ export const authOptions: NextAuthOptions = {
                 token.name = user.name ?? undefined;
                 token.email = user.email ?? undefined;
                 token.image = user.image ?? undefined;
-                token.admin = (user as { admin?: boolean }).admin ?? false;
+                token.admin = user.admin ?? false;
+
             }
 
             // Handle manual session updates
             if (trigger === "update" && session?.user) {
-                if (session.user.name) token.name = session.user.name;
-                if (session.user.image) token.image = session.user.image;
-                if (session.user.email) token.email = session.user.email;
-                if (typeof session.user.admin === 'boolean') token.admin = session.user.admin;
+                const u = session.user as {
+                    name?: string;
+                    email?: string;
+                    image?: string;
+                    admin?: boolean
+                };
+                if (u.name) token.name = u.name;
+                if (u.image) token.image = u.image;
+                if (u.email) token.email = u.email;
+                if (typeof u.admin === 'boolean') token.admin = u.admin;
+
             }
 
             return token;
@@ -244,40 +253,39 @@ export const authOptions: NextAuthOptions = {
          * - Checks for banned status on each session creation
          */
         async session({ session, token }) {
-            if (session.user && token) {
-                session.user.id = token.id as string;
-                session.user.name = (token.name as string) || session.user.name;
-                session.user.email = (token.email as string) || session.user.email;
-                session.user.image = (token.image as string) || session.user.image;
-                session.user.admin = (token.admin as boolean) ?? false;
-                session.user.address = "";
-                session.user.gender = "";
+            // Populate session with token data
+            if (session.user) {
+                session.user = {
+                    id: token.id as string,
+                    name: token.name ?? session.user.name,
+                    email: token.email ?? session.user.email,
+                    image: token.image,
+                    address: "",     // Placeholder, will be populated from DB
+                    gender: "",      // Placeholder, will be populated from DB
+                    admin: token.admin ?? false,
+                };
+            }
 
-                try {
-                    // Fetch fresh profile data from DB to ensure sync (admin status, banned, etc.)
-                    const db = (await clientPromise).db();
-                    const found = await db.collection("users").findOne(
-                        { email: session.user.email },
-                        { projection: { address: 1, gender: 1, image: 1, admin: 1, banned: 1 } }
-                    );
+            // Fetch additional user data from database
+            const db = (await clientPromise).db();
+            const found = await db.collection("users").findOne(
+                { email: token.email },
+                { projection: { address: 1, gender: 1, image: 1, admin: 1, banned: 1 } }
+            );
 
-                    if (found) {
-                        session.user.address = found.address ?? "";
-                        session.user.gender = found.gender ?? "";
-                        session.user.image = found.image ?? session.user.image;
-                        session.user.admin = found.admin ?? session.user.admin;
 
-                        // Security check: Terminate session if user was banned while logged in
-                        if (found.banned) {
-                            return {
-                                ...session,
-                                expires: new Date(0).toISOString(),
-                            };
-                        }
-                    }
-                } catch (error) {
-                    console.error("Error in session callback database fetch:", error);
-                    // Continue with token info if DB fetch fails to prevent breaking the session
+            if (found) {
+                // Update session with database values
+                session.user!.address = found.address ?? "";
+                session.user!.gender = found.gender ?? "";
+                session.user!.image = found.image ?? session.user?.image;
+                session.user!.admin = found.admin ?? session.user?.admin;
+
+
+                // Terminate session if user is banned
+                if (found.banned) {
+                    return null!;
+
                 }
             }
 
@@ -287,20 +295,4 @@ export const authOptions: NextAuthOptions = {
 
     // Secret key for encrypting tokens
     secret: process.env.NEXTAUTH_SECRET,
-
-    // Enable debug logs in development and production to catch silent failures
-    debug: true,
-
-    // Ensure cookies are handled correctly in production with subdomains or specific paths
-    cookies: {
-        sessionToken: {
-            name: process.env.NODE_ENV === 'production' ? `__Secure-next-auth.session-token` : `next-auth.session-token`,
-            options: {
-                httpOnly: true,
-                sameSite: 'lax',
-                path: '/',
-                secure: process.env.NODE_ENV === 'production',
-            },
-        },
-    },
 };
