@@ -182,32 +182,33 @@ export const authOptions: NextAuthOptions = {
          * - Updates last login timestamp for existing users
          */
         async signIn({ user, account }) {
-            const db = (await clientPromise).db();
-            const users = db.collection("users");
+            try {
+                // Ensure we have a valid email to check against
+                if (!user.email) return false;
 
-            // Check if user exists and is banned
-            const existingUser = await users.findOne({ email: user.email });
-            if (existingUser?.banned) {
-                throw new Error("UserBanned"); // Custom error for banned users
-            }
+                const db = (await clientPromise).db();
+                const users = db.collection("users");
 
-            const now = new Date();
-
-            if (existingUser) {
-                // Update last login timestamp for existing users
-                await users.updateOne(
-                    { _id: existingUser._id },
-                    { $set: { updatedAt: now } }
-                );
-
-                // Optionally sync Google profile image if it changed
-                if (account?.provider === 'google' && user.image && user.image !== existingUser.image) {
-                    // Only update if it's a Cloudinary URL or if we want to re-upload
-                    // For simplicity, we'll just update the timestamp for now
+                // Security check: Verify if the user is banned
+                const existingUser = await users.findOne({ email: user.email });
+                if (existingUser?.banned) {
+                    throw new Error("UserBanned");
                 }
-            }
 
-            return true; // Allow sign in - Adapter will handle creation if needed
+                // If user exists, update the last login timestamp
+                if (existingUser) {
+                    await users.updateOne(
+                        { _id: existingUser._id },
+                        { $set: { updatedAt: new Date() } }
+                    );
+                }
+
+                return true; // Allow NextAuth/Adapter to handle the rest
+            } catch (error) {
+                console.error("SignIn Callback Error:", error);
+                if (error instanceof Error && error.message === "UserBanned") throw error;
+                return false; // Block sign-in on unexpected DB errors
+            }
         },
 
         /**
@@ -286,4 +287,20 @@ export const authOptions: NextAuthOptions = {
 
     // Secret key for encrypting tokens
     secret: process.env.NEXTAUTH_SECRET,
+
+    // Enable debug logs in development and production to catch silent failures
+    debug: true,
+
+    // Ensure cookies are handled correctly in production with subdomains or specific paths
+    cookies: {
+        sessionToken: {
+            name: process.env.NODE_ENV === 'production' ? `__Secure-next-auth.session-token` : `next-auth.session-token`,
+            options: {
+                httpOnly: true,
+                sameSite: 'lax',
+                path: '/',
+                secure: process.env.NODE_ENV === 'production',
+            },
+        },
+    },
 };
