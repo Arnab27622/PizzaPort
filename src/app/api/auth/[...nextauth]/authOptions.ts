@@ -66,11 +66,10 @@ async function uploadExternalImageToCloudinary(
             return null;
         }
 
-        // Upload directly from URL using Cloudinary's fetch functionality
+        // Upload directly from URL to Cloudinary
         const result = await cloudinary.uploader.upload(imageUrl, {
-            resource_type: 'auto',
+            resource_type: 'image',
             folder,
-            type: 'fetch', // Use fetch type to download from URL
         });
 
         return result.secure_url;
@@ -106,7 +105,24 @@ export const authOptions: NextAuthOptions = {
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID!,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-            allowDangerousEmailAccountLinking: true, // Allows linking existing accounts with same email
+            /**
+             * Custom profile mapping for Google OAuth
+             * Handles initial user data and profile image upload to Cloudinary
+             */
+            async profile(profile) {
+                const imageUrl = profile.picture;
+                // Upload profile picture to Cloudinary on first sign-in
+                const cloudinaryUrl = await uploadExternalImageToCloudinary(imageUrl);
+
+                return {
+                    id: profile.sub,
+                    name: profile.name,
+                    email: profile.email,
+                    image: cloudinaryUrl || imageUrl,
+                    admin: false,  // Default admin status
+                    banned: false, // Default banned status
+                };
+            },
         }),
 
         // Credentials provider for email/password login
@@ -161,11 +177,9 @@ export const authOptions: NextAuthOptions = {
     // Authentication callbacks for custom logic
     callbacks: {
         /**
-         * SignIn callback - handles user validation and database operations
+         * SignIn callback - handles user validation and database updates
          * - Checks if user is banned
-         * - Uploads Google OAuth images to Cloudinary
-         * - Creates new user record for OAuth first-time login
-         * - Updates last login timestamp
+         * - Updates last login timestamp for existing users
          */
         async signIn({ user, account }) {
             const db = (await clientPromise).db();
@@ -178,36 +192,22 @@ export const authOptions: NextAuthOptions = {
             }
 
             const now = new Date();
-            let imageUrl = user.image;
 
-            // Upload Google OAuth profile images to Cloudinary
-            if (account?.provider === 'google' && imageUrl) {
-                const cloudinaryUrl = await uploadExternalImageToCloudinary(imageUrl);
-                if (cloudinaryUrl) {
-                    imageUrl = cloudinaryUrl;
-                }
-            }
-
-            if (!existingUser) {
-                // First-time OAuth login - create new user record
-                await users.insertOne({
-                    name: user.name,
-                    email: user.email,
-                    image: imageUrl,
-                    createdAt: now,
-                    updatedAt: now,
-                    admin: false,    // Default non-admin
-                    banned: false,   // Default not banned
-                });
-            } else {
+            if (existingUser) {
                 // Update last login timestamp for existing users
                 await users.updateOne(
                     { _id: existingUser._id },
                     { $set: { updatedAt: now } }
                 );
+
+                // Optionally sync Google profile image if it changed
+                if (account?.provider === 'google' && user.image && user.image !== existingUser.image) {
+                    // Only update if it's a Cloudinary URL or if we want to re-upload
+                    // For simplicity, we'll just update the timestamp for now
+                }
             }
 
-            return true; // Allow sign in
+            return true; // Allow sign in - Adapter will handle creation if needed
         },
 
         /**
