@@ -329,7 +329,7 @@ export default function OrdersPage() {
                     <p className="text-xl mb-4 text-amber-300">You haven&apos;t placed any orders yet</p>
                     <button
                         onClick={handleBrowseMenu}
-                        className="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-amber-600 transition-colors"
+                        className="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-amber-600 transition-colors cursor-pointer"
                     >
                         Browse Menu
                     </button>
