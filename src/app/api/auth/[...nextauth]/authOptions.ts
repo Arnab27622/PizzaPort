@@ -203,7 +203,7 @@ export const authOptions: NextAuthOptions = {
                     });
                 } else {
                     // Existing user - Update only necessary fields
-                    const updateData: any = { updatedAt: now };
+                    const updateData: { updatedAt: Date; image?: string } = { updatedAt: now };
 
                     // If the user doesn't have an image or uses a Google proxy URL, update to Cloudinary
                     if (user.image && (!existingUser.image || existingUser.image.includes('googleusercontent.com'))) {
