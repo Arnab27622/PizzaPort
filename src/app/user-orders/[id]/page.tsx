@@ -145,7 +145,6 @@ export default function UserOrderPage() {
     const [order, setOrder] = useState<Order | null>(null);
     const [loadingOrder, setLoadingOrder] = useState(true);
     const [statusText, setStatusText] = useState<string>('');
-    const [isRedirecting, setIsRedirecting] = useState(false);
 
     /**
      * Non-Reactive Value Refs
@@ -182,7 +181,7 @@ export default function UserOrderPage() {
      */
     const groupedCartItems = useMemo(() => {
         if (!order) return [];
-        
+
         const grouped = order.cart.reduce((acc, item) => {
             const extrasString = (item.extras ?? []).map(e => e.name).sort().join('|');
             const key = `${item._id}|${item.name}|${item.size?.name || ''}|${extrasString}`;
@@ -197,10 +196,10 @@ export default function UserOrderPage() {
                     quantity: 1
                 });
             }
-            
+
             return acc;
         }, [] as Array<{ key: string; item: OrderItem; quantity: number }>);
-        
+
         return grouped;
     }, [order]);
 
@@ -319,7 +318,6 @@ export default function UserOrderPage() {
 
                     // Handle order completion with automatic redirection
                     if (newStatus === 'completed') {
-                        setIsRedirecting(true);
                         toast.info('Order delivered! Redirecting...');
                         setTimeout(() => router.push('/user-orders'), 2000);
                     }
@@ -380,16 +378,6 @@ export default function UserOrderPage() {
      * Displays loading state during automatic redirection after order completion
      * Provides user feedback during navigation transition
      */
-    if (isRedirecting) {
-        return (
-            <div className="max-w-7xl mx-auto mt-20 px-4 text-amber-100">
-                <h1 className="text-3xl font-bold mb-8 text-primary heading-border">Order Delivered</h1>
-                <div className="flex justify-center items-center flex-col">
-                    <LoadingSpinner />
-                </div>
-            </div>
-        );
-    }
 
     /**
      * Error State - No Order Data
@@ -430,7 +418,7 @@ export default function UserOrderPage() {
             <div className="mb-6">
                 <BackButton label="Back to My Orders" />
             </div>
-            
+
             <div className="bg-[#1a1108] border border-amber-900 p-4 sm:p-6 rounded-lg shadow-lg">
                 {/* Order Header Section */}
                 <div className="flex flex-col md:flex-row justify-between items-center md:items-start mb-6 sm:mb-8">
