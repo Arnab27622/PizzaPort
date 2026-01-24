@@ -1,4 +1,3 @@
-// File: app/api/user-orders/[id]/status/route.ts
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongoConnect";

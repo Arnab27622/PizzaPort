@@ -252,7 +252,7 @@ function LoginPage() {
 
           {/* Login Form Column */}
           <div className="w-full lg:w-3/5">
-            <div className="bg-gradient-to-br from-[#2c1a0d]/80 to-[#1a1108]/80 backdrop-blur-sm border border-amber-900/30 rounded-2xl p-8">
+            <div className="bg-linear-to-br from-[#2c1a0d]/80 to-[#1a1108]/80 backdrop-blur-sm border border-amber-900/30 rounded-2xl p-8">
 
               {/* Login Form */}
               <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} noValidate>

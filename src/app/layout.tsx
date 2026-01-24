@@ -132,7 +132,7 @@ export default function RootLayout({
               <ToastContainer
                 position="top-center"
                 hideProgressBar
-                autoClose={2000} // Optimal duration for user reading
+                autoClose={1500} // Optimal duration for user reading
               />
             </AppContext>
           </main>

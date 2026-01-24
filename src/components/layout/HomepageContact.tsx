@@ -151,7 +151,7 @@ function HomepageContact() {
     return (
         <>
             {/* Anchor spacer for navigation - provides scroll target for #contact */}
-            <div className="w-full h-[105px]" id='contact'></div>
+            <div className="w-full h-26.25" id='contact'></div>
 
             {/* Main contact section */}
             <section className="text-center mb-16 px-4">
@@ -182,7 +182,7 @@ function HomepageContact() {
                 {!submitted ? (
                     <form
                         onSubmit={handleSubmit}
-                        className="mt-10 max-w-md mx-auto text-left space-y-3 bg-gradient-to-br from-[#2c1a0d]/50 to-[#1a1108]/80 backdrop-blur-sm border border-amber-900/30 rounded-2xl p-6"
+                        className="mt-10 max-w-md mx-auto text-left space-y-3 bg-linear-to-br from-[#2c1a0d]/50 to-[#1a1108]/80 backdrop-blur-sm border border-amber-900/30 rounded-2xl p-6"
                         noValidate
                     >
                         {/* Name input field */}
