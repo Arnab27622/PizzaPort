@@ -222,7 +222,7 @@ export const authOptions: NextAuthOptions = {
                 token.name = user.name ?? undefined;
                 token.email = user.email ?? undefined;
                 token.image = user.image ?? undefined;
-                token.admin = (user as any).admin ?? false;
+                token.admin = (user as { admin?: boolean }).admin ?? false;
             }
 
             // Handle manual session updates
@@ -268,7 +268,10 @@ export const authOptions: NextAuthOptions = {
 
                         // Security check: Terminate session if user was banned while logged in
                         if (found.banned) {
-                            return null as any;
+                            return {
+                                ...session,
+                                expires: new Date(0).toISOString(),
+                            };
                         }
                     }
                 } catch (error) {
