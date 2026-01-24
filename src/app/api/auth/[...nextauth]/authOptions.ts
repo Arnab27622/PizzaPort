@@ -3,7 +3,6 @@ import bcrypt from "bcryptjs";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { MongoDBAdapter } from "@auth/mongodb-adapter"
 import clientPromise from "@/lib/mongoConnect";
 import mongoose from "mongoose";
 import { v2 as cloudinary } from 'cloudinary';
@@ -84,9 +83,6 @@ async function uploadExternalImageToCloudinary(
  * Defines authentication providers, session management, and custom callbacks
  */
 export const authOptions: NextAuthOptions = {
-    // MongoDB adapter for storing user sessions and accounts
-    adapter: MongoDBAdapter(clientPromise),
-
     // Session configuration using JWT strategy
     session: {
         strategy: "jwt", // JSON Web Token based sessions
@@ -106,22 +102,13 @@ export const authOptions: NextAuthOptions = {
             clientId: process.env.GOOGLE_CLIENT_ID!,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
             async profile(profile) {
-                // Upload profile image to Cloudinary to avoid ephemeral storage issues
-                let imageUrl = profile.picture;
-                if (imageUrl) {
-                    const cloudinaryUrl = await uploadExternalImageToCloudinary(imageUrl);
-                    if (cloudinaryUrl) imageUrl = cloudinaryUrl;
-                }
-
+                // Return default profile structure. Cloudinary upload will be handled
+                // in the signIn callback to have better control over existing users.
                 return {
                     id: profile.sub,
                     name: profile.name,
                     email: profile.email,
-                    image: imageUrl,
-                    admin: false,    // Default non-admin for new users
-                    banned: false,   // Default not banned for new users
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
+                    image: profile.picture,
                 };
             },
         }),
@@ -183,29 +170,60 @@ export const authOptions: NextAuthOptions = {
          * - Updates last login timestamp for existing users
          */
         async signIn({ user, account }) {
+            // Ensure database connection
             const db = (await clientPromise).db();
             const users = db.collection("users");
 
-            // Check if user exists and is banned
+            // Check if user is banned before allowing sign-in
             const existingUser = await users.findOne({ email: user.email });
             if (existingUser?.banned) {
-                throw new Error("UserBanned"); // Custom error for banned users
+                throw new Error("UserBanned");
             }
 
             const now = new Date();
 
-            if (existingUser) {
-                // Update last login timestamp for existing users
+            if (account?.provider === 'google') {
+                // Handle Google OAuth manually since we're not using the adapter
+                if (!existingUser) {
+                    // New user from Google
+                    let imageUrl = user.image;
+                    if (imageUrl) {
+                        const cloudinaryUrl = await uploadExternalImageToCloudinary(imageUrl);
+                        if (cloudinaryUrl) imageUrl = cloudinaryUrl;
+                    }
+
+                    await users.insertOne({
+                        name: user.name,
+                        email: user.email,
+                        image: imageUrl,
+                        admin: false,
+                        banned: false,
+                        createdAt: now,
+                        updatedAt: now,
+                    });
+                } else {
+                    // Existing user - Update only necessary fields
+                    const updateData: any = { updatedAt: now };
+
+                    // If the user doesn't have an image or uses a Google proxy URL, update to Cloudinary
+                    if (user.image && (!existingUser.image || existingUser.image.includes('googleusercontent.com'))) {
+                        const cloudinaryUrl = await uploadExternalImageToCloudinary(user.image);
+                        if (cloudinaryUrl) updateData.image = cloudinaryUrl;
+                    }
+
+                    await users.updateOne(
+                        { _id: existingUser._id },
+                        { $set: updateData }
+                    );
+                }
+            } else if (existingUser) {
+                // For Credentials provider, just update timestamp
                 await users.updateOne(
                     { _id: existingUser._id },
                     { $set: { updatedAt: now } }
                 );
             }
 
-            // Allow sign in - Adapter will handle creation for new users 
-            // using the data returned from the provider's profile() callback.
-            // This prevents the 'OAuthAccountNotLinked' error that occurs when 
-            // a user is manually created before NextAuth can link the account.
             return true;
         },
 
@@ -217,12 +235,22 @@ export const authOptions: NextAuthOptions = {
         async jwt({ token, user, trigger, session }) {
             // Initial sign in
             if (user) {
-                token.id = user.id;
-                token.name = user.name ?? undefined;
-                token.email = user.email ?? undefined;
-                token.image = user.image ?? undefined;
-                token.admin = user.admin ?? false;
+                // For OAuth providers, the 'user' object might not have the DB ID.
+                // We ensure token.id is the MongoDB _id.
+                if (!token.id || (user.id && user.id.length > 24)) {
+                    const db = (await clientPromise).db();
+                    const found = await db.collection("users").findOne({ email: user.email });
+                    if (found) {
+                        token.id = found._id.toString();
+                        token.admin = found.admin ?? false;
+                    }
+                }
 
+                if (user.id && !token.id) token.id = user.id;
+                token.name = user.name ?? token.name;
+                token.email = user.email ?? token.email;
+                token.image = user.image ?? token.image;
+                if (typeof user.admin === 'boolean') token.admin = user.admin;
             }
 
             // Handle manual session updates
@@ -237,7 +265,6 @@ export const authOptions: NextAuthOptions = {
                 if (u.image) token.image = u.image;
                 if (u.email) token.email = u.email;
                 if (typeof u.admin === 'boolean') token.admin = u.admin;
-
             }
 
             return token;
