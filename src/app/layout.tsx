@@ -42,6 +42,7 @@ import AppContext from "@/components/AppContext";
 import Script from "next/script";
 import BackgroundManager from "@/components/layout/BackgroundManager";
 import NextTopLoader from "nextjs-toploader";
+import ScrollToTop from "@/components/layout/ScrollToTop";
 
 /**
  * Font Configuration
@@ -106,10 +107,11 @@ export default function RootLayout({
       <body suppressHydrationWarning className={
         `${sedgwick.variable} ${oswald.variable} ${openSans.variable} antialiased main-content flex flex-col min-h-screen`
       }>
+        <ScrollToTop />
         {/* Razorpay Payment Gateway Integration */}
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"
-          strategy="beforeInteractive" // Loads before page becomes interactive
+          strategy="lazyOnload" // Loads lazily during idle time
         />
 
         {/* Page Loading Progress Indicator */}
@@ -121,7 +123,7 @@ export default function RootLayout({
 
         {/* Background Management and Context Providers */}
         <BackgroundManager>
-          <main className="flex-grow">
+          <main className="grow">
             <AppContext>
               <Navbar />
               {children}

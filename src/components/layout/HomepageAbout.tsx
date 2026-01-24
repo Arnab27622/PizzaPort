@@ -23,7 +23,7 @@ function HomepageAbout() {
     return (
         <>
             {/* Anchor spacer for navigation - provides scroll target offset */}
-            <div className="w-full h-[105px]" id='about'></div>
+            <div className="w-full h-26.25" id='about'></div>
 
             {/* Main about section */}
             <section className='text-center mb-25 px-4'>
@@ -41,10 +41,10 @@ function HomepageAbout() {
                     </div>
 
                     {/* Main content card with glassmorphism effect */}
-                    <div className="relative z-10 bg-gradient-to-br from-[#2c1a0d]/50 to-[#1a1108]/90 backdrop-blur-sm border border-amber-900/30 rounded-2xl p-8 space-y-6">
+                    <div className="relative z-10 bg-linear-to-br from-[#2c1a0d]/50 to-[#1a1108]/90 backdrop-blur-sm border border-amber-900/30 rounded-2xl p-8 space-y-6">
                         {/* First paragraph - company passion and craftsmanship */}
                         <p className='text-amber-100 text-lg leading-relaxed'>
-                            At our PizzaPort, every slice tells a story — one of passion, flavor, and tradition. From our carefully crafted dough to our house-made sauces, we pay attention to every detail to give you a pizza that&apos;s unforgettable.
+                            At PizzaPort, every slice tells a story — one of passion, flavor, and tradition. From our carefully crafted dough to our house-made sauces, we pay attention to every detail to give you a pizza that&apos;s unforgettable.
                         </p>
 
                         {/* Second paragraph - ingredients and menu diversity */}
