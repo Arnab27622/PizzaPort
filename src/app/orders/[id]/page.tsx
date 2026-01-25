@@ -49,6 +49,17 @@ interface Order {
 }
 
 /**
+ * Database Order Type Definition
+ * 
+ * Represents the order document as it comes from the database via lean()
+ * before being serialized to JSON for the client components.
+ */
+interface DBOrder extends Omit<Order, "_id" | "createdAt"> {
+    _id: mongoose.Types.ObjectId | string;
+    createdAt: Date | string;
+}
+
+/**
  * Status Color Mapping Function
  * 
  * Provides consistent visual indicators for order states across the application
@@ -165,7 +176,7 @@ export default async function OrderDetailPage({
             }
 
             // Find order by ID in the database
-            const orderDoc = await OrderModel.findById(id).lean() as any;
+            const orderDoc = await OrderModel.findById(id).lean() as DBOrder | null;
 
             if (!orderDoc) {
                 order = null;
