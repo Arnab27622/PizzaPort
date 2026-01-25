@@ -1,7 +1,10 @@
 import React from "react";
 import SectionHeader from "@/components/layout/SectionHeader";
 import BackButton from "@/components/layout/BackButton";
-import { headers } from "next/headers";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+import mongoose from "mongoose";
+import OrderModel from "@/app/models/Orders";
 
 /**
  * Order Item Type Definition
@@ -151,24 +154,34 @@ export default async function OrderDetailPage({
      * Order Data Fetcher
      */
     try {
-        const headerList = await headers();
-        const res = await fetch(
-            `${process.env.NEXTAUTH_URL || ""}/api/orders/${id}`,
-            {
-                headers: {
-                    cookie: headerList.get("cookie") || "",
-                },
-                next: {
-                    revalidate: 30,
-                },
+        const session = await getServerSession(authOptions);
+
+        if (!session) {
+            error = "Unauthorized. Please log in.";
+        } else {
+            // Establish database connection
+            if (mongoose.connection.readyState === 0) {
+                await mongoose.connect(process.env.MONGO_URL!);
             }
-        );
 
-        if (!res.ok) {
-            throw new Error(`Failed to load order: ${res.status} ${res.statusText}`);
+            // Find order by ID in the database
+            const orderDoc = await OrderModel.findById(id).lean() as any;
+
+            if (!orderDoc) {
+                order = null;
+            } else {
+                // Authorization check: Admin or Order Owner
+                const isAdmin = session.user?.admin;
+                const isOwner = orderDoc.userEmail === session.user?.email;
+
+                if (!isAdmin && !isOwner) {
+                    error = "Forbidden: You do not have permission to view this order.";
+                } else {
+                    // Convert MongoDB document to plain serializable object
+                    order = JSON.parse(JSON.stringify(orderDoc));
+                }
+            }
         }
-
-        order = await res.json();
     } catch (err) {
         console.error("Error fetching order:", err);
         error = err instanceof Error ? err.message : "An unknown error occurred";
