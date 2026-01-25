@@ -123,10 +123,12 @@ export default function RootLayout({
 
         {/* Background Management and Context Providers */}
         <BackgroundManager>
-          <main className="grow">
+          <main className="grow flex flex-col">
             <AppContext>
               <Navbar />
-              {children}
+              <div className="grow">
+                {children}
+              </div>
               <Footer />
               {/* Global Toast Notification System */}
               <ToastContainer

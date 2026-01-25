@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { useIsAdmin } from "../hook/useAdmin";
 import BackButton from "@/components/layout/BackButton";
 import LoadingSpinner from "@/components/icons/LoadingSpinner";
+import LocationIcon from "@/components/icons/LocationIcon";
 
 /**
  * Order Item Type Definition
@@ -371,9 +372,9 @@ export default function AdminOrdersPage() {
      * - Detailed order navigation
      */
     return (
-        <div className="max-w-7xl min-h-[90vh] mx-auto mt-10 px-4 py-12 text-amber-100">
-            <div className="flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-                <h1 className="text-3xl font-bold heading-border underline">Manage Orders</h1>
+        <div className="max-w-7xl min-h-[90vh] mx-auto mt-8 px-4 py-12 text-amber-100">
+            <div className="flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 md:mb-8">
+                <h1 className="text-2xl md:text-3xl font-bold heading-border underline">Manage Orders</h1>
                 <BackButton label="Back" />
             </div>
 
@@ -394,93 +395,9 @@ export default function AdminOrdersPage() {
             {sortedOrders.length === 0 ? (
                 <p className="text-gray-400">No orders found.</p>
             ) : (
-                <div className="overflow-x-auto rounded-md bg-[#2c1a0d] border border-amber-800">
-                    {/* Desktop Table View */}
-                    <table className="w-full hidden md:table">
-                        <thead>
-                            <tr className="bg-[#1a1108]">
-                                <th className="px-4 py-2 text-left">Order ID</th>
-                                <th className="px-4 py-2 text-left">Customer</th>
-                                <th className="px-4 py-2 text-left">Address</th>
-                                <th className="px-4 py-2 text-left">Items</th>
-                                <th className="px-4 py-2 text-left">Total</th>
-                                <th className="px-4 py-2 text-left">Status</th>
-                                <th className="px-4 py-2 text-left">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {sortedOrders.map((order) => {
-                                const isUpdating = updatingOrders.has(order._id);
-                                const isCanceling = cancelingOrders.has(order._id);
-                                const isCompletedOrCanceled = order.status === "completed" || order.status === "canceled";
-
-                                return (
-                                    <tr
-                                        key={order._id}
-                                        onClick={() => handleRowClick(order._id)}
-                                        className="border-b border-amber-800 hover:bg-[#3a281a] cursor-pointer"
-                                    >
-                                        <td className="px-4 py-3">{order.razorpayOrderId}</td>
-                                        <td className="px-4 py-3">
-                                            <div className="font-semibold">{order.userName}</div>
-                                            <div className="text-sm text-amber-200">{order.userEmail}</div>
-                                        </td>
-                                        <td className="px-4 py-3 max-w-xs truncate">{order.address}</td>
-                                        <td className="px-4 py-3">{order.cart.length}</td>
-                                        <td className="px-4 py-3 font-semibold">₹{order.total}</td>
-                                        <td className="px-4 py-3">
-                                            <div className="flex items-center gap-2">
-                                                {isUpdating ? (
-                                                    <div className="h-4 w-4">
-                                                        <LoadingSpinner size="sm" color="text-primary" />
-                                                    </div>
-                                                ) : (
-                                                    <div className={`w-2 h-2 rounded-full ${statusColors[order.status as OrderStatus]}`} />
-                                                )}
-                                                <select
-                                                    value={order.status}
-                                                    onMouseDown={(e) => e.stopPropagation()}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    onChange={(e) => updateOrderStatus(order._id, e.target.value as OrderStatus, e)}
-                                                    className={`bg-[#1a1108] border border-amber-700 rounded px-2 py-1 ${isCompletedOrCanceled
-                                                        ? "opacity-50 cursor-not-allowed"
-                                                        : "cursor-pointer"
-                                                        }`}
-                                                    disabled={isCompletedOrCanceled || isUpdating}
-                                                >
-                                                    {Object.entries(statusLabels)
-                                                        .filter(([value]) => value !== "canceled" || order.status === "canceled")
-                                                        .map(([value, label]) => (
-                                                            <option key={value} value={value}>{label}</option>
-                                                        ))}
-                                                </select>
-                                            </div>
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            {order.status === "canceled" ? (
-                                                <span className="text-red-500 font-semibold">Canceled</span>
-                                            ) : order.status === "completed" ? (
-                                                <span className="text-green-500 font-semibold">Completed</span>
-                                            ) : (
-                                                <button
-                                                    onClick={(e) => cancelOrder(order._id, e)}
-                                                    disabled={isCanceling}
-                                                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center h-8"
-                                                >
-                                                    {isCanceling ? (
-                                                        <LoadingSpinner size="sm" color="text-white" />
-                                                    ) : 'Cancel'}
-                                                </button>
-                                            )}
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-
-                    {/* Mobile Card View */}
-                    <div className="md:hidden">
+                <div className="rounded-md bg-[#2c1a0d] border border-amber-800">
+                    {/* Orders List - Mobile-inspired Card View for all screens */}
+                    <div className="divide-y divide-amber-900/30">
                         {sortedOrders.map((order) => {
                             const isUpdating = updatingOrders.has(order._id);
                             const isCanceling = cancelingOrders.has(order._id);
@@ -490,47 +407,72 @@ export default function AdminOrdersPage() {
                                 <div
                                     key={order._id}
                                     onClick={() => handleRowClick(order._id)}
-                                    className="p-4 border-b border-amber-800 hover:bg-[#3a281a] cursor-pointer"
+                                    className="p-4 sm:p-6 hover:bg-[#3a281a] cursor-pointer transition-all active:bg-[#4a382a] group"
                                 >
-                                    <div className="grid grid-cols-2 gap-2 mb-3">
-                                        <div className="font-semibold">Order ID:</div>
-                                        <div>{order.razorpayOrderId}</div>
+                                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                                        {/* Left Side: Order Info */}
+                                        <div className="flex-1 space-y-4">
+                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between lg:justify-start gap-4">
+                                                <div className="min-w-0">
+                                                    <h3 className="text-[10px] font-bold text-amber-500 uppercase tracking-widest mb-1">Order ID</h3>
+                                                    <p className="font-mono text-sm text-amber-100 break-all bg-black/20 px-2 py-1.5 rounded border border-amber-900/30">
+                                                        {order.razorpayOrderId}
+                                                    </p>
+                                                </div>
+                                                <div className="sm:text-right lg:text-left lg:ml-8">
+                                                    <div className="text-2xl font-black text-amber-50">₹{order.total}</div>
+                                                    <div className="text-[10px] text-amber-400/60 font-medium">
+                                                        {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                                        <div className="font-semibold">Customer:</div>
-                                        <div>
-                                            <div>{order.userName}</div>
-                                            <div className="text-sm text-amber-200">{order.userEmail}</div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                {/* Customer Info */}
+                                                <div className="flex items-start gap-3">
+                                                    <div className="w-10 h-10 rounded-full bg-amber-900/50 flex items-center justify-center shrink-0 border border-amber-700/30">
+                                                        <span className="text-amber-300 text-sm font-bold uppercase">{order.userName.charAt(0)}</span>
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <div className="font-bold text-amber-100 truncate">{order.userName}</div>
+                                                        <div className="text-xs text-amber-400/70 truncate">{order.userEmail}</div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Address Info */}
+                                                <div className="text-sm text-amber-200/80 bg-black/10 p-2.5 rounded-md flex gap-2 items-start hover:bg-black/20 transition-colors">
+                                                    <LocationIcon />
+                                                    <span className="line-clamp-2 md:line-clamp-1 lg:line-clamp-2" title={order.address}>{order.address}</span>
+                                                </div>
+
+                                                {/* Items Info */}
+                                                <div className="flex items-center gap-2">
+                                                    <span className="bg-amber-900/40 px-3 py-1 rounded-full border border-amber-800/30 text-xs text-amber-300 font-semibold">
+                                                        {order.cart.length} Item{order.cart.length !== 1 ? 's' : ''} Packed
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
 
-                                        <div className="font-semibold">Address:</div>
-                                        <div className="truncate">{order.address}</div>
-
-                                        <div className="font-semibold">Items:</div>
-                                        <div>{order.cart.length}</div>
-
-                                        <div className="font-semibold">Total:</div>
-                                        <div className="font-semibold">₹{order.total}</div>
-                                    </div>
-
-                                    <div className="flex flex-col space-y-3">
-                                        <div>
-                                            <div className="font-semibold mb-1">Status:</div>
-                                            <div className="flex items-center gap-2">
-                                                {isUpdating ? (
-                                                    <div className="h-4 w-4">
+                                        {/* Right Side: Status & Actions */}
+                                        <div className="flex flex-col sm:flex-row lg:flex-col gap-3 lg:min-w-50">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2 mb-1.5">
+                                                    {isUpdating ? (
                                                         <LoadingSpinner size="sm" color="text-primary" />
-                                                    </div>
-                                                ) : (
-                                                    <div className={`w-2 h-2 rounded-full ${statusColors[order.status as OrderStatus]}`} />
-                                                )}
+                                                    ) : (
+                                                        <div className={`w-2 h-2 rounded-full ${statusColors[order.status as OrderStatus]}`} />
+                                                    )}
+                                                    <span className="text-[10px] font-bold text-amber-400/80 uppercase tracking-tighter">Current Status</span>
+                                                </div>
                                                 <select
                                                     value={order.status}
                                                     onMouseDown={(e) => e.stopPropagation()}
                                                     onClick={(e) => e.stopPropagation()}
                                                     onChange={(e) => updateOrderStatus(order._id, e.target.value as OrderStatus, e)}
-                                                    className={`w-full bg-[#1a1108] border border-amber-700 rounded px-2 py-1 ${isCompletedOrCanceled
+                                                    className={`w-full bg-[#1a1108] border border-amber-800 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all ${isCompletedOrCanceled
                                                         ? "opacity-50 cursor-not-allowed"
-                                                        : "cursor-pointer"
+                                                        : "cursor-pointer border-amber-700 hover:border-primary"
                                                         }`}
                                                     disabled={isCompletedOrCanceled || isUpdating}
                                                 >
@@ -541,28 +483,30 @@ export default function AdminOrdersPage() {
                                                         ))}
                                                 </select>
                                             </div>
-                                        </div>
 
-                                        <div>
-                                            {order.status === "canceled" ? (
-                                                <span className="block text-center text-red-500 font-semibold">
-                                                    Canceled
-                                                </span>
-                                            ) : order.status === "completed" ? (
-                                                <span className="block text-center text-green-500 font-semibold">
-                                                    Completed
-                                                </span>
-                                            ) : (
-                                                <button
-                                                    onClick={(e) => cancelOrder(order._id, e)}
-                                                    disabled={isCanceling}
-                                                    className="w-full bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center h-10"
-                                                >
-                                                    {isCanceling ? (
-                                                        <LoadingSpinner size="sm" color="text-white" />
-                                                    ) : 'Cancel Order'}
-                                                </button>
-                                            )}
+                                            <div className="flex-1 flex flex-col justify-end">
+                                                {order.status === "canceled" ? (
+                                                    <div className="w-full py-2.5 text-center text-red-500 font-bold text-xs border border-red-500/20 rounded-lg bg-red-500/5 uppercase tracking-widest">
+                                                        Canceled
+                                                    </div>
+                                                ) : order.status === "completed" ? (
+                                                    <div className="w-full py-2.5 text-center text-green-500 font-bold text-xs border border-green-500/20 rounded-lg bg-green-500/5 uppercase tracking-widest">
+                                                        Completed
+                                                    </div>
+                                                ) : (
+                                                    <button
+                                                        onClick={(e) => cancelOrder(order._id, e)}
+                                                        disabled={isCanceling}
+                                                        className="w-full bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white font-bold py-2.5 rounded-lg border border-red-600/30 transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-wider"
+                                                    >
+                                                        {isCanceling ? (
+                                                            <LoadingSpinner size="sm" color="text-white" />
+                                                        ) : (
+                                                            <>Cancel Order</>
+                                                        )}
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

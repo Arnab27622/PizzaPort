@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import mongoose from "mongoose";
 import OrderModel from "@/app/models/Orders";
+import Image from "next/image";
 
 /**
  * Order Item Type Definition
@@ -14,6 +15,7 @@ import OrderModel from "@/app/models/Orders";
  */
 interface OrderItem {
     name: string;                             // Product name as displayed to customer
+    imageUrl?: string;                        // Optional product image URL
     size?: {                                  // Selected size option with price adjustment
         name: string;
         extraPrice: number;
@@ -264,128 +266,165 @@ export default async function OrderDetailPage({
      * Main Component Render
      */
     return (
-        <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100">
+        <div className="max-w-7xl mx-auto mt-8 px-4 py-12 text-amber-100">
             {/* Back Button */}
             <div className="mb-6">
                 <BackButton href="/orders" />
             </div>
 
-            {/* Page Header with Order Reference */}
-            <SectionHeader
-                subHeader=""
-                mainHeader={`Order: ${order.razorpayOrderId}`}
-            />
+            {/* Page Header */}
+            <div className="text-center mb-6 md:mb-10">
+                <h3 className="uppercase font-bold tracking-widest text-card text-xs md:text-sm mb-2">Order Tracking</h3>
+                <h1 className="text-xl md:text-3xl lg:text-4xl font-bold text-white break-all max-w-4xl mx-auto px-2">
+                    Order: <span className="text-amber-500">#{order.razorpayOrderId}</span>
+                </h1>
+                <div className='w-16 md:w-24 h-1 bg-primary mx-auto rounded-full mt-3 md:mt-4'></div>
+            </div>
 
             {/* Main Order Content Container */}
-            <div className="bg-[#1a1108] p-6 rounded-lg shadow-lg">
-                {/* Order Header Section */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-                    <div>
-                        <h1 className="text-2xl font-bold">
-                            Order #{order.razorpayOrderId}
-                        </h1>
-                        <p className="text-amber-300">
-                            Placed on {formatDate(order.createdAt)}
-                        </p>
-                    </div>
-                    {/* Order Total Display */}
-                    <div className="text-xl font-bold">{formatCurrency(order.total)}</div>
-                </div>
-
-                {/* Order Items Section */}
-                <div className="space-y-4 mb-8">
-                    <h2 className="text-xl font-semibold mb-4">Order Items</h2>
-                    {groupedItemsArray.map((group, idx) => (
-                        <div
-                            key={`${group.item.name}-${idx}-${group.item.size?.name || 'no-size'}`}
-                            className="bg-[#2c1a0d] p-4 rounded-lg flex flex-col sm:flex-row justify-between gap-4"
-                        >
-                            {/* Item Details */}
-                            <div className="flex-1">
-                                <p className="font-semibold text-lg">
-                                    {group.item.name}
-                                    {group.quantity > 1 && <span className="text-amber-300 ml-2">x{group.quantity}</span>}
-                                </p>
-                                {/* Size Information */}
-                                {group.item.size && (
-                                    <p className="text-amber-300">
-                                        Size: {group.item.size.name}
-                                    </p>
-                                )}
-                                {/* Extras/Toppings List */}
-                                {(group.item.extras?.length ?? 0) > 0 && (
-                                    <div className="mt-2">
-                                        <p className="font-semibold text-amber-300">Toppings:</p>
-                                        <ul className="list-disc list-inside ml-2 text-amber-200">
-                                            {group.item.extras!.map((extra, extraIdx) => (
-                                                <li key={`${extra.name}-${extraIdx}`}>
-                                                    {extra.name} ({formatCurrency(extra.extraPrice)})
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
-                            </div>
-                            {/* Item Total */}
-                            <div className="font-semibold text-lg">
-                                {formatCurrency(group.total * group.quantity)}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Information Grid: Delivery Details & Order Summary */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Delivery Information Card */}
-                    <div>
-                        <h2 className="font-bold text-xl mb-4">Delivery Details</h2>
-                        <div className="space-y-2">
-                            <p><span className="font-semibold">Name:</span> {order.userName}</p>
-                            <p><span className="font-semibold">Email:</span> {order.userEmail}</p>
-                            <p><span className="font-semibold">Address:</span> {order.address}</p>
-                        </div>
-                    </div>
-
-                    {/* Financial & Status Summary Card */}
-                    <div>
-                        <h2 className="font-bold text-xl mb-4">Payment & Order Summary</h2>
-                        <div className="space-y-2">
-                            {/* Financial Breakdown */}
-                            <div className="flex justify-between">
-                                <span>Subtotal:</span>
-                                <span>{formatCurrency(order.subtotal)}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span>Tax:</span>
-                                <span>{formatCurrency(order.tax)}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span>Delivery Fee:</span>
-                                <span>{formatCurrency(order.deliveryFee)}</span>
-                            </div>
-                            {/* Order Total */}
-                            <div className="border-t border-amber-800 pt-2 mt-2 flex justify-between font-semibold text-lg">
-                                <span>Total:</span>
-                                <span>{formatCurrency(order.total)}</span>
-                            </div>
-                            {/* Status Information */}
-                            <div className="flex justify-between mt-4">
-                                <span>Order Status:</span>
-                                <span className={getStatusColor(order.status)}>
+            <div className="bg-[#1a1108] border border-amber-900/50 rounded-xl shadow-2xl overflow-hidden">
+                {/* Order Header Banner */}
+                <div className="bg-[#2c1a0d]/50 p-4 sm:p-6 md:p-8 border-b border-amber-900/30">
+                    <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start md:items-center gap-4 sm:gap-6">
+                        <div className="space-y-1 text-center sm:text-left">
+                            <div className="flex items-center justify-center sm:justify-start gap-3">
+                                <span className={`text-base md:text-lg font-bold uppercase tracking-widest ${getStatusColor(order.status)}`}>
                                     {getStatusLabel(order.status)}
                                 </span>
                             </div>
-                            <div className="flex justify-between">
-                                <span>Payment Status:</span>
-                                <span className={
-                                    order.paymentStatus === "refund_initiated"
-                                        ? "text-primary"
-                                        : order.paymentStatus === "paid"
-                                            ? "text-green-500"
-                                            : "text-amber-400"
-                                }>
-                                    {order.paymentStatus.replace(/_/g, " ")}
-                                </span>
+                            <p className="text-amber-300/80 text-xs md:text-sm max-w-62.5 sm:max-w-none">
+                                Placed on {formatDate(order.createdAt)}
+                            </p>
+                        </div>
+                        <div className="text-center sm:text-right">
+                            <p className="text-[10px] md:text-xs uppercase text-amber-500 font-bold tracking-widest mb-1">Total Amount</p>
+                            <div className="text-2xl md:text-3xl font-black text-amber-50">{formatCurrency(order.total)}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="p-4 sm:p-6 md:p-8 space-y-8 md:space-y-10">
+                    {/* Order Items Section */}
+                    <div>
+                        <h2 className="text-lg md:text-xl font-bold mb-4 md:mb-6 flex items-center justify-center sm:justify-start gap-2">
+                            <span className="text-primary">🍕</span> Order Items
+                        </h2>
+                        <div className="grid gap-3 md:gap-4">
+                            {groupedItemsArray.map((group, idx) => (
+                                <div
+                                    key={`${group.item.name}-${idx}`}
+                                    className="bg-[#2c1a0d]/30 border border-amber-900/20 p-3 md:p-4 rounded-xl flex flex-col sm:flex-row items-center sm:items-start gap-4 transition-all hover:border-primary/30"
+                                >
+                                    {/* Item Image */}
+                                    {group.item.imageUrl && (
+                                        <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0 border border-amber-900/30 shadow-md">
+                                            <Image
+                                                src={group.item.imageUrl}
+                                                alt={group.item.name}
+                                                className="w-full h-full object-cover"
+                                                width={80}
+                                                height={80}
+                                            />
+                                        </div>
+                                    )}
+
+                                    {/* Item Details */}
+                                    <div className="flex-1 text-center sm:text-left min-w-0 w-full">
+                                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-1 mb-2">
+                                            <p className="text-base md:text-lg font-bold text-amber-50 whitespace-normal">
+                                                {group.item.name}
+                                                {group.quantity > 1 && (
+                                                    <span className="bg-primary/20 text-primary text-[10px] md:text-xs px-2 py-0.5 rounded ml-2 align-middle">
+                                                        x{group.quantity}
+                                                    </span>
+                                                )}
+                                            </p>
+                                            <p className="font-bold text-base md:text-lg text-amber-200">
+                                                {formatCurrency(group.total * group.quantity)}
+                                            </p>
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            {group.item.size && (
+                                                <p className="text-xs md:text-sm text-amber-400/80 flex items-center gap-1.5 justify-center sm:justify-start">
+                                                    <span className="w-1 h-1 bg-amber-600 rounded-full" />
+                                                    Size: {group.item.size.name}
+                                                </p>
+                                            )}
+                                            {(group.item.extras?.length ?? 0) > 0 && (
+                                                <div className="text-xs md:text-sm text-amber-400/80 flex items-start gap-1.5 justify-center sm:justify-start">
+                                                    <span className="w-1 h-1 bg-amber-600 rounded-full mt-1.5 shrink-0" />
+                                                    <span className="whitespace-normal">Extras: {group.item.extras!.map(e => e.name).join(', ')}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Information Grid: Delivery Details & Order Summary */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+                        {/* Delivery Information Card */}
+                        <div className="bg-black/20 p-4 md:p-6 rounded-xl border border-amber-900/20">
+                            <h2 className="font-bold text-base md:text-lg mb-4 md:mb-6 flex items-center gap-2 text-amber-500 uppercase tracking-widest justify-center sm:justify-start">
+                                Delivery Details
+                            </h2>
+                            <div className="space-y-3 md:space-y-4">
+                                <div className="flex flex-col text-center sm:text-left">
+                                    <span className="text-[10px] uppercase text-amber-600 font-bold tracking-tighter">Customer Name</span>
+                                    <span className="text-sm md:text-base text-amber-50 font-medium">{order.userName}</span>
+                                </div>
+                                <div className="flex flex-col text-center sm:text-left">
+                                    <span className="text-[10px] uppercase text-amber-600 font-bold tracking-tighter">Email Address</span>
+                                    <span className="text-sm md:text-base text-amber-50 font-medium break-all">{order.userEmail}</span>
+                                </div>
+                                <div className="flex flex-col text-center sm:text-left">
+                                    <span className="text-[10px] uppercase text-amber-600 font-bold tracking-tighter">
+                                        Shipping Address
+                                    </span>
+                                    <span className="text-sm md:text-base text-amber-200/90 whitespace-normal">{order.address}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Financial & Status Summary Card */}
+                        <div className="bg-black/20 p-4 md:p-6 rounded-xl border border-amber-900/20">
+                            <h2 className="font-bold text-base md:text-lg mb-4 md:mb-6 flex items-center gap-2 text-amber-500 uppercase tracking-widest justify-center sm:justify-start">
+                                <span>💳</span> Billing Summary
+                            </h2>
+                            <div className="w-full space-y-3">
+                                <div className="flex justify-between items-center text-xs md:text-sm text-amber-300/80">
+                                    <span>Subtotal</span>
+                                    <span className="font-mono">{formatCurrency(order.subtotal)}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-xs md:text-sm text-amber-300/80">
+                                    <span>Tax (GST)</span>
+                                    <span className="font-mono">{formatCurrency(order.tax)}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-xs md:text-sm text-amber-300/80">
+                                    <span>Delivery Fee</span>
+                                    <span className="font-mono">{formatCurrency(order.deliveryFee)}</span>
+                                </div>
+                                <div className="border-t border-amber-900/50 pt-3 mt-3 flex justify-between items-center text-amber-50 font-black text-lg md:text-xl">
+                                    <span className="text-sm md:text-lg">Total Amount</span>
+                                    <span>{formatCurrency(order.total)}</span>
+                                </div>
+
+                                <div className="pt-4 md:pt-6 space-y-4">
+                                    <div className="flex justify-between items-center bg-[#1a1108] p-3 rounded-lg border border-amber-900/30">
+                                        <span className="text-[10px] md:text-xs uppercase font-bold text-amber-600">Payment Status</span>
+                                        <span className={`text-[10px] md:text-sm font-bold uppercase tracking-wider ${order.paymentStatus === "refund_initiated"
+                                            ? "text-primary"
+                                            : order.paymentStatus === "paid" || order.paymentStatus === "verified"
+                                                ? "text-green-500"
+                                                : "text-amber-400"
+                                            }`}>
+                                            {order.paymentStatus.replace(/_/g, " ")}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -393,4 +432,5 @@ export default async function OrderDetailPage({
             </div>
         </div>
     );
+
 }
