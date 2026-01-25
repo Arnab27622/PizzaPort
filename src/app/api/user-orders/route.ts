@@ -88,7 +88,7 @@ export async function GET() {
         const orders = await db.collection("orders")
             .find({
                 userEmail: session.user.email, // Scope to current user only
-                paymentStatus: { $in: ["verified", "completed"] }
+                paymentStatus: { $in: ["verified", "completed", "refund_initiated"] }
             })
             .project({
                 razorpayOrderId: 1,    // Payment gateway order reference

@@ -267,7 +267,7 @@ export default async function OrderDetailPage({
         <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100">
             {/* Back Button */}
             <div className="mb-6">
-                <BackButton />
+                <BackButton href="/orders" />
             </div>
 
             {/* Page Header with Order Reference */}

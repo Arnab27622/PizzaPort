@@ -100,9 +100,14 @@ export default function MenuPage() {
 
   if (isAdminLoading || swrLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[80vh]">
-        <LoadingSpinner size="lg" color="text-primary" />
-        <p className="mt-4 text-amber-200">Loading menu...</p>
+      <div className="min-h-[80vh] text-card p-6 lg:py-6 lg:px-15 mt-16 max-w-7xl mx-auto">
+        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <h1 className="text-3xl font-bold heading-border text-amber-50">Manage Menu Items</h1>
+        </header>
+        <div className="flex flex-col items-center justify-center mt-32">
+          <LoadingSpinner size="lg" color="text-primary" />
+          <p className="mt-4 text-amber-200">Loading menu...</p>
+        </div>
       </div>
     );
   }

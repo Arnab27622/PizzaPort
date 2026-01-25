@@ -83,7 +83,7 @@ export async function GET(
         const order = await db.collection("orders").findOne({
             razorpayOrderId: orderId,        // Order identifier from payment gateway
             userEmail: session.user.email,   // Ownership verification
-            paymentStatus: { $in: ["verified", "completed"] }
+            paymentStatus: { $in: ["verified", "completed", "refund_initiated"] }
         });
 
         // Handle case where order doesn't exist or doesn't belong to user

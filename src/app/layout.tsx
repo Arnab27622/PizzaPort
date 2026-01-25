@@ -42,7 +42,7 @@ import AppContext from "@/components/AppContext";
 import Script from "next/script";
 import BackgroundManager from "@/components/layout/BackgroundManager";
 import NextTopLoader from "nextjs-toploader";
-import ScrollToTop from "@/components/layout/ScrollToTop";
+
 
 /**
  * Font Configuration
@@ -95,7 +95,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+    <html lang="en">
       <head>
         {/* Critical resource preloading for performance optimization */}
         <link
@@ -107,7 +107,7 @@ export default function RootLayout({
       <body suppressHydrationWarning className={
         `${sedgwick.variable} ${oswald.variable} ${openSans.variable} antialiased main-content flex flex-col min-h-screen`
       }>
-        <ScrollToTop />
+
         {/* Razorpay Payment Gateway Integration */}
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"

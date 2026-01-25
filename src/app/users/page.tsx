@@ -272,10 +272,12 @@ function UsersPage() {
      */
     if (isLoading || swrLoading) {
         return (
-            <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100 min-h-[80vh] flex flex-col items-center justify-center">
-                <h1 className="text-3xl font-bold mb-8 text-primary heading-border">Manage Users</h1>
-                <LoadingSpinner size="lg" color="text-primary" className="mb-4" />
-                <p className="text-amber-300">Loading users...</p>
+            <div className="min-h-[80vh] p-6 mt-16 text-card">
+                <h1 className="text-3xl font-bold heading-border underline mb-5">All Users</h1>
+                <div className="flex flex-col items-center justify-center mt-32">
+                    <LoadingSpinner size="lg" color="text-primary" />
+                    <p className="mt-4 text-amber-300">Loading users...</p>
+                </div>
             </div>
         );
     }

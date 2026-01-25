@@ -6,6 +6,7 @@ import React from 'react';
 interface BackButtonProps {
   className?: string;
   label?: string;
+  href?: string;
 }
 
 /**
@@ -26,15 +27,24 @@ interface BackButtonProps {
  * - Mobile-friendly touch targets
  * - Keyboard navigation support
  */
-export default function BackButton({ 
-  className = '', 
-  label = 'Back' 
+export default function BackButton({
+  className = '',
+  label = 'Back',
+  href
 }: BackButtonProps) {
   const router = useRouter();
 
+  const handleClick = () => {
+    if (href) {
+      router.push(href);
+    } else {
+      router.back();
+    }
+  };
+
   return (
     <button
-      onClick={() => router.back()}
+      onClick={handleClick}
       className={`inline-flex items-center gap-2 px-5 py-2.5 md:py-2 text-white bg-[#FF5500] hover:bg-[#e14a00] rounded font-semibold transition-colors cursor-pointer text-sm md:text-base ${className}`}
       aria-label="Go back to previous page"
     >

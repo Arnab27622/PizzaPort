@@ -190,9 +190,14 @@ export default function SalesPage() {
      */
     if (isAdminLoading || swrLoading) {
         return (
-            <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100 min-h-[80vh] flex flex-col items-center justify-center">
-                <h1 className="text-3xl font-bold mb-8 text-primary heading-border">Sales Analytics</h1>
-                <LoadingSpinner size="lg" color="text-primary" className="mb-4" />
+            <div className="p-6 mt-20 text-card min-h-[80vh]">
+                <header className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                    <h1 className="text-3xl font-bold heading-border underline">Sales Analytics</h1>
+                </header>
+                <div className="flex flex-col items-center justify-center mt-32">
+                    <LoadingSpinner size="lg" color="text-primary" />
+                    <p className="mt-4 text-amber-300">Loading sales data...</p>
+                </div>
             </div>
         );
     }

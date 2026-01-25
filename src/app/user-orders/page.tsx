@@ -164,7 +164,6 @@ export default function OrdersPage() {
      */
     const fetchOrders = useCallback(async () => {
         try {
-            setLoading(true);
             setError("");
             const response = await fetch("/api/user-orders");
 
@@ -192,6 +191,9 @@ export default function OrdersPage() {
     useEffect(() => {
         if (status === "authenticated") {
             fetchOrders();
+            // Implement auto-refresh every 15 seconds for real-time order tracking
+            const interval = setInterval(fetchOrders, 15000);
+            return () => clearInterval(interval);
         } else if (status === "unauthenticated") {
             setLoading(false);
             router.push("/login");
@@ -245,6 +247,14 @@ export default function OrdersPage() {
         );
     }, [orders]);
 
+    const initialScrollDone = React.useRef(false);
+    React.useLayoutEffect(() => {
+        if (!loading && !initialScrollDone.current) {
+            window.scrollTo(0, 0);
+            initialScrollDone.current = true;
+        }
+    }, [loading]);
+
     /**
      * Group identical items in an order by name
      * Combines quantities of the same item name
@@ -273,10 +283,15 @@ export default function OrdersPage() {
      */
     if (loading) {
         return (
-            <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100 min-h-[80vh] flex flex-col items-center justify-center">
-                <h1 className="text-3xl font-bold mb-8 text-primary heading-border">Your Orders</h1>
-                <LoadingSpinner size="lg" color="text-primary" className="mb-4" />
-                <p className="text-amber-300">Loading your orders...</p>
+            <div className="max-w-7xl min-h-[83vh] mx-auto mt-10 px-4 py-12 text-amber-100">
+                <div className="mb-6">
+                    <BackButton />
+                </div>
+                <h1 className="text-3xl font-bold heading-border underline mb-6">Your Orders</h1>
+                <div className="flex flex-col items-center justify-center mt-32">
+                    <LoadingSpinner size="lg" color="text-primary" />
+                    <p className="mt-4 text-amber-300">Loading your orders...</p>
+                </div>
             </div>
         );
     }

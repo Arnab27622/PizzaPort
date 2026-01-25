@@ -62,7 +62,7 @@ export async function GET() {
          * - Converts cursor to array for JSON serialization
          */
         const orders = await db.collection("orders")
-            .find({ paymentStatus: { $in: ["verified", "completed"] } })
+            .find({ paymentStatus: { $in: ["verified", "completed", "refund_initiated"] } })
             .sort({ createdAt: -1 })
             .toArray();
 
