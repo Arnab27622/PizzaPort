@@ -184,7 +184,7 @@ export default function UserOrderPage() {
         const grouped = order.cart.reduce((acc, item) => {
             const extrasString = (item.extras ?? []).map(e => e.name).sort().join('|');
             const key = `${item._id}|${item.name}|${item.size?.name || ''}|${extrasString}`;
-            
+
             const existing = acc.find(g => g.key === key);
             if (existing) {
                 existing.quantity += 1;
@@ -475,7 +475,10 @@ export default function UserOrderPage() {
 
                 {/* Order Items Section */}
                 <div className="mb-6 sm:mb-8">
-                    <h2 className="text-xl sm:text-2xl font-bold mb-3 text-primary">Your Items</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold mb-3 text-primary">
+                        <span className="text-primary">🍕</span>
+                        Your Items
+                    </h2>
                     <div className="space-y-3">
                         {groupedCartItems.map((group) => (
                             <div

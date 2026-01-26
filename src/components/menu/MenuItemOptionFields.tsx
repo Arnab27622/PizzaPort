@@ -1,5 +1,6 @@
 import React from 'react';
 import { OptionForm } from '@/types/menu';
+import TrashIcon from '../icons/TrashIcon';
 
 interface MenuItemOptionFieldsProps {
     label: string;
@@ -44,7 +45,7 @@ export default function MenuItemOptionFields({
                         className="text-red-500 hover:text-red-400 p-2 cursor-pointer transition-colors"
                         aria-label={`Remove ${label} option`}
                     >
-                        🗑️
+                        <TrashIcon />
                     </button>
                 </div>
             ))}

@@ -28,7 +28,7 @@ export default function DesktopNav({
 }: DesktopNavProps) {
     return (
         <nav
-            className="hidden md:flex items-center gap-6 text-[#FFFAF0] font-semibold"
+            className="hidden md:flex items-center gap-4 lg:gap-6 text-[#FFFAF0] font-semibold md:text-sm lg:text-base whitespace-nowrap"
             aria-label="Main navigation"
         >
             {/* Navigation Links */}
@@ -45,13 +45,13 @@ export default function DesktopNav({
 
             {/* Authentication Section */}
             {status === "authenticated" ? (
-                <div className="flex items-center gap-4 ml-4">
+                <div className="flex items-center gap-3 lg:gap-4 md:ml-2 lg:ml-4">
                     <Link
                         href="/profile"
                         onClick={(e) => onNavigate("/profile", e)}
                         className="relative text-primary font-semibold inline-flex items-center"
                     >
-                        <span className="hover:underline">Hello, {userName}</span>
+                        <span className="hover:underline max-w-30 truncate">Hello, {userName}</span>
                         {isAdmin && (
                             <span className="ml-1 px-2 py-1 text-xs uppercase font-semibold text-red-100 bg-red-600 rounded-full text-[10px] leading-none">
                                 Admin
@@ -71,17 +71,17 @@ export default function DesktopNav({
 
                     <button
                         onClick={onLogout}
-                        className="px-5 py-2 rounded-2xl border border-red-500 text-red-300 hover:bg-red-500/10 transition-colors cursor-pointer"
+                        className="md:px-3 lg:px-5 py-2 rounded-2xl border border-red-500 text-red-300 hover:bg-red-500/10 transition-colors cursor-pointer"
                     >
                         Logout
                     </button>
                 </div>
             ) : status === "unauthenticated" ? (
                 /* Authentication Buttons (Unauthenticated) */
-                <div className="flex gap-3 ml-4">
+                <div className="flex gap-2 lg:gap-3 md:ml-2 lg:ml-4">
                     <Link
                         href="/login"
-                        className="px-5 py-2 rounded-2xl border border-primary text-primary hover:bg-primary/10 transition-colors"
+                        className="md:px-3 lg:px-5 py-2 rounded-2xl border border-primary text-primary hover:bg-primary/10 transition-colors"
                     >
                         Login
                     </Link>

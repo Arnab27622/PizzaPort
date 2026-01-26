@@ -269,7 +269,7 @@ export default async function OrderDetailPage({
         <div className="max-w-7xl mx-auto mt-8 px-4 py-12 text-amber-100">
             {/* Back Button */}
             <div className="mb-6">
-                <BackButton href="/orders" />
+                <BackButton />
             </div>
 
             {/* Page Header */}
@@ -392,7 +392,7 @@ export default async function OrderDetailPage({
                         {/* Financial & Status Summary Card */}
                         <div className="bg-black/20 p-4 md:p-6 rounded-xl border border-amber-900/20">
                             <h2 className="font-bold text-base md:text-lg mb-4 md:mb-6 flex items-center gap-2 text-amber-500 uppercase tracking-widest justify-center sm:justify-start">
-                                <span>💳</span> Billing Summary
+                                Billing Summary
                             </h2>
                             <div className="w-full space-y-3">
                                 <div className="flex justify-between items-center text-xs md:text-sm text-amber-300/80">

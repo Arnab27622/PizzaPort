@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import LoadingSpinner from '@/components/icons/LoadingSpinner';
 import ConfirmModal from '@/components/layout/ConfirmAdmin';
 import { useIsAdmin } from '../hook/useAdmin';
+import SearchIcon from '@/components/icons/SearchIcon';
 
 /**
  * User Interface Definition
@@ -308,21 +309,26 @@ function UsersPage() {
             {/* Search, Filter, and Sort Controls */}
             <div className="flex flex-col sm:flex-row gap-4 mb-4 items-start sm:items-center">
                 {/* Search Input */}
-                <input
-                    type="text"
-                    placeholder="Search by name or email"
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    className="p-2 bg-[#2c1a0d] border border-amber-900 text-amber-100 rounded w-full sm:w-1/3"
-                    aria-label="Search users"
-                />
+                <div className="relative w-full sm:w-1/3">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-amber-500/50">
+                        <SearchIcon />
+                    </div>
+                    <input
+                        type="text"
+                        placeholder="Search by name or email"
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        className="block w-full pl-10 p-2 bg-[#2c1a0d] border border-amber-900 text-amber-100 rounded focus:ring-amber-500 focus:border-amber-500"
+                        aria-label="Search users"
+                    />
+                </div>
                 {/* Filter Buttons */}
                 <div className="flex gap-2">
                     {["all", "admins", "banned"].map(f => (
                         <button
                             key={f}
                             onClick={() => setFilter(f as "all" | "admins" | "banned")}
-                            className={`px-3 py-1 rounded font-semibold ${filter === f ? "bg-[#FF5500] text-white" : "border border-amber-900 bg-black/70 text-amber-100"
+                            className={`px-3 py-1 rounded font-semibold ${filter === f ? "bg-[#FF5500] text-white" : "border border-amber-900 bg-black/70 text-amber-100 cursor-pointer"
                                 }`}
                             aria-pressed={filter === f}
                         >

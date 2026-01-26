@@ -117,12 +117,12 @@ export default function MenuPage() {
   return (
     <div className="min-h-[80vh] text-card p-6 lg:py-6 lg:px-15 mt-16 max-w-7xl mx-auto">
       <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-        <h1 className="text-3xl font-bold heading-border text-amber-50">Manage Menu Items</h1>
+        <h1 className="text-3xl font-bold heading-border underline text-amber-50">Manage Menu Items</h1>
         <div className="flex flex-row justify-between items-center w-full sm:w-auto gap-4">
           <BackButton label="Back" />
           <button
             onClick={handleCreateClick}
-            className="bg-primary text-white px-6 py-2.5 rounded-lg hover:bg-primary-dark transition-all shadow-lg hover:shadow-primary/20 transform hover:-translate-y-0.5 font-semibold cursor-pointer flex items-center gap-2"
+            className="bg-[#FF5500] hover:bg-[#e14a00] text-white px-4.5 py-2 rounded-sm hover:bg-primary-dark transition-all shadow-lg hover:shadow-primary/20 transform hover:-translate-y-0.5 font-semibold cursor-pointer flex items-center gap-2"
           >
             <span className="text-xl leading-none">+</span> New Item
           </button>

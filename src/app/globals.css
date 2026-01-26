@@ -215,8 +215,6 @@ input[type="file"] {
   /* Brand orange for primary actions */
   --color-card: #F8F4E9;
   /* Off-white for card backgrounds */
-  --breakpoint-md: 53.75rem;
-  /* Custom medium breakpoint */
 }
 
 /**

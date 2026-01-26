@@ -35,9 +35,9 @@ export default function MobileNav({
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="md:hidden overflow-hidden bg-[rgba(25,18,12,0.95)]"
+                    className="md:hidden overflow-hidden bg-[rgba(25,18,12,0.95)] rounded-md"
                 >
-                    <div className="flex flex-col py-4 px-6 gap-4">
+                    <div className="flex flex-col py-4 px-6">
                         {links.map((link) => (
                             <Link
                                 key={link.href}
