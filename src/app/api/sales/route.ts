@@ -71,9 +71,20 @@ export async function GET(request: Request) {
          * METRICS PIPELINE - Key Performance Indicators
          * Calculates overall business metrics for the selected date range
          */
+        const validPaymentStatus = { $in: ["verified", "completed", "refund_initiated"] };
+
+        /**
+         * METRICS PIPELINE - Key Performance Indicators
+         * Calculates overall business metrics for the selected date range
+         */
         const metricsPipeline = [
-            // Filter orders by date range
-            { $match: { createdAt: { $gte: fromDate, $lte: now } } },
+            // Filter orders by date range and payment status
+            {
+                $match: {
+                    createdAt: { $gte: fromDate, $lte: now },
+                    paymentStatus: validPaymentStatus
+                }
+            },
             {
                 $group: {
                     _id: null, // Single group for all documents
@@ -93,8 +104,13 @@ export async function GET(request: Request) {
          * Groups revenue by day for trend analysis and charting
          */
         const dailyPipeline = [
-            // Filter orders by date range
-            { $match: { createdAt: { $gte: fromDate, $lte: now } } },
+            // Filter orders by date range and payment status
+            {
+                $match: {
+                    createdAt: { $gte: fromDate, $lte: now },
+                    paymentStatus: validPaymentStatus
+                }
+            },
             {
                 $group: {
                     _id: {
@@ -113,8 +129,13 @@ export async function GET(request: Request) {
          * Identifies best-selling products by quantity ordered
          */
         const topProductsPipeline = [
-            // Filter orders by date range
-            { $match: { createdAt: { $gte: fromDate, $lte: now } } },
+            // Filter orders by date range and payment status
+            {
+                $match: {
+                    createdAt: { $gte: fromDate, $lte: now },
+                    paymentStatus: validPaymentStatus
+                }
+            },
             { $unwind: "$cart" }, // Deconstruct cart array to analyze individual items
             {
                 $group: {

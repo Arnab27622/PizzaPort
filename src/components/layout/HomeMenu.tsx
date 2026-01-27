@@ -10,19 +10,14 @@ import Right from '../icons/Right';
 
 import { MenuItem } from '@/types/menu';
 
-/**
- * Number of menu items to display in the home section
- * @constant {number}
- */
-const DISPLAY_ITEM_COUNT = 6;
 
 /**
- * HomeMenu component that displays a curated selection of menu items
+ * HomeMenu component that displays the top best-selling menu items
  * 
  * @component
  * @description 
- * - Fetches menu items from API endpoint
- * - Displays random selection of items (shuffled)
+ * - Fetches top 6 best-selling menu items based on actual order data
+ * - Displays items sorted by sales quantity (most popular first)
  * - Shows loading state during fetch
  * - Handles errors with retry functionality
  * - Includes modal for full-size image viewing
@@ -31,7 +26,7 @@ const DISPLAY_ITEM_COUNT = 6;
  * @example
  * return <HomeMenu />
  * 
- * @returns {JSX.Element} Section displaying featured menu items
+ * @returns {JSX.Element} Section displaying best-selling menu items
  */
 function HomeMenu() {
     // State for storing fetched menu items
@@ -44,21 +39,20 @@ function HomeMenu() {
     const [fullImageUrl, setFullImageUrl] = useState<string | null>(null);
 
     /**
-     * Fetches menu items from the API and processes the data
+     * Fetches the top best-selling menu items from the API
      * @function fetchMenuItems
      * @async
      * @returns {Promise<void>}
      * 
      * @description
-     * - Makes API call to fetch menu items
+     * - Makes API call to fetch best-selling menu items based on order data
      * - Transforms data and ensures imageUrl is properly formatted
-     * - Shuffles items using Fisher-Yates algorithm for random display
-     * - Limits displayed items to DISPLAY_ITEM_COUNT
+     * - Displays top 6 best-selling items
      * - Handles errors and updates loading state
      */
     const fetchMenuItems = useCallback(async () => {
         try {
-            const response = await fetch('/api/menuitem');
+            const response = await fetch('/api/menuitem/bestsellers');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -72,15 +66,8 @@ function HomeMenu() {
                 extraIngredients: item.extraIngredients || []
             })) as MenuItem[];
 
-            // Fisher-Yates shuffle algorithm for random selection
-            const shuffled = [...transformedData];
-            for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-            }
-
-            // Set state with limited number of shuffled items
-            setMenuItems(shuffled.slice(0, DISPLAY_ITEM_COUNT));
+            // Set state with best-selling items (already limited to 6 by API)
+            setMenuItems(transformedData);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to load menu items');
             console.error('Fetch error:', err);
@@ -148,7 +135,7 @@ function HomeMenu() {
                 <SectionHeader subHeader="Check out" mainHeader="Our Best Sellers" />
 
                 {/* Grid layout for menu items */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     {menuItems.map(item => (
                         <MenuItemCard
                             key={item._id}

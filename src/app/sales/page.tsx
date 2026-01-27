@@ -29,7 +29,7 @@ const fetcher = (url: string) => fetch(url).then(res => {
  * Defines available time periods for sales data analysis
  * Ensures type safety for filter operations throughout the component
  */
-const FILTERS = ['today', '7days', 'month'] as const;
+const FILTERS = ['today', '7days', 'month', 'all-time'] as const;
 type FilterType = typeof FILTERS[number];
 
 /**
@@ -45,6 +45,7 @@ function computeFrom(filter: FilterType): Date {
     const now = new Date();
     if (filter === 'today') return new Date(now.setHours(0, 0, 0, 0));          // Start of current day
     if (filter === 'month') return new Date(now.getFullYear(), now.getMonth(), 1); // Start of current month
+    if (filter === 'all-time') return new Date(0);                              // Beginning of time (Epoch)
     return new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);                      // 7 days ago from now
 }
 
@@ -179,7 +180,8 @@ export default function SalesPage() {
     const filterLabels: Record<FilterType, string> = useMemo(() => ({
         today: 'Today',
         '7days': 'Last 7 Days',
-        month: 'This Month'
+        month: 'This Month',
+        'all-time': 'All Time'
     }), []);
 
     /**
