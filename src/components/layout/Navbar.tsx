@@ -89,14 +89,23 @@ export default function Navbar() {
         >
             <div className="max-w-6xl mx-auto flex items-center justify-between">
                 {/* Logo/Brand */}
-                <Link
-                    href="/"
-                    onClick={(e) => handleNavigation("/", e)}
-                    className="text-primary font-semibold text-3xl logo-text"
-                    aria-label="PizzaPort Home"
-                >
-                    PizzaPort
-                </Link>
+                {isAdmin ? (
+                    <span
+                        className="text-primary font-semibold text-3xl logo-text"
+                        aria-label="PizzaPort Home (Disabled for Admin)"
+                    >
+                        PizzaPort
+                    </span>
+                ) : (
+                    <Link
+                        href="/"
+                        onClick={(e) => handleNavigation("/", e)}
+                        className="text-primary font-semibold text-3xl logo-text"
+                        aria-label="PizzaPort Home"
+                    >
+                        PizzaPort
+                    </Link>
+                )}
 
                 {/* Desktop Navigation */}
                 <DesktopNav

@@ -63,6 +63,11 @@ export default async function Home() {
     redirect('/login');
   }
 
+  // Redirect admin users to admin orders page
+  if (session.user?.admin) {
+    redirect('/orders');
+  }
+
   /**
    * Page Composition
    * 

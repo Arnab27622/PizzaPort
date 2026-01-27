@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { Line, Bar } from 'react-chartjs-2';
-import { Chart, registerables } from 'chart.js';
+import { Chart, registerables, TooltipItem } from 'chart.js';
 import { SalesReport } from '../../../types/sales';
 
 // Register Chart.js components for chart functionality
@@ -30,19 +30,6 @@ Chart.register(...registerables);
  */
 export default function SalesCharts({ report }: { report: SalesReport }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(0);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const obs = new ResizeObserver(entries => {
-      const entry = entries[0];
-      setWidth(entry.contentRect.width);
-    });
-
-    obs.observe(containerRef.current);
-    return () => obs.disconnect();
-  }, []);
 
   const dailyRevenue = report.dailyRevenue ?? [];
   const topProducts = report.topProducts ?? [];
@@ -62,12 +49,12 @@ export default function SalesCharts({ report }: { report: SalesReport }) {
           ...baseScales.ticks,
           maxRotation: 0,
           autoSkip: true,
-          callback: function (this: any, val: any) {
-            const label = this.getLabelForValue(val);
+          callback: function (val: string | number) {
+            const label = typeof val === 'number' ? String(val) : val;
             try {
               const date = new Date(label);
               return new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short' }).format(date);
-            } catch (e) {
+            } catch {
               return label;
             }
           }
@@ -78,7 +65,7 @@ export default function SalesCharts({ report }: { report: SalesReport }) {
         beginAtZero: true,
         ticks: {
           ...baseScales.ticks,
-          callback: (value: any) => '₹' + value.toLocaleString('en-IN')
+          callback: (value: string | number) => '₹' + Number(value).toLocaleString('en-IN')
         }
       }
     },
@@ -86,7 +73,7 @@ export default function SalesCharts({ report }: { report: SalesReport }) {
       legend: { labels: { color: "#fff" } },
       tooltip: {
         callbacks: {
-          label: (context: any) => `Revenue: ₹${context.raw.toLocaleString('en-IN')}`
+          label: (context: TooltipItem<'line'>) => `Revenue: ₹${(context.raw as number).toLocaleString('en-IN')}`
         }
       }
     }
@@ -107,8 +94,8 @@ export default function SalesCharts({ report }: { report: SalesReport }) {
         grid: { display: false },
         ticks: {
           ...baseScales.ticks,
-          callback: function (this: any, val: any) {
-            const label = this.getLabelForValue(val);
+          callback: (val: string | number) => {
+            const label = typeof val === 'number' ? String(val) : val;
             if (typeof label === 'string' && label.length > 25) {
               return label.substring(0, 22) + '...';
             }
@@ -121,8 +108,8 @@ export default function SalesCharts({ report }: { report: SalesReport }) {
       legend: { display: false },
       tooltip: {
         callbacks: {
-          title: (items: any[]) => items[0].label,
-          label: (context: any) => `Sold: ${context.raw}`
+          title: (items: TooltipItem<'bar'>[]) => items[0].label,
+          label: (context: TooltipItem<'bar'>) => `Sold: ${context.raw}`
         }
       }
     }
