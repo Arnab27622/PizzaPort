@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongoConnect';
+import { PAYMENT_STATUS } from '@/utils/constants';
 
 /**
  * GET /api/menuitem/bestsellers
@@ -45,7 +46,13 @@ export async function GET() {
             // Filter only successfully paid orders
             {
                 $match: {
-                    paymentStatus: { $in: ["verified", "completed", "refund_initiated"] }
+                    paymentStatus: {
+                        $in: [
+                            PAYMENT_STATUS.VERIFIED,
+                            PAYMENT_STATUS.COMPLETED,
+                            PAYMENT_STATUS.REFUND_INITIATED
+                        ]
+                    }
                 }
             },
             { $unwind: "$cart" }, // Deconstruct cart array to analyze individual items

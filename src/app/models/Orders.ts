@@ -1,5 +1,5 @@
-// Orders.ts
 import mongoose from "mongoose";
+import { ORDER_STATUS, PAYMENT_STATUS } from "@/utils/constants";
 
 /**
  * Represents an order in the system.
@@ -62,8 +62,8 @@ const OrderSchema = new mongoose.Schema(
         total: Number,
         paymentStatus: {
             type: String,
-            enum: ["pending", "verified", "completed", "failed", "refund_initiated"],
-            default: "pending"
+            enum: Object.values(PAYMENT_STATUS),
+            default: PAYMENT_STATUS.PENDING
         },
         razorpayOrderId: String,
         razorpayPaymentId: String,
@@ -72,8 +72,8 @@ const OrderSchema = new mongoose.Schema(
         verifiedAt: Date,
         status: {
             type: String,
-            enum: ["placed", "confirmed", "preparing", "out_for_delivery", "completed", "canceled"],
-            default: "placed"
+            enum: Object.values(ORDER_STATUS),
+            default: ORDER_STATUS.PLACED
         },
         canceledAt: Date
     },

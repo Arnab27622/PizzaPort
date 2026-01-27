@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
+import useSWR from 'swr';
 import SectionHeader from './SectionHeader';
 import Image from 'next/image';
 import MenuItemCard from './MenuItemCard';
@@ -29,57 +30,25 @@ import { MenuItem } from '@/types/menu';
  * @returns {JSX.Element} Section displaying best-selling menu items
  */
 function HomeMenu() {
-    // State for storing fetched menu items
-    const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-    // State to track loading status
-    const [loading, setLoading] = useState(true);
-    // State to store any error messages
-    const [error, setError] = useState<string | null>(null);
-    // State to control full-size image modal
-    const [fullImageUrl, setFullImageUrl] = useState<string | null>(null);
+    // Generic fetcher function for SWR
+    const fetcher = (url: string) => fetch(url).then(res => {
+        if (!res.ok) throw new Error('Failed to fetch data');
+        return res.json();
+    });
 
     /**
-     * Fetches the top best-selling menu items from the API
-     * @function fetchMenuItems
-     * @async
-     * @returns {Promise<void>}
-     * 
-     * @description
-     * - Makes API call to fetch best-selling menu items based on order data
-     * - Transforms data and ensures imageUrl is properly formatted
-     * - Displays top 6 best-selling items
-     * - Handles errors and updates loading state
+     * SWR hook for data fetching
+     * Provides automatic caching, revalidation, and loading states
      */
-    const fetchMenuItems = useCallback(async () => {
-        try {
-            const response = await fetch('/api/menuitem/bestsellers');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
+    const { data: menuItems = [], error, isLoading } = useSWR<MenuItem[]>('/api/menuitem/bestsellers', fetcher, {
+        refreshInterval: 60000, // Refresh every minute
+        revalidateOnFocus: false,
+    });
 
-            // Transform data to ensure consistent structure
-            const transformedData = data.map((item: Partial<MenuItem>) => ({
-                ...item,
-                imageUrl: item.imageUrl || undefined,
-                sizeOptions: item.sizeOptions || [],
-                extraIngredients: item.extraIngredients || []
-            })) as MenuItem[];
+    const loading = isLoading;
 
-            // Set state with best-selling items (already limited to 6 by API)
-            setMenuItems(transformedData);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to load menu items');
-            console.error('Fetch error:', err);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    // Fetch menu items on component mount
-    useEffect(() => {
-        fetchMenuItems();
-    }, [fetchMenuItems]);
+    // State to control full-size image modal
+    const [fullImageUrl, setFullImageUrl] = useState<string | null>(null);
 
     /**
      * Closes the full-size image modal
@@ -105,7 +74,7 @@ function HomeMenu() {
         );
     }
 
-    // Error state UI with retry functionality
+    // Error state UI
     if (error) {
         return (
             <section className='px-4'>
@@ -113,14 +82,7 @@ function HomeMenu() {
                     <SectionHeader subHeader="Check out" mainHeader="Our Best Sellers" />
                     <div className="max-w-xl mx-auto flex flex-col items-center justify-center p-4 bg-red-100 border border-red-200 rounded-lg">
                         <p className="text-red-700 font-medium mb-2">Error Loading Menu</p>
-                        <p className="text-red-600 text-sm mb-4">{error}</p>
-                        <button
-                            onClick={fetchMenuItems}
-                            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors cursor-pointer"
-                            aria-label="Retry loading menu items"
-                        >
-                            Try Again
-                        </button>
+                        <p className="text-red-600 text-sm mb-4">{(error as Error).message}</p>
                     </div>
                 </div>
             </section>

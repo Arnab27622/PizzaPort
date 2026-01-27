@@ -4,11 +4,39 @@ import { ObjectId } from 'mongodb';
 import { v2 as cloudinary } from 'cloudinary';
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/authOptions";
+import { z } from "zod";
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const MenuItemSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    description: z.string().optional().default(""),
+    basePrice: z.coerce.number().min(0, "Base price must be positive"),
+    category: z.string().optional().default(""),
+    sizeOptions: z.string().optional().default("[]").transform((str) => {
+        try {
+            return JSON.parse(str);
+        } catch {
+            return [];
+        }
+    }).pipe(z.array(z.object({
+        name: z.string(),
+        extraPrice: z.coerce.number()
+    }))),
+    extraIngredients: z.string().optional().default("[]").transform((str) => {
+        try {
+            return JSON.parse(str);
+        } catch {
+            return [];
+        }
+    }).pipe(z.array(z.object({
+        name: z.string(),
+        extraPrice: z.coerce.number()
+    })))
 });
 
 /**
@@ -37,17 +65,7 @@ async function getCollection() {
     return client.db().collection<MenuItemDB>('menuitems');
 }
 
-/**
- * Form Data Parser Helper
- * Parses JSON string from form data for array fields (sizeOptions, extraIngredients)
- * @param {FormData} form - Form data object
- * @param {string} key - Field name to parse
- * @returns {Promise<{name: string, extraPrice: number}[]>} Parsed array of options
- */
-async function parseOptions(form: FormData, key: string) {
-    const s = form.get(key)?.toString() || '[]';
-    return JSON.parse(s) as { name: string; extraPrice: number }[];
-}
+
 
 /**
  * GET /api/menu-items
@@ -86,15 +104,25 @@ export async function POST(req: NextRequest) {
         const form = await req.formData();
         const col = await getCollection();
 
-        // Extract basic form fields
-        const name = form.get('name')?.toString() || '';
-        const basePrice = parseFloat(form.get('basePrice')?.toString() || '0');
-        const category = form.get('category')?.toString() || '';
-        const description = form.get('description')?.toString() || '';
+        // Convert FormData to standard object for Zod validation
+        const formDataObj = Object.fromEntries(form.entries());
+        const validation = MenuItemSchema.safeParse(formDataObj);
 
-        // Parse array fields from JSON strings
-        const sizeOptions = await parseOptions(form, 'sizeOptions');
-        const extraIngredients = await parseOptions(form, 'extraIngredients');
+        if (!validation.success) {
+            return NextResponse.json(
+                { error: validation.error.issues[0].message },
+                { status: 400 }
+            );
+        }
+
+        const {
+            name,
+            description,
+            basePrice,
+            category,
+            sizeOptions,
+            extraIngredients
+        } = validation.data;
 
         let imageUrl: string | undefined;
         const file = form.get('image') as Blob | null;
@@ -102,17 +130,17 @@ export async function POST(req: NextRequest) {
         // Handle image upload if present
         if (file && file.size > 0) {
             const buffer = Buffer.from(await file.arrayBuffer());
-            
+
             // Convert to base64
             const base64 = buffer.toString('base64');
             const dataURI = `data:${file.type};base64,${base64}`;
-            
+
             // Upload to Cloudinary
             const result = await cloudinary.uploader.upload(dataURI, {
                 resource_type: 'auto',
                 folder: 'pizza-delivery/menuitems',
             });
-            
+
             imageUrl = result.secure_url;
         }
 
@@ -165,14 +193,20 @@ export async function PUT(req: NextRequest) {
             return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
         }
 
+        // Convert FormData to standard object for Zod validation
+        const formDataObj = Object.fromEntries(form.entries());
+        const validation = MenuItemSchema.safeParse(formDataObj);
+
+        if (!validation.success) {
+            return NextResponse.json(
+                { error: validation.error.issues[0].message },
+                { status: 400 }
+            );
+        }
+
         // Construct update object with basic fields
         const update: Partial<MenuItemDB> = {
-            name: form.get('name')?.toString() || '',
-            description: form.get('description')?.toString() || '',
-            basePrice: parseFloat(form.get('basePrice')?.toString() || '0'),
-            category: form.get('category')?.toString() || '',
-            sizeOptions: JSON.parse(form.get('sizeOptions')?.toString() || '[]'),
-            extraIngredients: JSON.parse(form.get('extraIngredients')?.toString() || '[]'),
+            ...validation.data,
             updatedAt: new Date(),
         };
 
@@ -181,17 +215,17 @@ export async function PUT(req: NextRequest) {
         // Handle new image upload if provided
         if (file && file.size > 0) {
             const buffer = Buffer.from(await file.arrayBuffer());
-            
+
             // Convert to base64
             const base64 = buffer.toString('base64');
             const dataURI = `data:${file.type};base64,${base64}`;
-            
+
             // Upload to Cloudinary
             const result = await cloudinary.uploader.upload(dataURI, {
                 resource_type: 'auto',
                 folder: 'pizza-delivery/menuitems',
             });
-            
+
             update.imageUrl = result.secure_url;
         }
 
@@ -242,10 +276,10 @@ export async function DELETE(req: NextRequest) {
         }
 
         const col = await getCollection();
-        
+
         // Get the menu item to retrieve its image URL before deletion
         const item = await col.findOne({ _id: new ObjectId(id) });
-        
+
         if (!item) {
             return NextResponse.json({ error: 'Menu item not found' }, { status: 404 });
         }
@@ -257,7 +291,7 @@ export async function DELETE(req: NextRequest) {
                 const urlParts = item.imageUrl.split('/');
                 const filename = urlParts[urlParts.length - 1];
                 const publicId = `pizza-delivery/menuitems/${filename.split('.')[0]}`;
-                
+
                 await cloudinary.uploader.destroy(publicId);
             } catch (cloudinaryError) {
                 console.error('Error deleting image from Cloudinary:', cloudinaryError);
