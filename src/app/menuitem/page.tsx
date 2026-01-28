@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import BackButton from "@/components/layout/BackButton";
 import LoadingSpinner from "@/components/icons/LoadingSpinner";
 import { confirm } from "@/components/layout/ConfirmDelete";
-import { useIsAdmin } from "../hook/useAdmin";
+import { useIsAdmin } from "@/hooks/useAdmin";
 
 import MenuItemForm from "@/components/menu/MenuItemForm";
 import MenuItemGrid from "@/components/menu/MenuItemGrid";

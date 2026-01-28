@@ -14,6 +14,7 @@ export function useMenuItemForm({ onSuccess, onClose }: UseMenuItemFormProps) {
         name: "",
         category: "",
         basePrice: "",
+        discountPrice: "",
         description: "",
         imageFile: null,
         imagePreview: "",
@@ -37,6 +38,7 @@ export function useMenuItemForm({ onSuccess, onClose }: UseMenuItemFormProps) {
                 name: item.name,
                 category: item.category,
                 basePrice: item.basePrice.toString(),
+                discountPrice: item.discountPrice?.toString() ?? "",
                 description: item.description ?? "",
                 imageFile: null,
                 imagePreview: item.imageUrl || "",
@@ -55,6 +57,7 @@ export function useMenuItemForm({ onSuccess, onClose }: UseMenuItemFormProps) {
                 name: "",
                 category: "",
                 basePrice: "",
+                discountPrice: "",
                 description: "",
                 imageFile: null,
                 imagePreview: "",
@@ -115,6 +118,9 @@ export function useMenuItemForm({ onSuccess, onClose }: UseMenuItemFormProps) {
             fd.append("name", form.name);
             fd.append("category", form.category);
             fd.append("basePrice", form.basePrice);
+            if (form.discountPrice && parseFloat(form.discountPrice) > 0) {
+                fd.append("discountPrice", form.discountPrice);
+            }
             fd.append("description", form.description);
 
             const sizeOptions = form.sizeOptions.map(o => ({

@@ -10,6 +10,8 @@ const RazorpayOrderSchema = z.object({
     email: z.string().email('Invalid email address'),
     address: z.string().min(5, 'Address is too short'),
     cart: z.array(z.any()).min(1, 'Cart is empty'),
+    couponCode: z.string().optional(),
+    discountAmount: z.number().optional()
 });
 
 /**
@@ -113,7 +115,7 @@ export async function POST(req: Request) {
         );
     }
 
-    const { name, email, cart, address } = validation.data;
+    const { name, email, cart, address, couponCode, discountAmount } = validation.data;
 
     /**
      * Order Amount Calculation
@@ -121,16 +123,63 @@ export async function POST(req: Request) {
      * This ensures pricing integrity and security
      */
     const subtotal = cart.reduce((sum: number, item: CartProduct) => {
-        // Calculate item total including size and extra ingredient options
+        // Use discountPrice if available and valid
+        const basePrice = (item.discountPrice && item.discountPrice < item.basePrice)
+            ? item.discountPrice
+            : item.basePrice;
+
         const sizePrice = item.size?.extraPrice || 0;
         const extrasPrice = item.extras?.reduce((s: number, e) => s + e.extraPrice, 0) || 0;
-        return sum + item.basePrice + sizePrice + extrasPrice;
+        return sum + basePrice + sizePrice + extrasPrice;
     }, 0);
 
     // Apply tax (5%) and conditional delivery fee
     const tax = Math.round(subtotal * 0.05); // 5% tax rate
     const deliveryFee = subtotal >= 400 ? 0 : 50; // Free delivery for orders above 400
-    const total = subtotal + tax + deliveryFee;
+
+    // Calculate total with coupon discount
+    console.log(`Subtotal: ${subtotal}, Tax: ${tax}, Delivery: ${deliveryFee}, Discount: ${discountAmount}`);
+
+    let finalDiscount = 0;
+    let validatedCouponCode = null;
+
+    if (couponCode) {
+        try {
+            const db = clientDB.db();
+            const coupon = await db.collection("coupons").findOne({
+                code: couponCode.toUpperCase(),
+                isActive: true
+            });
+
+            if (coupon) {
+                // Check if coupon is valid (not expired and usage limit not reached)
+                const now = new Date();
+                const isNotExpired = !coupon.expiryDate || new Date(coupon.expiryDate) > now;
+                const isWithinLimit = !coupon.usageLimit || coupon.usageCount < coupon.usageLimit;
+                const isMinOrderMet = !coupon.minOrderValue || subtotal >= coupon.minOrderValue;
+
+                if (isNotExpired && isWithinLimit && isMinOrderMet) {
+                    validatedCouponCode = coupon.code;
+
+                    if (coupon.discountType === "percentage") {
+                        let calcDiscount = Math.round((subtotal * coupon.discountValue) / 100);
+                        if (coupon.maxDiscount && calcDiscount > coupon.maxDiscount) {
+                            calcDiscount = coupon.maxDiscount;
+                        }
+                        finalDiscount = calcDiscount;
+                    } else if (coupon.discountType === "fixed") {
+                        finalDiscount = Math.min(coupon.discountValue, subtotal);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("Error validating coupon server-side:", error);
+            // Fallback to 0 discount if validation fails to be safe
+            finalDiscount = 0;
+        }
+    }
+
+    const total = Math.max(0, subtotal + tax + deliveryFee - finalDiscount);
 
     /**
      * Initialize Razorpay client
@@ -190,6 +239,8 @@ export async function POST(req: Request) {
         subtotal,                    // Calculated subtotal
         tax,                         // Calculated tax amount
         deliveryFee,                 // Delivery fee (0 for free delivery)
+        couponCode: validatedCouponCode,                  // Applied coupon code (server-validated)
+        discountAmount: finalDiscount, // Discount amount
         total,                       // Final total amount
         razorpayOrderId: order.id,   // Razorpay's order identifier
         securityHash,                // Security hash for cart verification

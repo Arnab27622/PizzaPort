@@ -3,7 +3,7 @@
 import React, { useRef } from 'react';
 import { Line, Bar } from 'react-chartjs-2';
 import { Chart, registerables, TooltipItem } from 'chart.js';
-import { SalesReport } from '../../../types/sales';
+import { SalesReport } from '../../types/sales';
 
 // Register Chart.js components for chart functionality
 Chart.register(...registerables);

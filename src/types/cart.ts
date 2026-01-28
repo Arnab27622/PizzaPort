@@ -11,5 +11,7 @@ export interface CartTotals {
     subtotal: number;
     tax: number;
     deliveryFee: number;
+    couponDiscount: number;
     total: number;
+    appliedCouponCode?: string;
 }

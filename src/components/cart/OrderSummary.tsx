@@ -33,6 +33,12 @@ export default function OrderSummary({
                         {totals.deliveryFee === 0 ? "Free" : `₹${totals.deliveryFee}`}
                     </span>
                 </div>
+                {totals.couponDiscount > 0 && (
+                    <div className="flex justify-between text-green-400">
+                        <span>Coupon Discount{totals.appliedCouponCode ? ` (${totals.appliedCouponCode})` : ''}:</span>
+                        <span>-₹{totals.couponDiscount}</span>
+                    </div>
+                )}
                 <div className="flex justify-between text-lg font-bold pt-3 border-t border-amber-800 text-primary">
                     <span>Total:</span>
                     <span>₹{totals.total}</span>

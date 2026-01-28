@@ -4,9 +4,9 @@ import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
 import LoadingSpinner from '@/components/icons/LoadingSpinner';
-import { useIsAdmin } from '../hook/useAdmin';
+import { useIsAdmin } from '@/hooks/useAdmin';
 import SalesCharts from '@/components/layout/SalesCharts';
-import { SalesReport } from '../../../types/sales';
+import { SalesReport } from '../../types/sales';
 
 /**
  * Data Fetcher for SWR

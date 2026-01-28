@@ -80,7 +80,7 @@ export default function MenuItemForm({ item, onClose, onSuccess }: MenuItemFormP
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm text-gray-300 mb-1">Base Price</label>
+                                <label className="block text-sm text-gray-300 mb-1">Base Price (₹)</label>
                                 <input
                                     name="basePrice"
                                     type="number"
@@ -93,6 +93,29 @@ export default function MenuItemForm({ item, onClose, onSuccess }: MenuItemFormP
                                     className="w-full bg-[#2F3234] border border-[#555] text-[#F9FBF7] p-3 rounded-md focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all outline-hidden"
                                 />
                             </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm text-gray-300 mb-1">
+                                Discount Price (₹) <span className="text-xs text-gray-400">(Optional - for sales/promotions)</span>
+                            </label>
+                            <input
+                                name="discountPrice"
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                value={form.discountPrice}
+                                onChange={handleChange}
+                                placeholder="Leave empty for no discount"
+                                className="w-full bg-[#2F3234] border border-[#555] text-[#F9FBF7] p-3 rounded-md focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all outline-hidden"
+                            />
+                            {form.discountPrice && parseFloat(form.discountPrice) > 0 && parseFloat(form.basePrice) > 0 && (
+                                <p className="text-xs mt-1 text-green-400">
+                                    {parseFloat(form.discountPrice) < parseFloat(form.basePrice)
+                                        ? `${Math.round(((parseFloat(form.basePrice) - parseFloat(form.discountPrice)) / parseFloat(form.basePrice)) * 100)}% OFF - Customers save ₹${(parseFloat(form.basePrice) - parseFloat(form.discountPrice)).toFixed(2)}`
+                                        : 'Discount price should be less than base price'}
+                                </p>
+                            )}
                         </div>
 
                         <div>

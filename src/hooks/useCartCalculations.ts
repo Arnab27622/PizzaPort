@@ -2,20 +2,30 @@ import { useMemo } from 'react';
 import { CartProduct } from '@/components/AppContext';
 import { GroupedCartItem, CartTotals } from '@/types/cart';
 
-export function useCartCalculations(cartProducts: CartProduct[]) {
+export function useCartCalculations(
+    cartProducts: CartProduct[],
+    couponDiscount: number = 0,
+    appliedCouponCode?: string
+) {
     const totals: CartTotals = useMemo(() => {
         const subtotal = cartProducts.reduce((sum, item) => {
+            // Use discountPrice if available and valid, otherwise use basePrice
+            const itemPrice = (item.discountPrice && item.discountPrice < item.basePrice)
+                ? item.discountPrice
+                : item.basePrice;
             const sizePrice = item.size?.extraPrice ?? 0;
             const extrasPrice = item.extras?.reduce((s, e) => s + e.extraPrice, 0) ?? 0;
-            return sum + item.basePrice + sizePrice + extrasPrice;
+            return sum + itemPrice + sizePrice + extrasPrice;
         }, 0);
 
         const tax = Math.round(subtotal * 0.05);
         const deliveryFee = subtotal >= 400 ? 0 : 50;
-        const total = subtotal + tax + deliveryFee;
 
-        return { subtotal, tax, deliveryFee, total };
-    }, [cartProducts]);
+        // Ensure total doesn't go below zero
+        const total = Math.max(0, subtotal + tax + deliveryFee - couponDiscount);
+
+        return { subtotal, tax, deliveryFee, couponDiscount, total, appliedCouponCode };
+    }, [cartProducts, couponDiscount, appliedCouponCode]);
 
     const groupedItems: GroupedCartItem[] = useMemo(() => {
         return cartProducts.reduce((acc, item, index) => {

@@ -26,10 +26,17 @@ const CartSchema = z.object({
 
 type CartInput = z.infer<typeof CartSchema>;
 
+import CouponInput from "@/components/cart/CouponInput";
+import { CouponValidationResponse } from "@/types/coupon";
+
 export default function CartPage() {
     const { cartProducts, removeCartProduct, clearCart } = useContext(CartContext);
     const { data: session, status } = useSession();
     const router = useRouter();
+
+    // Coupon State
+    const [couponDiscount, setCouponDiscount] = React.useState(0);
+    const [appliedCouponCode, setAppliedCouponCode] = React.useState<string | undefined>(undefined);
 
     const {
         register,
@@ -49,7 +56,13 @@ export default function CartPage() {
 
     const address = watch('address');
 
-    const { totals, groupedItems } = useCartCalculations(cartProducts);
+    const { totals, groupedItems } = useCartCalculations(cartProducts, couponDiscount);
+
+    // Update totals with applied coupon code for display (handled in hook via calculations, but we need to pass the code to summary if we want)
+    // Actually totals object has appliedCouponCode field but we aren't setting it in the hook.
+    // We can just augment the totals object before passing it or rely on the hook if updated properly.
+    // The hook returns totals with couponDiscount. The appliedCouponCode is in local state.
+    const totalsWithCode = { ...totals, appliedCouponCode };
 
     const userName = session?.user?.name || "";
     const userEmail = session?.user?.email || "";
@@ -59,8 +72,23 @@ export default function CartPage() {
         address,
         userName,
         userEmail,
-        clearCart
+        clearCart,
+        couponCode: appliedCouponCode,
+        discountAmount: couponDiscount
     });
+
+    // Handle coupon application
+    const handleCouponApplied = (response: CouponValidationResponse) => {
+        if (response.discount !== undefined) {
+            setCouponDiscount(response.discount);
+            setAppliedCouponCode(response.coupon?.code);
+        }
+    };
+
+    const handleCouponRemoved = () => {
+        setCouponDiscount(0);
+        setAppliedCouponCode(undefined);
+    };
 
     // Authentication Check
     useEffect(() => {
@@ -114,8 +142,16 @@ export default function CartPage() {
                     isFetchingLocation={isFetchingLocation}
                 />
 
+                <CouponInput
+                    subtotal={totals.subtotal}
+                    onCouponApplied={handleCouponApplied}
+                    onCouponRemoved={handleCouponRemoved}
+                    appliedCode={appliedCouponCode}
+                    isDisabled={cartProducts.length === 0}
+                />
+
                 <OrderSummary
-                    totals={totals}
+                    totals={totalsWithCode}
                     onSubmit={handleSubmit(handleSubmitOrder)}
                     isProcessing={isProcessing}
                     isDisabled={cartProducts.length === 0}

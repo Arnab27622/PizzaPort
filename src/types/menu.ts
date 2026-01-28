@@ -12,6 +12,7 @@ export interface MenuItem {
     name: string;
     description: string;
     basePrice: number;
+    discountPrice?: number;
     category: string;
     imageUrl?: string;
     sizeOptions: Option[];
@@ -23,6 +24,7 @@ export interface MenuItemFormState {
     name: string;
     category: string;
     basePrice: string;
+    discountPrice: string;
     description: string;
     imageFile: File | null;
     imagePreview: string;

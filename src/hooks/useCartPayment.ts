@@ -10,6 +10,8 @@ interface UseCartPaymentProps {
     userName: string;
     userEmail: string;
     clearCart: () => void;
+    couponCode?: string;
+    discountAmount?: number;
 }
 
 export function useCartPayment({
@@ -17,7 +19,9 @@ export function useCartPayment({
     address,
     userName,
     userEmail,
-    clearCart
+    clearCart,
+    couponCode,
+    discountAmount
 }: UseCartPaymentProps) {
     const [isProcessing, setIsProcessing] = useState(false);
     const router = useRouter();
@@ -32,6 +36,7 @@ export function useCartPayment({
                 name: item.name,
                 imageUrl: item.imageUrl,
                 basePrice: item.basePrice,
+                discountPrice: item.discountPrice,
                 size: item.size
                     ? { name: item.size.name, extraPrice: item.size.extraPrice }
                     : null,
@@ -48,6 +53,8 @@ export function useCartPayment({
                     email: userEmail,
                     address,
                     cart: trimmedCart,
+                    couponCode,
+                    discountAmount
                 }),
             });
 
@@ -118,7 +125,7 @@ export function useCartPayment({
         } finally {
             setIsProcessing(false);
         }
-    }, [cartProducts, address, userName, userEmail, clearCart, router]);
+    }, [cartProducts, address, userName, userEmail, clearCart, router, couponCode, discountAmount]);
 
     return { handleSubmitOrder, isProcessing };
 }

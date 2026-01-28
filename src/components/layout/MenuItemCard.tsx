@@ -47,8 +47,23 @@ export default function MenuItemCard({ item, onImageClick }: MenuItemCardProps) 
                 >
                     <div className="absolute inset-0 bg-linear-to-t from-[#1a1108] via-transparent to-transparent z-10" />
 
-                    <div className="absolute top-4 right-4 bg-amber-600 text-white text-sm font-bold px-3 py-1 rounded-full z-20 shadow-md">
-                        ₹{item.basePrice}
+                    {/* Price Badge */}
+                    <div className="absolute top-4 right-4 z-20">
+                        {item.discountPrice && item.discountPrice < item.basePrice ? (
+                            <div className="flex flex-col items-end gap-1">
+                                <div className="bg-green-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-md">
+                                    {Math.round(((item.basePrice - item.discountPrice) / item.basePrice) * 100)}% OFF
+                                </div>
+                                <div className="bg-amber-600 text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
+                                    <span className="line-through text-xs opacity-75 mr-1">₹{item.basePrice}</span>
+                                    ₹{item.discountPrice}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="bg-amber-600 text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
+                                ₹{item.basePrice}
+                            </div>
+                        )}
                     </div>
 
                     <Image

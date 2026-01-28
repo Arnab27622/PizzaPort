@@ -70,6 +70,7 @@ export default function Navbar() {
             { href: "/users", label: "Users" },
             { href: "/sales", label: "Sales" },
             { href: "/orders", label: "Orders" },
+            { href: "/coupons", label: "Coupons" },
         ]
         : [
             { href: "/", label: "Home" },

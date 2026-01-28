@@ -59,6 +59,8 @@ const OrderSchema = new mongoose.Schema(
         subtotal: Number,
         tax: Number,
         deliveryFee: Number,
+        couponCode: String,
+        discountAmount: Number,
         total: Number,
         paymentStatus: {
             type: String,

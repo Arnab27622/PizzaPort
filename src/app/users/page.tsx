@@ -6,7 +6,7 @@ import Image from "next/image";
 import { toast } from "react-toastify";
 import LoadingSpinner from '@/components/icons/LoadingSpinner';
 import ConfirmModal from '@/components/layout/ConfirmAdmin';
-import { useIsAdmin } from '../hook/useAdmin';
+import { useIsAdmin } from '@/hooks/useAdmin';
 import SearchIcon from '@/components/icons/SearchIcon';
 
 /**

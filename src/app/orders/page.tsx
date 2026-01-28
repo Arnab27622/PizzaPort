@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { useIsAdmin } from "../hook/useAdmin";
+import { useIsAdmin } from "@/hooks/useAdmin";
 import BackButton from "@/components/layout/BackButton";
 import LoadingSpinner from "@/components/icons/LoadingSpinner";
 import LocationIcon from "@/components/icons/LocationIcon";

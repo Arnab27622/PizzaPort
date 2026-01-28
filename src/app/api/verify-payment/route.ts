@@ -145,6 +145,14 @@ export async function POST(req: NextRequest) {
         }
     );
 
+    // If order has a coupon, increment its usage count
+    if (order.couponCode) {
+        await db.collection("coupons").updateOne(
+            { code: order.couponCode },
+            { $inc: { usageCount: 1 } }
+        );
+    }
+
     /**
      * Success Response
      * Client can now safely confirm the order to the user

@@ -31,6 +31,7 @@ export interface IMenuItem {
     name: string;
     description: string;
     basePrice: number;
+    discountPrice?: number;
     category: string;
     sizeOptions: OptionEntry[];
     extraIngredients: OptionEntry[];
@@ -55,6 +56,7 @@ const MenuItemSchema = new Schema<IMenuItem>(
         name: { type: String, required: true },
         description: { type: String },
         basePrice: { type: Number, required: true },
+        discountPrice: { type: Number },
         category: { type: String, required: true },
         sizeOptions: { type: [OptionEntrySchema], default: [] },
         extraIngredients: { type: [OptionEntrySchema], default: [] },

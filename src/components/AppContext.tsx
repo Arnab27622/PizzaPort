@@ -19,6 +19,7 @@ export interface CartProduct {
     _id: string;
     name: string;
     basePrice: number;
+    discountPrice?: number;
     imageUrl?: string;
     size?: { name: string; extraPrice: number } | null;
     extras?: { name: string; extraPrice: number }[];
