@@ -8,10 +8,7 @@ import React from 'react';
  * @property {string} subHeader - The subtitle text to display (uppercase, smaller)
  * @property {string} mainHeader - The main title text to display (larger, prominent)
  */
-type SectionHeaderProps = {
-    subHeader: string;
-    mainHeader: string;
-};
+import { SectionHeaderProps } from '@/types/common';
 
 /**
  * A reusable section header component for consistent page sections

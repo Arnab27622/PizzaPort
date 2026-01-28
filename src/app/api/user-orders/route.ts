@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongoConnect";
 import { authOptions } from "../auth/[...nextauth]/authOptions";
+import { PAYMENT_STATUS } from "@/types/payment";
 
 /**
  * GET /api/user-orders
@@ -88,7 +89,7 @@ export async function GET() {
         const orders = await db.collection("orders")
             .find({
                 userEmail: session.user.email, // Scope to current user only
-                paymentStatus: { $in: ["verified", "completed", "refund_initiated"] }
+                paymentStatus: { $in: [PAYMENT_STATUS.VERIFIED, PAYMENT_STATUS.COMPLETED, PAYMENT_STATUS.REFUND_INITIATED] }
             })
             .project({
                 razorpayOrderId: 1,    // Payment gateway order reference

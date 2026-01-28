@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Cart from '@/components/icons/Cart';
-import { MenuItem, Option } from '@/types/menu';
-
-interface ProductCustomizationModalProps {
-    item: MenuItem;
-    onClose: () => void;
-    onConfirm: (size: Option | null, extras: Option[]) => void;
-}
+import { ProductCustomizationModalProps } from '@/types/menu';
 
 export default function ProductCustomizationModal({
     item,

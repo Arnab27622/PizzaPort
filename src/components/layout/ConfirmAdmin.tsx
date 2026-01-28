@@ -1,13 +1,7 @@
 "use client";
 
 import React from 'react';
-
-interface ConfirmModalProps {
-    show: boolean;
-    onClose: () => void;
-    onConfirm: () => void;
-    message: string;
-}
+import { ConfirmModalProps } from '@/types/common';
 
 /**
  * A reusable confirmation modal component for admin actions

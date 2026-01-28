@@ -2,39 +2,7 @@
 import mongoose, { Schema, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-/**
- * User interface representing a user in the system.
- * @interface IUser
- * @property {string} name - The user's full name.
- * @property {string} email - The user's email address (unique).
- * @property {string} password - The user's hashed password.
- * @property {boolean} admin - Whether the user has admin privileges.
- * @property {boolean} banned - Whether the user is banned.
- * @property {string} [image] - URL to the user's profile image.
- * @property {string} [address] - The user's address.
- * @property {string} [gender] - The user's gender.
- */
-export interface IUser {
-    name: string;
-    email: string;
-    password: string;
-    admin: boolean;
-    banned: boolean;
-    image?: string;
-    address?: string;
-    gender?: string;
-}
-
-/**
- * User document interface that includes Mongoose document methods.
- * @interface IUserDoc
- * @extends {IUser}
- * @extends {Document}
- * @method comparePassword - Compares a candidate password with the user's hashed password.
- */
-export interface IUserDoc extends IUser {
-    comparePassword(candidate: string): Promise<boolean>;
-}
+import { IUserDoc } from '@/types/user';
 
 /**
  * Mongoose schema for User model.

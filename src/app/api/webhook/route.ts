@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import clientPromise from "@/lib/mongoConnect";
+import { PAYMENT_STATUS } from "@/types/payment";
 
 /**
  * Razorpay Webhook Secret from environment variables
@@ -121,7 +122,7 @@ export async function POST(req: NextRequest) {
                     { razorpayOrderId: payment.order_id }, // Find order by Razorpay order ID
                     {
                         $set: {
-                            paymentStatus: "completed", // Final payment status
+                            paymentStatus: PAYMENT_STATUS.COMPLETED, // Final payment status
                             webhookReceived: true       // Flag indicating webhook processing
                         }
                     }
@@ -139,7 +140,7 @@ export async function POST(req: NextRequest) {
                     { razorpayOrderId: payload.payload.payment.entity.order_id },
                     {
                         $set: {
-                            paymentStatus: "failed", // Payment failure status
+                            paymentStatus: PAYMENT_STATUS.FAILED, // Payment failure status
                             webhookReceived: true    // Flag indicating webhook processing
                         }
                     }

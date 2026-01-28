@@ -1,11 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 import Cart from '@/components/icons/Cart';
+import { NavLink } from '@/types/common';
 
-export interface NavLink {
-    href: string;
-    label: string;
-}
 
 interface DesktopNavProps {
     links: NavLink[];

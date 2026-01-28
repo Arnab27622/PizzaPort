@@ -1,17 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import LoadingSpinner from '@/components/icons/LoadingSpinner';
-import { MenuItem } from '@/types/menu';
-
-interface MenuItemGridProps {
-    items: MenuItem[];
-    isLoading: boolean;
-    error?: Error;
-    onEdit: (item: MenuItem) => void;
-    onDelete: (item: MenuItem) => void;
-    onImageClick: (imageUrl: string) => void;
-    isDeletingId: string | null;
-}
+import { MenuItemGridProps } from '@/types/menu';
 
 export default function MenuItemGrid({
     items,

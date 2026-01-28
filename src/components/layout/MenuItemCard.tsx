@@ -5,13 +5,8 @@ import Image from "next/image";
 import { toast } from "react-toastify";
 import Cart from "../icons/Cart";
 import { CartContext } from "../AppContext";
-import { MenuItem } from "@/types/menu";
+import { MenuItemCardProps } from "@/types/menu";
 import ProductCustomizationModal from "@/components/menu/ProductCustomizationModal";
-
-interface MenuItemCardProps {
-    item: MenuItem;
-    onImageClick?: () => void;
-}
 
 export default function MenuItemCard({ item, onImageClick }: MenuItemCardProps) {
     const { addToCart } = useContext(CartContext);

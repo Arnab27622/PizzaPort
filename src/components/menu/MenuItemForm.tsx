@@ -1,14 +1,8 @@
 import React, { useEffect } from 'react';
 import Image from 'next/image';
-import { MenuItem } from '@/types/menu';
+import { MenuItemFormProps } from '@/types/menu';
 import { useMenuItemForm } from '@/hooks/useMenuItemForm';
 import MenuItemOptionFields from './MenuItemOptionFields';
-
-interface MenuItemFormProps {
-    item?: MenuItem | null;
-    onClose: () => void;
-    onSuccess: () => void;
-}
 
 export default function MenuItemForm({ item, onClose, onSuccess }: MenuItemFormProps) {
     const {

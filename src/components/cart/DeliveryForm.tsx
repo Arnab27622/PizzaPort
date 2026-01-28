@@ -1,16 +1,7 @@
 import React from 'react';
 import LocationIcon from '@/components/icons/LocationIcon';
 import LoadingSpinner from '@/components/icons/LoadingSpinner';
-import { UseFormRegister, FieldErrors } from 'react-hook-form';
-
-interface DeliveryFormProps {
-    userName: string;
-    userEmail: string;
-    register: UseFormRegister<{ address: string }>;
-    errors: FieldErrors<{ address: string }>;
-    onFetchLocation: () => void;
-    isFetchingLocation: boolean;
-}
+import { DeliveryFormProps } from '@/types/cart';
 
 export default function DeliveryForm({
     userName,

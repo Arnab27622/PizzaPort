@@ -1,13 +1,6 @@
 import React from 'react';
 import LoadingSpinner from '@/components/icons/LoadingSpinner';
-import { CartTotals } from '@/types/cart';
-
-interface OrderSummaryProps {
-    totals: CartTotals;
-    onSubmit: () => void;
-    isProcessing: boolean;
-    isDisabled: boolean;
-}
+import { OrderSummaryProps } from '@/types/cart';
 
 export default function OrderSummary({
     totals,

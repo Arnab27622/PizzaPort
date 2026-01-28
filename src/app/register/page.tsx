@@ -47,13 +47,7 @@ const RegisterSchema = z
         message: "Passwords don't match",
     });
 
-/**
- * Registration Input Type
- * 
- * TypeScript type derived from Zod validation schema
- * Ensures type safety throughout the component and API communication
- */
-type RegisterInput = z.infer<typeof RegisterSchema>;
+import { RegisterInput } from '@/types/user';
 
 /**
  * RegisterPage Component

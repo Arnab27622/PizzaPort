@@ -1,13 +1,6 @@
 import React from 'react';
-import { Coupon } from '@/types/coupon';
+import { CouponListProps } from '@/types/coupon';
 import TrashIcon from '../icons/TrashIcon';
-
-interface CouponListProps {
-    coupons: Coupon[];
-    onEdit: (coupon: Coupon) => void;
-    onDelete: (coupon: Coupon) => void;
-    isDeletingId: string | null;
-}
 
 export default function CouponList({ coupons, onEdit, onDelete, isDeletingId }: CouponListProps) {
     if (!coupons.length) {

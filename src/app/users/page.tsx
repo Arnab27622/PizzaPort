@@ -9,24 +9,7 @@ import ConfirmModal from '@/components/layout/ConfirmAdmin';
 import { useIsAdmin } from '@/hooks/useAdmin';
 import SearchIcon from '@/components/icons/SearchIcon';
 
-/**
- * User Interface Definition
- * 
- * Comprehensive user profile structure for administrative user management
- * Contains user metadata, permissions, and account status information
- */
-interface User {
-    _id: string;                    // Unique MongoDB identifier
-    name: string;                   // User's full name
-    email: string;                  // Primary contact and login identifier
-    address?: string;               // Optional delivery address
-    gender?: string;                // Optional demographic information
-    image?: string;                 // Optional profile picture URL
-    admin: boolean;                 // Administrative privileges flag
-    banned?: boolean;               // Account suspension status
-    createdAt: string;              // Account registration timestamp
-    updatedAt: string;              // Last activity timestamp
-}
+import { User } from '@/types/user';
 
 /**
  * Data Fetcher for SWR

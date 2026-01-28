@@ -1,14 +1,6 @@
 import React from 'react';
-import { OptionForm } from '@/types/menu';
+import { MenuItemOptionFieldsProps } from '@/types/menu';
 import TrashIcon from '../icons/TrashIcon';
-
-interface MenuItemOptionFieldsProps {
-    label: string;
-    options: OptionForm[];
-    onChange: (idx: number, field: 'name' | 'extraPrice', value: string) => void;
-    onRemove: (idx: number) => void;
-    onAdd: () => void;
-}
 
 export default function MenuItemOptionFields({
     label,

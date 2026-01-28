@@ -40,22 +40,7 @@ const MenuItemSchema = z.object({
     })))
 });
 
-/**
- * Menu Item Database Interface
- * Defines the structure of menu items stored in MongoDB
- */
-interface MenuItemDB {
-    name: string;                                           // Item name (required)
-    description?: string;                                   // Optional item description
-    basePrice: number;                                      // Base price without extras
-    discountPrice?: number;                                 // Optional promotional/discount price
-    category: string;                                       // Food category (e.g., Pizza, Burger)
-    sizeOptions: { name: string; extraPrice: number }[];    // Size variations with pricing
-    extraIngredients: { name: string; extraPrice: number }[]; // Additional ingredients with costs
-    imageUrl?: string;                                      // Optional image path
-    createdAt: Date;                                        // Record creation timestamp
-    updatedAt: Date;                                        // Last update timestamp
-}
+import { MenuItemDB } from '@/types/menu';
 
 /**
  * Database Collection Helper

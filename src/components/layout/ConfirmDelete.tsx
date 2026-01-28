@@ -2,10 +2,7 @@
 
 import React from "react";
 import { confirmable, createConfirmation, type ConfirmDialogProps } from "react-confirm";
-
-interface CustomConfirmProps {
-    message: string;
-}
+import { CustomConfirmProps } from "@/types/common";
 
 type Props = ConfirmDialogProps<CustomConfirmProps, boolean>;
 

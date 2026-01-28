@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
-import { CartProduct } from '@/components/AppContext';
-import { GroupedCartItem, CartTotals } from '@/types/cart';
+import { CartProduct, GroupedCartItem, CartTotals } from '@/types/cart';
 
 export function useCartCalculations(
     cartProducts: CartProduct[],

@@ -1,11 +1,6 @@
 import { useState, useCallback, useEffect, ChangeEvent, FormEvent } from 'react';
-import { MenuItem, MenuItemFormState } from '@/types/menu';
+import { MenuItem, MenuItemFormState, UseMenuItemFormProps } from '@/types/menu';
 import { toast } from 'react-toastify';
-
-interface UseMenuItemFormProps {
-    onSuccess: () => void;
-    onClose: () => void;
-}
 
 export function useMenuItemForm({ onSuccess, onClose }: UseMenuItemFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);

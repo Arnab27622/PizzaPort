@@ -1,3 +1,6 @@
+export const SALES_FILTERS = ['today', '7days', 'month', 'all-time'] as const;
+export type FilterType = typeof SALES_FILTERS[number];
+
 export interface SalesMetrics {
     totalSales: number;
     avgOrderValue: number;
@@ -6,7 +9,7 @@ export interface SalesMetrics {
 }
 
 export interface DailyRevenue {
-     _id: string;
+    _id: string;
     date: string;
     revenue: number;
 }

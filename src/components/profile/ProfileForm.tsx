@@ -2,36 +2,7 @@ import React, { useRef } from 'react';
 import Image from 'next/image';
 import LoadingSpinner from '@/components/icons/LoadingSpinner';
 import LocationIcon from '@/components/icons/LocationIcon';
-import { UseFormRegister, FieldErrors } from 'react-hook-form';
-
-interface ProfileFormProps {
-    form: {
-        name: string;
-        email: string;
-        address: string;
-        gender: string;
-    };
-    errors: FieldErrors<{
-        name: string;
-        email: string;
-        address: string;
-        gender: string;
-    }>;
-    register: UseFormRegister<{
-        name: string;
-        email: string;
-        address: string;
-        gender: string;
-    }>;
-    userImage?: string;
-    preview: string | null;
-    saving: boolean;
-    uploadingImage: boolean;
-    isFetchingLocation: boolean;
-    onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onFetchLocation: () => void;
-    onSubmit: (e: React.FormEvent) => void;
-}
+import { ProfileFormProps } from '@/types/user';
 
 export default function ProfileForm({
     errors,

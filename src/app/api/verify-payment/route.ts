@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import clientPromise from "@/lib/mongoConnect";
+import { ORDER_STATUS } from "@/types/order";
+import { PAYMENT_STATUS } from "@/types/payment";
 
 /**
  * POST /api/payment/verify
@@ -137,10 +139,10 @@ export async function POST(req: NextRequest) {
         { razorpayOrderId: orderId }, // Target order by Razorpay order ID
         {
             $set: {
-                paymentStatus: "verified",        // Mark payment as manually verified
+                paymentStatus: PAYMENT_STATUS.VERIFIED,        // Mark payment as manually verified
                 razorpayPaymentId: razorpay_payment_id, // Store Razorpay payment reference
                 verifiedAt: new Date(),          // Timestamp of verification
-                status: "placed"                 // Move order to processing pipeline
+                status: ORDER_STATUS.PLACED                 // Move order to processing pipeline
             }
         }
     );

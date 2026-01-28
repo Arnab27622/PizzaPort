@@ -7,61 +7,8 @@ import mongoose from "mongoose";
 import OrderModel from "@/app/models/Orders";
 import Image from "next/image";
 
-/**
- * Order Item Type Definition
- * 
- * Represents individual line items within an order with complete pricing breakdown
- * Captures product configuration at time of purchase for accurate order history
- */
-interface OrderItem {
-    name: string;                             // Product name as displayed to customer
-    imageUrl?: string;                        // Optional product image URL
-    size?: {                                  // Selected size option with price adjustment
-        name: string;
-        extraPrice: number;
-    };
-    extras?: {                                // Additional customizations/toppings
-        name: string;
-        extraPrice: number;
-    }[];
-    basePrice: number;                        // Base product price without modifications
-    quantity?: number;                        // Quantity ordered (defaults to 1)
-}
+import { Order, OrderItem, DBOrder } from "@/types/order";
 
-/**
- * Complete Order Type Definition
- * 
- * Comprehensive order record with financial breakdown and status tracking
- * Serves as the single source of truth for order details and audit trails
- */
-interface Order {
-    _id: string;                    // Unique MongoDB identifier
-    userName: string;               // Customer's full name for delivery
-    userEmail: string;              // Customer contact for notifications
-    address: string;                // Complete delivery address
-    cart: OrderItem[];              // Ordered items with configurations
-    subtotal: number;               // Sum of all items before fees
-    tax: number;                    // Calculated tax amount
-    deliveryFee: number;            // Shipping/delivery charges
-    couponCode?: string;            // Applied coupon code
-    discountAmount?: number;        // Discount amount from coupon
-    total: number;                  // Final amount charged to customer
-    razorpayOrderId: string;        // Payment gateway transaction reference
-    createdAt: string;              // ISO timestamp of order placement
-    status: string;                 // Current order lifecycle state
-    paymentStatus: string;          // Financial transaction status
-}
-
-/**
- * Database Order Type Definition
- * 
- * Represents the order document as it comes from the database via lean()
- * before being serialized to JSON for the client components.
- */
-interface DBOrder extends Omit<Order, "_id" | "createdAt"> {
-    _id: mongoose.Types.ObjectId | string;
-    createdAt: Date | string;
-}
 
 /**
  * Status Color Mapping Function

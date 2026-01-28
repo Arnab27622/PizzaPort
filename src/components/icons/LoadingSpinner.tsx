@@ -1,12 +1,7 @@
 'use client';
 
-import React from 'react'
-
-interface LoadingSpinnerProps {
-    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-    color?: string;
-    className?: string;
-}
+import React from 'react';
+import { LoadingSpinnerProps } from '@/types/common';
 
 function LoadingSpinner({ size = 'md', color = 'text-primary', className = '' }: LoadingSpinnerProps) {
     const sizeMap = {

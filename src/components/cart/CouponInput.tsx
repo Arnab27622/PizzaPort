@@ -3,13 +3,7 @@ import { toast } from 'react-toastify';
 import LoadingSpinner from '@/components/icons/LoadingSpinner';
 import { CouponValidationResponse } from '@/types/coupon';
 
-interface CouponInputProps {
-    subtotal: number;
-    onCouponApplied: (response: CouponValidationResponse) => void;
-    onCouponRemoved: () => void;
-    appliedCode?: string;
-    isDisabled?: boolean;
-}
+import { CouponInputProps } from '@/types/cart';
 
 export default function CouponInput({
     subtotal,

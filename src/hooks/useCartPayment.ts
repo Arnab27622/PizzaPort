@@ -1,18 +1,9 @@
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-import { CartProduct } from '@/components/AppContext';
+import { UseCartPaymentProps } from '@/types/cart';
 import { RazorpayResponse, RazorpayOptions } from '@/types/payment';
 
-interface UseCartPaymentProps {
-    cartProducts: CartProduct[];
-    address: string;
-    userName: string;
-    userEmail: string;
-    clearCart: () => void;
-    couponCode?: string;
-    discountAmount?: number;
-}
 
 export function useCartPayment({
     cartProducts,

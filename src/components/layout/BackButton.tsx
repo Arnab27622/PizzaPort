@@ -2,12 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import React from 'react';
-
-interface BackButtonProps {
-  className?: string;
-  label?: string;
-  href?: string;
-}
+import { BackButtonProps } from '@/types/common';
 
 /**
  * BackButton Component

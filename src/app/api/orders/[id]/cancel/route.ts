@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongoConnect";
+import { ORDER_STATUS } from "@/types/order";
+import { PAYMENT_STATUS } from "@/types/payment";
 import { ObjectId } from "mongodb";
 
 /**
@@ -63,9 +65,9 @@ export async function PATCH(
             { _id: new ObjectId(orderId) }, // Find order by MongoDB ObjectId
             {
                 $set: {
-                    status: "canceled",           // Mark order as canceled
+                    status: ORDER_STATUS.CANCELED,           // Mark order as canceled
                     canceledAt: new Date(),       // Record cancellation timestamp
-                    paymentStatus: "refund_initiated", // Initiate refund workflow
+                    paymentStatus: PAYMENT_STATUS.REFUND_INITIATED, // Initiate refund workflow
                 },
             }
         );

@@ -6,31 +6,12 @@ import useSWR from 'swr';
 import LoadingSpinner from '@/components/icons/LoadingSpinner';
 import { useIsAdmin } from '@/hooks/useAdmin';
 import SalesCharts from '@/components/layout/SalesCharts';
-import { SalesReport } from '../../types/sales';
+import { SalesReport, FilterType, SALES_FILTERS } from '@/types/sales';
 
-/**
- * Data Fetcher for SWR
- * 
- * Handles API requests for sales data with comprehensive error handling
- * Used by SWR for intelligent caching and background revalidation
- * 
- * @param {string} url - API endpoint with query parameters
- * @returns {Promise<SalesReport>} Parsed sales report data
- * @throws {Error} When API response is not OK or network fails
- */
 const fetcher = (url: string) => fetch(url).then(res => {
     if (!res.ok) throw new Error('Failed to fetch sales data');
     return res.json();
 });
-
-/**
- * Time Filter Configuration
- * 
- * Defines available time periods for sales data analysis
- * Ensures type safety for filter operations throughout the component
- */
-const FILTERS = ['today', '7days', 'month', 'all-time'] as const;
-type FilterType = typeof FILTERS[number];
 
 /**
  * Date Range Calculator
@@ -270,7 +251,7 @@ export default function SalesPage() {
             <header className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                 <h1 className="text-3xl font-bold heading-border underline">Sales Analytics</h1>
                 <div className="flex flex-wrap gap-2">
-                    {FILTERS.map(f => (
+                    {SALES_FILTERS.map((f: FilterType) => (
                         <button
                             key={f}
                             onClick={() => handleFilterChange(f)}

@@ -7,32 +7,7 @@ import Image from "next/image";
 import LoadingSpinner from "@/components/icons/LoadingSpinner";
 import BackButton from "@/components/layout/BackButton";
 
-/**
- * Order Item Interface
- * 
- * Represents individual products within a customer order
- * Contains essential product information for order display and tracking
- */
-interface OrderItem {
-    name: string;              // Product name as displayed at time of purchase
-    imageUrl?: string;         // Product image for visual order identification
-}
-
-/**
- * Complete Order Interface
- * 
- * Comprehensive order record for customer order history display
- * Contains order metadata, status information, and item details
- */
-interface Order {
-    _id: string;                    // Unique MongoDB identifier
-    razorpayOrderId: string;        // Payment gateway transaction reference
-    total: number;                  // Final order amount in INR
-    createdAt: string;              // ISO timestamp of order placement
-    status: string;                 // Current order lifecycle state
-    paymentStatus: string;          // Financial transaction status
-    cart: OrderItem[];              // Ordered products with details
-}
+import { Order, OrderStatus, STATUS_COLORS } from "@/types/order";
 
 /**
  * Order Status Color Mapper
@@ -44,15 +19,7 @@ interface Order {
  * @returns {string} Tailwind CSS color class for status display
  */
 const getStatusColor = (status: string): string => {
-    switch (status) {
-        case "placed": return "text-amber-400";          // New order awaiting processing
-        case "confirmed": return "text-blue-400";        // Restaurant accepted order
-        case "preparing": return "text-purple-400";      // Kitchen actively preparing
-        case "out_for_delivery": return "text-yellow-400"; // Order en route to customer
-        case "completed": return "text-green-400";       // Successful delivery
-        case "canceled": return "text-red-400";          // Order canceled
-        default: return "text-amber-200";                // Fallback for unknown states
-    }
+    return STATUS_COLORS[status as OrderStatus] || "text-amber-200";
 };
 
 /**

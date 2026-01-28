@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
-import { ORDER_STATUS, PAYMENT_STATUS } from "@/utils/constants";
+import { ORDER_STATUS } from "@/types/order";
+import { PAYMENT_STATUS } from "@/types/payment";
 
 /**
  * Represents an order in the system.

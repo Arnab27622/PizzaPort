@@ -7,21 +7,10 @@ import LoadingSpinner from '@/components/icons/LoadingSpinner';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import TicketIcon from '@/components/icons/TicketIcon';
+import { UserCoupon } from '@/types/coupon';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-interface UserCoupon {
-    _id: string;
-    code: string;
-    discountType: 'percentage' | 'fixed';
-    discountValue: number;
-    minOrderValue?: number;
-    maxDiscount?: number;
-    expiryDate?: string;
-    usageLimit?: number;
-    userUsageCount: number;
-    remainingUses: number | null;
-}
 
 export default function UserCouponsPage() {
     const { status: authStatus } = useSession();

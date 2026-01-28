@@ -1,12 +1,7 @@
 import React, { useCallback } from 'react';
 import Image from 'next/image';
 import TrashIcon from '@/components/icons/TrashIcon';
-import { GroupedCartItem } from '@/types/cart';
-
-interface CartItemListProps {
-    groupedItems: GroupedCartItem[];
-    onRemove: (index: number) => void;
-}
+import { GroupedCartItem, CartItemListProps } from '@/types/cart';
 
 export default function CartItemList({ groupedItems, onRemove }: CartItemListProps) {
     const getItemTotal = useCallback((item: GroupedCartItem['item']) => {

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongoConnect';
-import { PAYMENT_STATUS } from '@/utils/constants';
+import { PAYMENT_STATUS } from '@/types/payment';
 
 /**
  * GET /api/menuitem/bestsellers

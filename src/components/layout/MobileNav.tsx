@@ -2,7 +2,8 @@ import React from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import Cart from '@/components/icons/Cart';
-import { NavLink } from './DesktopNav';
+import { NavLink } from '@/types/common';
+
 
 interface MobileNavProps {
     isOpen: boolean;

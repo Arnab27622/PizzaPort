@@ -2,7 +2,8 @@ import Razorpay from "razorpay";
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongoConnect";
 import crypto from 'crypto';
-import { CartProduct } from "@/components/AppContext";
+import { CartProduct } from "@/types/cart";
+import { RazorpayOrderResponse } from "@/types/payment";
 import { z } from "zod";
 
 const RazorpayOrderSchema = z.object({
@@ -14,16 +15,6 @@ const RazorpayOrderSchema = z.object({
     discountAmount: z.number().optional()
 });
 
-/**
- * Razorpay Order Response Interface
- * Defines the structure of the response from Razorpay order creation API
- */
-interface RazorpayOrderResponse {
-    id: string;                     // Razorpay order ID
-    amount: number;                 // Order amount in smallest currency unit (paise for INR)
-    currency: string;               // Currency code (e.g., "INR")
-    [key: string]: unknown;         // Allow for additional Razorpay response fields
-}
 
 /**
  * POST /api/payment/create-order

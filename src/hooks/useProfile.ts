@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ExtendedUser } from '@/types/user';
+import { ExtendedUser, ProfileFormState } from '@/types/user';
 
 const ProfileSchema = z.object({
     name: z.string().min(1, 'Full Name is required').max(50, 'Name is too long'),
@@ -13,8 +13,6 @@ const ProfileSchema = z.object({
     address: z.string().min(1, 'Address is required').max(200, 'Address is too long'),
     gender: z.string().min(1, 'Please select a gender'),
 });
-
-type ProfileInput = z.infer<typeof ProfileSchema>;
 
 export function useProfile() {
     const { data: session, status, update } = useSession({ required: true });
@@ -27,7 +25,7 @@ export function useProfile() {
         watch,
         reset,
         formState: { errors, isSubmitting: saving }
-    } = useForm<ProfileInput>({
+    } = useForm<ProfileFormState>({
         resolver: zodResolver(ProfileSchema),
         mode: 'onChange'
     });
@@ -116,7 +114,7 @@ export function useProfile() {
         }
     }, [setValue]);
 
-    const onSubmit = useCallback(async (data: ProfileInput) => {
+    const onSubmit = useCallback(async (data: ProfileFormState) => {
         try {
             const body = new FormData();
             body.append('name', data.name.trim());

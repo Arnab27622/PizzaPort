@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Coupon } from '@/types/coupon';
+import { CouponFormProps } from '@/types/coupon';
 import { toast } from 'react-toastify';
-
-interface CouponFormProps {
-    coupon?: Coupon | null;
-    onClose: () => void;
-    onSuccess: () => void;
-}
 
 export default function CouponForm({ coupon, onClose, onSuccess }: CouponFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);

@@ -8,45 +8,7 @@ import { toast } from 'react-toastify';
 import LoadingSpinner from '@/components/icons/LoadingSpinner';
 import { CartContext } from '@/components/AppContext';
 
-/**
- * Order Item Interface
- * 
- * Represents individual products within a customer order with complete pricing breakdown
- * Captures product configuration at time of purchase for accurate order history
- */
-interface OrderItem {
-    _id: string;                              // Unique MongoDB identifier for the order item
-    name: string;                             // Product name as displayed to customer
-    basePrice: number;                        // Base price without modifications
-    imageUrl?: string;                        // Product image for visual identification
-    size?: { name: string; extraPrice: number }; // Selected size option with price adjustment
-    extras?: { name: string; extraPrice: number }[]; // Additional customizations/toppings
-}
-
-/**
- * Complete Order Interface
- * 
- * Comprehensive order record with financial breakdown and status tracking
- * Serves as the single source of truth for order details and audit trails
- */
-interface Order {
-    _id: string;                    // Unique MongoDB identifier
-    userName: string;               // Customer's full name for delivery
-    userEmail: string;              // Customer contact for notifications
-    address: string;                // Complete delivery address
-    cart: OrderItem[];              // Ordered items with configurations
-    subtotal: number;               // Sum of all items before fees
-    tax: number;                    // Calculated tax amount (5%)
-    deliveryFee: number;            // Shipping/delivery charges
-    total: number;                  // Final amount charged to customer
-    razorpayOrderId: string;        // Payment gateway transaction reference
-    createdAt: string;              // ISO timestamp of order placement
-    status: string;                 // Current order lifecycle state
-    paymentStatus: string;          // Financial transaction status
-    canceledAt?: string;            // Optional timestamp for order cancellation
-    couponCode?: string;            // Applied coupon code
-    discountAmount?: number;        // Discount amount from coupon
-}
+import { Order, OrderItem, STATUS_LABELS } from "@/types/order";
 
 /**
  * Order Status Display Mapping
@@ -55,12 +17,10 @@ interface Order {
  * Converts API status values to human-readable format
  */
 const STATUS_DISPLAY_MAP: Record<string, string> = {
+    ...STATUS_LABELS,
     placed: 'Order Placed',
-    confirmed: 'Order Confirmed',
     preparing: 'Preparing Your Order',
-    out_for_delivery: 'Out for Delivery',
     completed: 'Order Delivered',
-    canceled: 'Order Canceled'
 };
 
 /**

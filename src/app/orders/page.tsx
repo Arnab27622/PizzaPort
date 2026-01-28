@@ -8,91 +8,7 @@ import BackButton from "@/components/layout/BackButton";
 import LoadingSpinner from "@/components/icons/LoadingSpinner";
 import LocationIcon from "@/components/icons/LocationIcon";
 
-/**
- * Order Item Type Definition
- * 
- * Represents individual items within an order's cart
- * Matches the database schema for order line items
- */
-interface OrderItem {
-    _id: string;                              // Unique MongoDB identifier for the order item
-    name: string;                             // Product name at time of order
-    basePrice: number;                        // Base price without modifications
-    size?: { name: string; extraPrice: number }; // Selected size with price adjustment
-    extras?: { name: string; extraPrice: number }[]; // Additional toppings/modifications
-    quantity?: number;                        // Quantity ordered (defaults to 1 if undefined)
-}
-
-/**
- * Order Type Definition
- * 
- * Complete order structure representing customer purchases
- * Contains order metadata, customer info, cart contents, and status
- */
-interface Order {
-    _id: string;                    // Unique MongoDB identifier for the order
-    userName: string;               // Customer's full name
-    userEmail: string;              // Customer's email for notifications
-    address: string;                // Delivery address
-    cart: OrderItem[];              // Array of ordered items
-    total: number;                  // Final order total in INR
-    status: string;                 // Current order status
-    razorpayOrderId: string;        // Payment gateway reference ID
-    createdAt: string;              // ISO timestamp of order creation
-}
-
-/**
- * Order Status Type Definition
- * 
- * Defines the complete lifecycle of an order from placement to completion
- * Ensures type safety for status transitions and validations
- */
-type OrderStatus = "placed" | "confirmed" | "preparing" | "out_for_delivery" | "completed" | "canceled";
-
-/**
- * Status Color Mapping
- * 
- * Provides consistent visual indicators for each order state
- * Uses Tailwind CSS classes for theming and accessibility
- */
-const statusColors: Record<OrderStatus, string> = {
-    placed: "text-amber-400",           // New order awaiting confirmation
-    confirmed: "text-blue-400",         // Restaurant has accepted order
-    preparing: "text-yellow-400",       // Kitchen is preparing food
-    out_for_delivery: "text-purple-400", // Order is with delivery personnel
-    completed: "text-green-400",        // Order successfully delivered
-    canceled: "text-red-400"            // Order canceled (with refund processing)
-};
-
-/**
- * Status Label Mapping
- * 
- * User-friendly display names for order statuses
- * Used in dropdowns and status displays throughout the UI
- */
-const statusLabels: Record<OrderStatus, string> = {
-    placed: "Placed",
-    confirmed: "Confirmed",
-    preparing: "Preparing",
-    out_for_delivery: "Out for Delivery",
-    completed: "Completed",
-    canceled: "Canceled"
-};
-
-/**
- * Status Progression Rank
- * 
- * Defines the logical flow of an order. Higher rank indicates a later stage.
- * Used to prevent moving an order backwards in the fulfillment pipeline.
- */
-const STATUS_RANK: Record<string, number> = {
-    placed: 1,
-    confirmed: 2,
-    preparing: 3,
-    out_for_delivery: 4,
-    completed: 5,
-    canceled: 6, // Terminal state
-};
+import { Order, OrderStatus, STATUS_COLORS, STATUS_LABELS, STATUS_RANK } from "@/types/order";
 
 /**
  * AdminOrdersPage Component
@@ -476,7 +392,7 @@ export default function AdminOrdersPage() {
                                                     {isUpdating ? (
                                                         <LoadingSpinner size="xs" color="text-primary" />
                                                     ) : (
-                                                        <div className={`w-2 h-2 rounded-full ${statusColors[order.status as OrderStatus]}`} />
+                                                        <div className={`w-2 h-2 rounded-full ${STATUS_COLORS[order.status as OrderStatus]}`} />
                                                     )}
                                                     <span className="text-[10px] font-bold text-amber-400/80 uppercase tracking-tighter">Current Status</span>
                                                 </div>
@@ -491,7 +407,7 @@ export default function AdminOrdersPage() {
                                                         }`}
                                                     disabled={isCompletedOrCanceled || isUpdating}
                                                 >
-                                                    {Object.entries(statusLabels)
+                                                    {Object.entries(STATUS_LABELS)
                                                         .filter(([value]) => value !== "canceled" || order.status === "canceled")
                                                         .map(([value, label]) => {
                                                             const isPreviousStatus = STATUS_RANK[value] < STATUS_RANK[order.status];

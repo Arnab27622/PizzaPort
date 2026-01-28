@@ -5,40 +5,12 @@ import React, {
     createContext,
     ReactNode,
     useState,
-    Dispatch,
-    SetStateAction,
     useEffect,
     useMemo,
     useCallback,
 } from "react";
 
-/**
- * Interface representing a product in the shopping cart
- */
-export interface CartProduct {
-    _id: string;
-    name: string;
-    basePrice: number;
-    discountPrice?: number;
-    imageUrl?: string;
-    size?: { name: string; extraPrice: number } | null;
-    extras?: { name: string; extraPrice: number }[];
-}
-
-/**
- * Interface defining the shape of the cart context
- */
-export interface CartContextType {
-    cartProducts: CartProduct[];
-    setCartProducts: Dispatch<SetStateAction<CartProduct[]>>;
-    addToCart: (
-        product: CartProduct,
-        size?: CartProduct["size"],
-        extras?: CartProduct["extras"]
-    ) => void;
-    clearCart: () => void;
-    removeCartProduct: (index: number) => void;
-}
+import { CartProduct, CartContextType } from "@/types/cart";
 
 /**
  * Cart context for managing shopping cart state across the application

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongoConnect";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/authOptions";
+import { PAYMENT_STATUS } from "@/types/payment";
 
 /**
  * GET /api/orders
@@ -62,7 +63,7 @@ export async function GET() {
          * - Converts cursor to array for JSON serialization
          */
         const orders = await db.collection("orders")
-            .find({ paymentStatus: { $in: ["verified", "completed", "refund_initiated"] } })
+            .find({ paymentStatus: { $in: [PAYMENT_STATUS.VERIFIED, PAYMENT_STATUS.COMPLETED, PAYMENT_STATUS.REFUND_INITIATED] } })
             .sort({ createdAt: -1 })
             .toArray();
 

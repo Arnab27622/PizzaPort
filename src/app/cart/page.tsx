@@ -24,10 +24,9 @@ const CartSchema = z.object({
     address: z.string().min(1, 'Address is required').min(5, 'Please provide a more detailed address').max(200, 'Address is too long'),
 });
 
-type CartInput = z.infer<typeof CartSchema>;
-
 import CouponInput from "@/components/cart/CouponInput";
 import { CouponValidationResponse } from "@/types/coupon";
+import { CartFormState } from "@/types/cart";
 
 export default function CartPage() {
     const { cartProducts, removeCartProduct, clearCart } = useContext(CartContext);
@@ -44,7 +43,7 @@ export default function CartPage() {
         setValue,
         watch,
         formState: { errors }
-    } = useForm<CartInput>({
+    } = useForm<CartFormState>({
         resolver: zodResolver(CartSchema),
         mode: 'onChange'
     });
