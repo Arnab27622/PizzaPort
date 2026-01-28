@@ -43,6 +43,8 @@ interface Order {
     subtotal: number;               // Sum of all items before fees
     tax: number;                    // Calculated tax amount
     deliveryFee: number;            // Shipping/delivery charges
+    couponCode?: string;            // Applied coupon code
+    discountAmount?: number;        // Discount amount from coupon
     total: number;                  // Final amount charged to customer
     razorpayOrderId: string;        // Payment gateway transaction reference
     createdAt: string;              // ISO timestamp of order placement
@@ -407,6 +409,17 @@ export default async function OrderDetailPage({
                                     <span>Delivery Fee</span>
                                     <span className="font-mono">{formatCurrency(order.deliveryFee)}</span>
                                 </div>
+                                {order.couponCode && (
+                                    <div className="flex justify-between items-center text-xs md:text-sm text-green-400">
+                                        <div className="flex items-center gap-1">
+                                            <span>Coupon</span>
+                                            <span className="bg-green-900/40 px-1.5 py-0.5 rounded text-[10px] font-bold border border-green-800/50 uppercase tracking-tighter">
+                                                {order.couponCode}
+                                            </span>
+                                        </div>
+                                        <span className="font-mono">-{formatCurrency(order.discountAmount || 0)}</span>
+                                    </div>
+                                )}
                                 <div className="border-t border-amber-900/50 pt-3 mt-3 flex justify-between items-center text-amber-50 font-black text-lg md:text-xl">
                                     <span className="text-sm md:text-lg">Total Amount</span>
                                     <span>{formatCurrency(order.total)}</span>

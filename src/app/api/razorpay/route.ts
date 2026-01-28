@@ -152,10 +152,18 @@ export async function POST(req: Request) {
             });
 
             if (coupon) {
-                // Check if coupon is valid (not expired and usage limit not reached)
+                // Check if coupon is valid (not expired)
                 const now = new Date();
                 const isNotExpired = !coupon.expiryDate || new Date(coupon.expiryDate) > now;
-                const isWithinLimit = !coupon.usageLimit || coupon.usageCount < coupon.usageLimit;
+
+                // PER-USER usage limit check
+                const userUsageCount = await db.collection("orders").countDocuments({
+                    userEmail: email,
+                    couponCode: coupon.code,
+                    paymentStatus: { $in: ["verified", "completed"] }
+                });
+
+                const isWithinLimit = !coupon.usageLimit || userUsageCount < coupon.usageLimit;
                 const isMinOrderMet = !coupon.minOrderValue || subtotal >= coupon.minOrderValue;
 
                 if (isNotExpired && isWithinLimit && isMinOrderMet) {

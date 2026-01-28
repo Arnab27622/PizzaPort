@@ -80,6 +80,21 @@ const statusLabels: Record<OrderStatus, string> = {
 };
 
 /**
+ * Status Progression Rank
+ * 
+ * Defines the logical flow of an order. Higher rank indicates a later stage.
+ * Used to prevent moving an order backwards in the fulfillment pipeline.
+ */
+const STATUS_RANK: Record<string, number> = {
+    placed: 1,
+    confirmed: 2,
+    preparing: 3,
+    out_for_delivery: 4,
+    completed: 5,
+    canceled: 6, // Terminal state
+};
+
+/**
  * AdminOrdersPage Component
  * 
  * Comprehensive order management interface for restaurant administrators
@@ -459,7 +474,7 @@ export default function AdminOrdersPage() {
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2 mb-1.5">
                                                     {isUpdating ? (
-                                                        <LoadingSpinner size="sm" color="text-primary" />
+                                                        <LoadingSpinner size="xs" color="text-primary" />
                                                     ) : (
                                                         <div className={`w-2 h-2 rounded-full ${statusColors[order.status as OrderStatus]}`} />
                                                     )}
@@ -478,9 +493,18 @@ export default function AdminOrdersPage() {
                                                 >
                                                     {Object.entries(statusLabels)
                                                         .filter(([value]) => value !== "canceled" || order.status === "canceled")
-                                                        .map(([value, label]) => (
-                                                            <option key={value} value={value}>{label}</option>
-                                                        ))}
+                                                        .map(([value, label]) => {
+                                                            const isPreviousStatus = STATUS_RANK[value] < STATUS_RANK[order.status];
+                                                            return (
+                                                                <option
+                                                                    key={value}
+                                                                    value={value}
+                                                                    disabled={isPreviousStatus}
+                                                                >
+                                                                    {label}
+                                                                </option>
+                                                            );
+                                                        })}
                                                 </select>
                                             </div>
 
@@ -500,7 +524,7 @@ export default function AdminOrdersPage() {
                                                         className="w-full bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white font-bold py-2.5 rounded-lg border border-red-600/30 transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-wider"
                                                     >
                                                         {isCanceling ? (
-                                                            <LoadingSpinner size="sm" color="text-white" />
+                                                            <LoadingSpinner size="xs" color="text-white" />
                                                         ) : (
                                                             <>Cancel Order</>
                                                         )}

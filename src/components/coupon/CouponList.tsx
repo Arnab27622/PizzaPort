@@ -50,8 +50,8 @@ export default function CouponList({ coupons, onEdit, onDelete, isDeletingId }: 
                             </p>
 
                             <p className="text-xs text-amber-200/50 mt-2">
-                                Used: <span className="text-amber-100">{coupon.usageCount}</span>
-                                {coupon.usageLimit ? ` / ${coupon.usageLimit}` : ''} times
+                                Total uses: <span className="text-amber-100">{coupon.usageCount}</span>
+                                {coupon.usageLimit ? <span> • Limit: <span className="text-amber-100">{coupon.usageLimit}</span> per user</span> : ''}
                             </p>
 
                             {coupon.expiryDate && (

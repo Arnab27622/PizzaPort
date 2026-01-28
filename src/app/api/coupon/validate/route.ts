@@ -73,12 +73,22 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        // Check usage limit
-        if (coupon.usageLimit && coupon.usageCount >= coupon.usageLimit) {
-            return NextResponse.json({
-                valid: false,
-                message: "This coupon has reached its usage limit"
+        // Check usage limit (PER-USER)
+        if (coupon.usageLimit) {
+            const client = await clientPromise;
+            const db = client.db();
+            const userUsageCount = await db.collection("orders").countDocuments({
+                userEmail: session.user?.email,
+                couponCode: coupon.code,
+                paymentStatus: { $in: ["verified", "completed"] }
             });
+
+            if (userUsageCount >= coupon.usageLimit) {
+                return NextResponse.json({
+                    valid: false,
+                    message: `You have reached the usage limit (${coupon.usageLimit}) for this coupon`
+                });
+            }
         }
 
         // Check minimum order value

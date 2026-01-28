@@ -76,6 +76,7 @@ export default function Navbar() {
             { href: "/", label: "Home" },
             { href: "/menu", label: "Menu" },
             { href: "/user-orders", label: "Orders" },
+            { href: "/user-coupons", label: "Coupons" },
             { href: "/#about", label: "About" },
             { href: "/#contact", label: "Contact" },
         ];

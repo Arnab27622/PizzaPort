@@ -44,6 +44,8 @@ interface Order {
     status: string;                 // Current order lifecycle state
     paymentStatus: string;          // Financial transaction status
     canceledAt?: string;            // Optional timestamp for order cancellation
+    couponCode?: string;            // Applied coupon code
+    discountAmount?: number;        // Discount amount from coupon
 }
 
 /**
@@ -560,6 +562,17 @@ export default function UserOrderPage() {
                                     {order.deliveryFee === 0 ? "Free" : `₹${order.deliveryFee}`}
                                 </span>
                             </div>
+                            {order.couponCode && (
+                                <div className="flex justify-between text-sm sm:text-base text-green-400">
+                                    <div className="flex items-center gap-1.5">
+                                        <span>Coupon:</span>
+                                        <span className="bg-green-900/40 px-1.5 py-0.5 rounded text-[10px] font-bold border border-green-800/50 uppercase tracking-tighter">
+                                            {order.couponCode}
+                                        </span>
+                                    </div>
+                                    <span>-₹{order.discountAmount}</span>
+                                </div>
+                            )}
                             <div className="flex justify-between mt-2 pt-2 border-t border-amber-800 font-bold text-base sm:text-lg">
                                 <span>Total:</span><span>₹{order.total}</span>
                             </div>
