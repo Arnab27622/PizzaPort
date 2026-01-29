@@ -8,7 +8,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { CartContext } from "@/components/AppContext";
+import { CartContext } from "@/components/CartProvider";
 import BackButton from "@/components/layout/BackButton";
 import LoadingSpinner from "@/components/icons/LoadingSpinner";
 

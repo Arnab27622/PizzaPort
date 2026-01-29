@@ -4,7 +4,7 @@ import Link from "next/link";
 import React, { useState, useEffect, useContext } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { CartContext } from "../AppContext";
+import { CartContext } from "../CartProvider";
 import DesktopNav from "./DesktopNav";
 import MobileNav from "./MobileNav";
 import { ExtendedUser } from "@/types/user";

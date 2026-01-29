@@ -3,66 +3,34 @@
 import React, { useState, useCallback } from 'react';
 import useSWR from 'swr';
 import SectionHeader from './SectionHeader';
-import Image from 'next/image';
 import MenuItemCard from './MenuItemCard';
 import LoadingSpinner from '../icons/LoadingSpinner';
 import Link from 'next/link';
 import Right from '../icons/Right';
+import SharedImageModal from '../common/SharedImageModal';
 
 import { MenuItem } from '@/types/menu';
 
+const fetcher = (url: string) => fetch(url).then(res => {
+    if (!res.ok) throw new Error('Failed to fetch data');
+    return res.json();
+});
 
-/**
- * HomeMenu component that displays the top best-selling menu items
- * 
- * @component
- * @description 
- * - Fetches top 6 best-selling menu items based on actual order data
- * - Displays items sorted by sales quantity (most popular first)
- * - Shows loading state during fetch
- * - Handles errors with retry functionality
- * - Includes modal for full-size image viewing
- * - Provides navigation to full menu page
- * 
- * @example
- * return <HomeMenu />
- * 
- * @returns {JSX.Element} Section displaying best-selling menu items
- */
 function HomeMenu() {
-    // Generic fetcher function for SWR
-    const fetcher = (url: string) => fetch(url).then(res => {
-        if (!res.ok) throw new Error('Failed to fetch data');
-        return res.json();
-    });
-
-    /**
-     * SWR hook for data fetching
-     * Provides automatic caching, revalidation, and loading states
-     */
     const { data: menuItems = [], error, isLoading } = useSWR<MenuItem[]>('/api/menuitem/bestsellers', fetcher, {
-        refreshInterval: 60000, // Refresh every minute
+        refreshInterval: 120000,
         revalidateOnFocus: false,
     });
 
-    const loading = isLoading;
-
-    // State to control full-size image modal
     const [fullImageUrl, setFullImageUrl] = useState<string | null>(null);
 
-    /**
-     * Closes the full-size image modal
-     * @function closeModal
-     * @returns {void}
-     */
     const closeModal = useCallback(() => {
         setFullImageUrl(null);
     }, []);
 
-    // Loading state UI
-    if (loading) {
+    if (isLoading) {
         return (
-            <section className='px-4'>
+            <section className='px-4 py-12'>
                 <div className='relative max-w-6xl mx-auto'>
                     <SectionHeader subHeader="Check out" mainHeader="Our Best Sellers" />
                     <div className="max-w-xl mx-auto flex flex-col items-center justify-center h-96">
@@ -74,29 +42,27 @@ function HomeMenu() {
         );
     }
 
-    // Error state UI
     if (error) {
         return (
-            <section className='px-4'>
+            <section className='px-4 py-12'>
                 <div className='relative max-w-6xl mx-auto'>
                     <SectionHeader subHeader="Check out" mainHeader="Our Best Sellers" />
-                    <div className="max-w-xl mx-auto flex flex-col items-center justify-center p-4 bg-red-100 border border-red-200 rounded-lg">
-                        <p className="text-red-700 font-medium mb-2">Error Loading Menu</p>
-                        <p className="text-red-600 text-sm mb-4">{(error as Error).message}</p>
+                    <div className="max-w-xl mx-auto p-6 text-center">
+                        <div className="bg-red-900/30 border border-red-800 rounded-lg p-6">
+                            <h3 className="text-xl font-semibold text-red-300 mb-2">Error Loading Menu</h3>
+                            <p className="text-amber-200">{(error as Error).message}</p>
+                        </div>
                     </div>
                 </div>
             </section>
         );
     }
 
-    // Main component render
     return (
         <section className='px-4 py-12'>
             <div className='relative max-w-6xl mx-auto'>
-                {/* Section header with title and subtitle */}
                 <SectionHeader subHeader="Check out" mainHeader="Our Best Sellers" />
 
-                {/* Grid layout for menu items */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     {menuItems.map(item => (
                         <MenuItemCard
@@ -107,50 +73,17 @@ function HomeMenu() {
                     ))}
                 </div>
 
-                {/* Navigation to full menu page */}
                 <div className="mt-10 flex justify-center">
                     <Link
                         href="/menu"
-                        className="flex items-center bg-white text-primary px-5 py-2 md:px-6 md:py-2 rounded-full font-bold hover:bg-gray-200 transition-all gap-1 cursor-pointer uppercase hover:shadow-lg hover:scale-105 text-sm md:text-base"
-                        aria-label="View all menu items"
+                        className="flex items-center bg-white text-primary px-5 py-2 md:px-6 md:py-2 rounded-full font-bold hover:bg-gray-100 transition-all gap-1 cursor-pointer uppercase hover:shadow-lg hover:scale-105 text-sm md:text-base"
                     >
                         See All Items
                         <Right className="w-4 h-4 md:w-5 md:h-5" />
                     </Link>
                 </div>
 
-                {/* Full-size image modal overlay */}
-                {fullImageUrl && (
-                    <div
-                        className="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-50"
-                        onClick={closeModal}
-                        role="dialog"
-                        aria-label="Full size menu item image"
-                        aria-modal="true"
-                    >
-                        {/* Image container with responsive sizing */}
-                        <div className="relative w-full max-w-xs sm:max-w-md h-72 sm:h-96">
-                            <Image
-                                src={fullImageUrl}
-                                alt="Full size menu item"
-                                fill
-                                className="object-contain"
-                                priority
-                            />
-                        </div>
-
-                        {/* Close button for the modal */}
-                        <button
-                            onClick={closeModal}
-                            className="absolute top-4 right-4 text-white bg-black/50 rounded-full p-2 hover:bg-black/70 transition-colors"
-                            aria-label="Close image viewer"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                )}
+                <SharedImageModal imageUrl={fullImageUrl} onClose={closeModal} />
             </div>
         </section>
     );

@@ -4,7 +4,7 @@ import React, { useContext, useState } from "react";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import Cart from "../icons/Cart";
-import { CartContext } from "../AppContext";
+import { CartContext } from "../CartProvider";
 import { MenuItemCardProps } from "@/types/menu";
 import ProductCustomizationModal from "@/components/menu/ProductCustomizationModal";
 
