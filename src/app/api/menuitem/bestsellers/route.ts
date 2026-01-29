@@ -59,7 +59,7 @@ export async function GET() {
             {
                 $group: {
                     _id: "$cart.name", // Group by product name
-                    quantity: { $sum: 1 } // Count occurrences of each product
+                    quantity: { $sum: { $ifNull: ["$cart.quantity", 1] } } // Sum actual quantities
                 }
             },
             { $sort: { quantity: -1 } }, // Sort by quantity descending (highest first)
@@ -113,8 +113,11 @@ export async function GET() {
             sortedBestSellers = [...sortedBestSellers, ...paddedItems];
         }
 
-        // Ensure we only return 6 items
-        const finalResult = sortedBestSellers.slice(0, 6);
+        // Ensure we only return 6 items and remove internal analytics data
+        const finalResult = sortedBestSellers.slice(0, 6).map(item => {
+            const { totalSold, ...rest } = item;
+            return rest;
+        });
 
         return NextResponse.json(finalResult);
 

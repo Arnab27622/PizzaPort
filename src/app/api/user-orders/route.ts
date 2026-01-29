@@ -65,21 +65,6 @@ export async function GET() {
         const client = await clientPromise;
         const db = client.db();
 
-        /**
-         * Database Index Optimization
-         * Create composite index for efficient querying by user email and date
-         * This improves performance for frequent order history lookups
-         * Index creation is idempotent - safe to run multiple times
-         */
-        try {
-            await db.collection("orders").createIndex({
-                userEmail: 1,      // Ascending index on userEmail
-                createdAt: -1      // Descending index on createdAt for recent-first sorting
-            });
-        } catch {
-            // Index likely already exists - safe to ignore this error
-            console.log("Index may already exist");
-        }
 
         /**
          * Orders Query

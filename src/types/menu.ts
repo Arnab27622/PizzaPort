@@ -21,6 +21,7 @@ export interface IMenuItem {
     sizeOptions: OptionEntry[];
     extraIngredients: OptionEntry[];
     imageUrl?: string;
+    cloudinaryPublicId?: string;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -34,6 +35,7 @@ export interface MenuItemDB {
     sizeOptions: { name: string; extraPrice: number }[];    // Size variations with pricing
     extraIngredients: { name: string; extraPrice: number }[]; // Additional ingredients with costs
     imageUrl?: string;                                      // Optional image path
+    cloudinaryPublicId?: string;                            // Cloudinary public_id for deletion
     createdAt: Date;                                        // Record creation timestamp
     updatedAt: Date;                                        // Last update timestamp
 }

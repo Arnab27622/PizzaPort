@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast } from "react-toastify";
 import { useIsAdmin } from "@/hooks/useAdmin";
 import BackButton from "@/components/layout/BackButton";
@@ -49,7 +49,6 @@ import { Order, OrderStatus, STATUS_COLORS, STATUS_LABELS, STATUS_RANK } from "@
  * - Clickable rows for detailed order inspection
  */
 export default function AdminOrdersPage() {
-    const router = useRouter();
 
     /**
      * Admin Access Control Hook
@@ -212,18 +211,6 @@ export default function AdminOrdersPage() {
         }
     }, [fetchOrders]);
 
-    /**
-     * Order Detail Navigation
-     * 
-     * Handles row/card clicks to navigate to order details page
-     * Provides intuitive drill-down functionality
-     * 
-     * @function
-     * @param {string} orderId - ID of order to view details for
-     */
-    const handleRowClick = useCallback((orderId: string) => {
-        router.push(`/orders/${orderId}`);
-    }, [router]);
 
     /**
      * Orders Sorting Hook
@@ -337,18 +324,28 @@ export default function AdminOrdersPage() {
                             return (
                                 <div
                                     key={order._id}
-                                    onClick={() => handleRowClick(order._id)}
-                                    className="p-4 sm:p-6 hover:bg-[#3a281a] cursor-pointer transition-all active:bg-[#4a382a] group"
+                                    className="relative p-4 sm:p-6 hover:bg-[#3a281a] transition-all active:bg-[#4a382a] group"
                                 >
-                                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                                    {/* Absolute Link to trigger progress bar */}
+                                    <Link
+                                        href={`/orders/${order._id}`}
+                                        className="absolute inset-0 z-10"
+                                        aria-label={`View details for order ${order.razorpayOrderId}`}
+                                    />
+
+                                    <div className="relative z-20 flex flex-col lg:flex-row lg:items-center justify-between gap-6 pointer-events-none">
                                         {/* Left Side: Order Info */}
                                         <div className="flex-1 space-y-4">
                                             <div className="flex flex-col sm:flex-row sm:items-center justify-between lg:justify-start gap-4">
                                                 <div className="min-w-0">
                                                     <h3 className="text-[10px] font-bold text-amber-500 uppercase tracking-widest mb-1">Order ID</h3>
-                                                    <p className="font-mono text-sm text-amber-100 break-all bg-black/20 px-2 py-1.5 rounded border border-amber-900/30">
+                                                    <Link
+                                                        href={`/orders/${order._id}`}
+                                                        className="font-mono text-sm text-amber-100 break-all bg-black/20 px-2 py-1.5 rounded border border-amber-900/30 hover:border-primary/50 transition-colors block pointer-events-auto"
+                                                        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                                                    >
                                                         {order.razorpayOrderId}
-                                                    </p>
+                                                    </Link>
                                                 </div>
                                                 <div className="sm:text-right lg:text-left lg:ml-8">
                                                     <div className="text-2xl font-black text-amber-50">₹{order.total}</div>
@@ -401,7 +398,7 @@ export default function AdminOrdersPage() {
                                                     onMouseDown={(e) => e.stopPropagation()}
                                                     onClick={(e) => e.stopPropagation()}
                                                     onChange={(e) => updateOrderStatus(order._id, e.target.value as OrderStatus, e)}
-                                                    className={`w-full bg-[#1a1108] border border-amber-800 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all ${isCompletedOrCanceled
+                                                    className={`w-full bg-[#1a1108] border border-amber-800 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all pointer-events-auto ${isCompletedOrCanceled
                                                         ? "opacity-50 cursor-not-allowed"
                                                         : "cursor-pointer border-amber-700 hover:border-primary"
                                                         }`}
@@ -437,7 +434,7 @@ export default function AdminOrdersPage() {
                                                     <button
                                                         onClick={(e) => cancelOrder(order._id, e)}
                                                         disabled={isCanceling}
-                                                        className="w-full bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white font-bold py-2.5 rounded-lg border border-red-600/30 transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-wider"
+                                                        className="w-full bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white font-bold py-2.5 rounded-lg border border-red-600/30 transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-wider pointer-events-auto"
                                                     >
                                                         {isCanceling ? (
                                                             <LoadingSpinner size="xs" color="text-white" />

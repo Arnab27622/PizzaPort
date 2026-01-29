@@ -135,20 +135,35 @@ export async function POST(req: NextRequest) {
      * Only reached if both security validations pass
      * Updates order with payment verification details and moves to "placed" status
      */
+    const updateData: {
+        paymentStatus: string;
+        razorpayPaymentId: string;
+        verifiedAt: Date;
+        status?: string;
+    } = {
+        paymentStatus: PAYMENT_STATUS.VERIFIED,        // Mark payment as manually verified
+        razorpayPaymentId: razorpay_payment_id,        // Store Razorpay payment reference
+        verifiedAt: new Date(),                        // Timestamp of verification
+    };
+
+    /**
+     * Order Status Protection
+     * Only move to PLACED if it hasn't progressed yet or is new
+     */
+    if (!order.status || order.status === ORDER_STATUS.PLACED) {
+        updateData.status = ORDER_STATUS.PLACED;
+    }
+
     await db.collection("orders").updateOne(
-        { razorpayOrderId: orderId }, // Target order by Razorpay order ID
-        {
-            $set: {
-                paymentStatus: PAYMENT_STATUS.VERIFIED,        // Mark payment as manually verified
-                razorpayPaymentId: razorpay_payment_id, // Store Razorpay payment reference
-                verifiedAt: new Date(),          // Timestamp of verification
-                status: ORDER_STATUS.PLACED                 // Move order to processing pipeline
-            }
-        }
+        { _id: order._id },
+        { $set: updateData }
     );
 
-    // If order has a coupon, increment its usage count
-    if (order.couponCode) {
+    // If order has a coupon, increment its usage count ONLY if not already counted (e.g., by webhook)
+    const alreadyCounted = order.paymentStatus === PAYMENT_STATUS.COMPLETED ||
+        order.paymentStatus === PAYMENT_STATUS.VERIFIED;
+
+    if (order.couponCode && !alreadyCounted) {
         await db.collection("coupons").updateOne(
             { code: order.couponCode },
             { $inc: { usageCount: 1 } }

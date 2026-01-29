@@ -4,6 +4,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import clientPromise from "@/lib/mongoConnect";
+import dbConnect from "@/lib/mongoose";
 import mongoose from "mongoose";
 import { v2 as cloudinary } from 'cloudinary';
 
@@ -103,14 +104,17 @@ export const authOptions: NextAuthOptions = {
                 const password = credentials.password;
 
                 // Ensure database connection
-                if (mongoose.connection.readyState === 0) {
-                    await mongoose.connect(process.env.MONGO_URL!);
-                }
+                await dbConnect();
 
                 // Find user and include password and admin fields
-                const user = await User.findOne({ email }).select('+password +admin');
-                if (!user || !user.password || typeof user.password !== 'string') {
-                    console.log("User not found or missing password");
+                const user = await User.findOne({ email }).select('+password +admin +banned');
+                if (!user || user.banned) {
+                    console.log("User not found or banned");
+                    return null;
+                }
+
+                if (!user.password || typeof user.password !== 'string') {
+                    console.log("User missing password");
                     return null;
                 }
 
@@ -225,14 +229,10 @@ export const authOptions: NextAuthOptions = {
             if (trigger === "update" && session?.user) {
                 const u = session.user as {
                     name?: string;
-                    email?: string;
                     image?: string;
-                    admin?: boolean
                 };
                 if (u.name) token.name = u.name;
                 if (u.image) token.image = u.image;
-                if (u.email) token.email = u.email;
-                if (typeof u.admin === 'boolean') token.admin = u.admin;
             }
 
             return token;
@@ -242,22 +242,9 @@ export const authOptions: NextAuthOptions = {
          * Session callback - populates session with user data
          * - Enhances session with user info from token
          * - Fetches additional user data from database
-         * - Checks for banned status on each session creation
+         * - Banned status is checked to invalidate session if user was banned after login
          */
         async session({ session, token }) {
-            // Populate session with token data
-            if (session.user) {
-                session.user = {
-                    id: token.id as string,
-                    name: token.name ?? session.user.name,
-                    email: token.email ?? session.user.email,
-                    image: token.image,
-                    address: "",     // Placeholder, will be populated from DB
-                    gender: "",      // Placeholder, will be populated from DB
-                    admin: token.admin ?? false,
-                };
-            }
-
             // Fetch additional user data from database
             const db = (await clientPromise).db();
             const found = await db.collection("users").findOne(
@@ -266,19 +253,28 @@ export const authOptions: NextAuthOptions = {
             );
 
 
-            if (found) {
-                // Update session with database values
-                session.user!.address = found.address ?? "";
-                session.user!.gender = found.gender ?? "";
-                session.user!.image = found.image ?? session.user?.image;
-                session.user!.admin = found.admin ?? session.user?.admin;
-
-
-                // Terminate session if user is banned
-                if (found.banned) {
-                    return null!;
-
+            // CRITICAL SECURITY: If user is banned or not found, return an empty/invalid session
+            if (!found || found.banned) {
+                if (found?.banned) {
+                    console.log(`Banned user attempted to use session: ${token.email}`);
                 }
+                return {
+                    ...session,
+                    user: undefined // This will effectively sign out the user on the client-side
+                };
+            }
+
+            // Populate session with token data and database values
+            if (session.user) {
+                session.user = {
+                    id: token.id as string,
+                    name: token.name ?? session.user.name,
+                    email: token.email ?? session.user.email,
+                    image: found.image ?? token.image,
+                    address: found.address ?? "",
+                    gender: found.gender ?? "",
+                    admin: found.admin ?? token.admin ?? false,
+                };
             }
 
             return session;

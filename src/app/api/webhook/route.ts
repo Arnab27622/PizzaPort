@@ -2,12 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import clientPromise from "@/lib/mongoConnect";
 import { PAYMENT_STATUS } from "@/types/payment";
+import { ORDER_STATUS } from "@/types/order";
 
 /**
  * Razorpay Webhook Secret from environment variables
  * Used to verify webhook request authenticity
+ * 
+ * CRITICAL: This secret must be set in environment variables
+ * If missing, the application will fail to start
  */
-const WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET!;
+const WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET;
+
+if (!WEBHOOK_SECRET) {
+    throw new Error('RAZORPAY_WEBHOOK_SECRET environment variable is required for webhook security');
+}
 
 /**
  * POST /api/webhooks/razorpay
@@ -77,9 +85,11 @@ export async function POST(req: NextRequest) {
     /**
      * Generate expected signature using webhook secret and raw body
      * Razorpay signs the entire raw request body with the webhook secret
+     * We need a type assertion here because TypeScript can't guarantee the secret
+     * exists at runtime, even though we validate it at module load time.
      */
     const expectedSignature = crypto
-        .createHmac("sha256", WEBHOOK_SECRET) // Use webhook-specific secret
+        .createHmac("sha256", WEBHOOK_SECRET as string) // Use webhook-specific secret
         .update(rawBody)                      // Use exact raw request body
         .digest("hex");                       // Generate HMAC hex digest
 
@@ -114,19 +124,57 @@ export async function POST(req: NextRequest) {
                 /**
                  * PAYMENT CAPTURED EVENT
                  * 
-                 * Triggered when Razorpay successfully captures the payment
-                 * This is the final confirmation of successful payment
+                 * Triggered when Razorpay successfully captures the payment.
+                 * This is the final confirmation of successful payment.
                  */
                 const payment = payload.payload.payment.entity;
-                await db.collection("orders").updateOne(
-                    { razorpayOrderId: payment.order_id }, // Find order by Razorpay order ID
-                    {
-                        $set: {
-                            paymentStatus: PAYMENT_STATUS.COMPLETED, // Final payment status
-                            webhookReceived: true       // Flag indicating webhook processing
-                        }
+                const rOrderId = payment.order_id;
+
+                // Fetch current order state to prevent regression
+                const existingOrder = await db.collection("orders").findOne({ razorpayOrderId: rOrderId });
+
+                if (existingOrder) {
+                    const updateData: {
+                        paymentStatus: string;
+                        webhookReceived: boolean;
+                        status?: string;
+                    } = {
+                        paymentStatus: PAYMENT_STATUS.COMPLETED, // Final payment status
+                        webhookReceived: true                    // Flag indicating webhook processing
+                    };
+
+                    /**
+                     * Order Status Protection
+                     * 
+                     * Only set status to PLACED if it's currently pending or already placed.
+                     * Prevents resetting orders that have already progressed (e.g., PREPARING, OUT_FOR_DELIVERY).
+                     * Also prevents resurrecting CANCELED orders.
+                     */
+                    if (!existingOrder.status || existingOrder.status === ORDER_STATUS.PLACED) {
+                        updateData.status = ORDER_STATUS.PLACED;
                     }
-                );
+
+                    await db.collection("orders").updateOne(
+                        { _id: existingOrder._id },
+                        { $set: updateData }
+                    );
+
+                    /**
+                     * Coupon Usage Enforcement
+                     * 
+                     * Increment coupon usage if not already done by client-side verification.
+                     * Webhooks act as a fallback for critical business logic.
+                     */
+                    const alreadyProcessed = existingOrder.paymentStatus === PAYMENT_STATUS.VERIFIED ||
+                        existingOrder.paymentStatus === PAYMENT_STATUS.COMPLETED;
+
+                    if (existingOrder.couponCode && !alreadyProcessed) {
+                        await db.collection("coupons").updateOne(
+                            { code: existingOrder.couponCode },
+                            { $inc: { usageCount: 1 } }
+                        );
+                    }
+                }
                 break;
 
             case "payment.failed":

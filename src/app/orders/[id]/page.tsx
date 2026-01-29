@@ -3,7 +3,7 @@ import SectionHeader from "@/components/layout/SectionHeader";
 import BackButton from "@/components/layout/BackButton";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
-import mongoose from "mongoose";
+import dbConnect from "@/lib/mongoose";
 import OrderModel from "@/app/models/Orders";
 import Image from "next/image";
 
@@ -121,10 +121,8 @@ export default async function OrderDetailPage({
         if (!session) {
             error = "Unauthorized. Please log in.";
         } else {
-            // Establish database connection
-            if (mongoose.connection.readyState === 0) {
-                await mongoose.connect(process.env.MONGO_URL!);
-            }
+            // Ensure database connection
+            await dbConnect();
 
             // Find order by ID in the database
             const orderDoc = await OrderModel.findById(id).lean() as DBOrder | null;

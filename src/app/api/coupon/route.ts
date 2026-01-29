@@ -1,53 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
-import mongoose from "mongoose";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { Coupon } from "@/app/models/Coupon";
-import clientPromise from "@/lib/mongoConnect";
+import dbConnect from "@/lib/mongoose";
+import { z } from "zod";
+
+const CouponSchema = z.object({
+    code: z.string().min(1, "Code is required").toUpperCase(),
+    discountType: z.enum(["percentage", "fixed"]),
+    discountValue: z.coerce.number().min(0),
+    minOrderValue: z.coerce.number().min(0).optional(),
+    maxDiscount: z.coerce.number().min(0).optional(),
+    expiryDate: z.string().optional().nullable().transform(val => val ? new Date(val) : undefined),
+    usageLimit: z.coerce.number().min(0).optional(),
+    isActive: z.boolean().optional().default(true),
+});
+
+const CouponUpdateSchema = CouponSchema.partial().extend({
+    id: z.string().min(1, "Coupon ID is required"),
+});
+
+/**
+ * Middleware-like check for admin status
+ */
+async function isAdmin() {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.admin) {
+        return false;
+    }
+    return true;
+}
 
 /**
  * GET /api/coupon - Fetch all coupons (admin only)
  */
 export async function GET() {
     try {
-        const session = await getServerSession(authOptions);
-
-        if (!session?.user?.email) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            );
+        if (!await isAdmin()) {
+            return NextResponse.json({ error: "Forbidden - Admin access required" }, { status: 403 });
         }
 
-        // Connect to MongoDB
-        if (mongoose.connection.readyState === 0) {
-            await mongoose.connect(process.env.MONGO_URL!);
-        }
-
-        // Fetch user to verify admin status
-        const db = (await clientPromise).db();
-        const userDoc = await db.collection("users").findOne({
-            email: session.user.email
-        });
-
-        if (!userDoc?.admin) {
-            return NextResponse.json(
-                { error: "Forbidden - Admin access required" },
-                { status: 403 }
-            );
-        }
-
-        // Fetch all coupons
-        // Coupon.find() will return an empty array if none exist, which is a success case.
+        await dbConnect();
         const coupons = await Coupon.find({}).sort({ createdAt: -1 });
 
         return NextResponse.json(coupons || []);
     } catch (error) {
         console.error("Error fetching coupons:", error);
-        return NextResponse.json(
-            { error: "Internal Server Error" },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
 
@@ -56,99 +55,34 @@ export async function GET() {
  */
 export async function POST(req: NextRequest) {
     try {
-        const session = await getServerSession(authOptions);
-
-        if (!session?.user?.email) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            );
-        }
-
-        // Connect to MongoDB
-        if (mongoose.connection.readyState === 0) {
-            await mongoose.connect(process.env.MONGO_URL!);
-        }
-
-        // Check if user is admin
-        const db = (await clientPromise).db();
-        const userDoc = await db.collection("users").findOne({
-            email: session.user.email
-        });
-
-        if (!userDoc?.admin) {
-            return NextResponse.json(
-                { error: "Forbidden - Admin access required" },
-                { status: 403 }
-            );
+        if (!await isAdmin()) {
+            return NextResponse.json({ error: "Forbidden - Admin access required" }, { status: 403 });
         }
 
         const body = await req.json();
-        const {
-            code,
-            discountType,
-            discountValue,
-            minOrderValue,
-            maxDiscount,
-            expiryDate,
-            usageLimit,
-            isActive
-        } = body;
+        const validation = CouponSchema.safeParse(body);
 
-        // Validation
-        if (!code || !discountType || discountValue === undefined) {
-            return NextResponse.json(
-                { error: "Code, discount type, and discount value are required" },
-                { status: 400 }
-            );
+        if (!validation.success) {
+            return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
         }
 
-        if (discountType === "percentage" && (discountValue < 0 || discountValue > 100)) {
-            return NextResponse.json(
-                { error: "Percentage discount must be between 0 and 100" },
-                { status: 400 }
-            );
+        await dbConnect();
+
+        // Check for duplicates
+        const existing = await Coupon.findOne({ code: validation.data.code });
+        if (existing) {
+            return NextResponse.json({ error: "Coupon code already exists" }, { status: 400 });
         }
 
-        if (discountType === "fixed" && discountValue < 0) {
-            return NextResponse.json(
-                { error: "Fixed discount must be positive" },
-                { status: 400 }
-            );
-        }
-
-        // Check if coupon code already exists
-        const existingCoupon = await Coupon.findOne({
-            code: code.toUpperCase()
-        });
-
-        if (existingCoupon) {
-            return NextResponse.json(
-                { error: "Coupon code already exists" },
-                { status: 400 }
-            );
-        }
-
-        // Create coupon
         const coupon = await Coupon.create({
-            code: code.toUpperCase(),
-            discountType,
-            discountValue: Number(discountValue),
-            minOrderValue: minOrderValue ? Number(minOrderValue) : undefined,
-            maxDiscount: maxDiscount ? Number(maxDiscount) : undefined,
-            expiryDate: expiryDate ? new Date(expiryDate) : undefined,
-            usageLimit: usageLimit ? Number(usageLimit) : undefined,
-            isActive: isActive !== undefined ? isActive : true,
+            ...validation.data,
             usageCount: 0
         });
 
         return NextResponse.json(coupon, { status: 201 });
     } catch (error) {
         console.error("Error creating coupon:", error);
-        return NextResponse.json(
-            { error: "Failed to create coupon" },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: "Failed to create coupon" }, { status: 500 });
     }
 }
 
@@ -157,104 +91,50 @@ export async function POST(req: NextRequest) {
  */
 export async function PUT(req: NextRequest) {
     try {
-        const session = await getServerSession(authOptions);
-
-        if (!session?.user?.email) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            );
-        }
-
-        // Connect to MongoDB
-        if (mongoose.connection.readyState === 0) {
-            await mongoose.connect(process.env.MONGO_URL!);
-        }
-
-        // Check if user is admin
-        const db = (await clientPromise).db();
-        const userDoc = await db.collection("users").findOne({
-            email: session.user.email
-        });
-
-        if (!userDoc?.admin) {
-            return NextResponse.json(
-                { error: "Forbidden - Admin access required" },
-                { status: 403 }
-            );
+        if (!await isAdmin()) {
+            return NextResponse.json({ error: "Forbidden - Admin access required" }, { status: 403 });
         }
 
         const body = await req.json();
-        const { id, ...updateData } = body;
+        const validation = CouponUpdateSchema.safeParse(body);
 
-        if (!id) {
-            return NextResponse.json(
-                { error: "Coupon ID is required" },
-                { status: 400 }
-            );
+        if (!validation.success) {
+            return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
         }
 
-        // Validate ObjectId
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            return NextResponse.json(
-                { error: "Invalid coupon ID" },
-                { status: 400 }
-            );
-        }
+        const { id, ...updateData } = validation.data;
+
+        await dbConnect();
 
         // If updating code, check for duplicates
         if (updateData.code) {
-            const existingCoupon = await Coupon.findOne({
-                code: updateData.code.toUpperCase(),
+            const existing = await Coupon.findOne({
+                code: updateData.code,
                 _id: { $ne: id }
             });
 
-            if (existingCoupon) {
-                return NextResponse.json(
-                    { error: "Coupon code already exists" },
-                    { status: 400 }
-                );
+            if (existing) {
+                return NextResponse.json({ error: "Coupon code already exists" }, { status: 400 });
             }
-            updateData.code = updateData.code.toUpperCase();
         }
 
-        // Convert string numbers to actual numbers
-        if (updateData.discountValue !== undefined) {
-            updateData.discountValue = Number(updateData.discountValue);
-        }
-        if (updateData.minOrderValue !== undefined) {
-            updateData.minOrderValue = updateData.minOrderValue ? Number(updateData.minOrderValue) : undefined;
-        }
-        if (updateData.maxDiscount !== undefined) {
-            updateData.maxDiscount = updateData.maxDiscount ? Number(updateData.maxDiscount) : undefined;
-        }
-        if (updateData.usageLimit !== undefined) {
-            updateData.usageLimit = updateData.usageLimit ? Number(updateData.usageLimit) : undefined;
-        }
-        if (updateData.expiryDate !== undefined) {
-            updateData.expiryDate = updateData.expiryDate ? new Date(updateData.expiryDate) : undefined;
-        }
-
+        /**
+         * Explicitly exclude usageCount from updates to prevent tampering via API
+         */
         const updatedCoupon = await Coupon.findByIdAndUpdate(
             id,
-            updateData,
+            { $set: updateData },
             { new: true, runValidators: true }
         );
 
         if (!updatedCoupon) {
-            return NextResponse.json(
-                { error: "Coupon not found" },
-                { status: 404 }
-            );
+            return NextResponse.json({ error: "Coupon not found" }, { status: 404 });
         }
 
         return NextResponse.json(updatedCoupon);
     } catch (error) {
         console.error("Error updating coupon:", error);
-        return NextResponse.json(
-            { error: "Failed to update coupon" },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: "Failed to update coupon" }, { status: 500 });
     }
 }
 
@@ -263,57 +143,21 @@ export async function PUT(req: NextRequest) {
  */
 export async function DELETE(req: NextRequest) {
     try {
-        const session = await getServerSession(authOptions);
-
-        if (!session?.user?.email) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            );
-        }
-
-        // Connect to MongoDB
-        if (mongoose.connection.readyState === 0) {
-            await mongoose.connect(process.env.MONGO_URL!);
-        }
-
-        // Check if user is admin
-        const db = (await clientPromise).db();
-        const userDoc = await db.collection("users").findOne({
-            email: session.user.email
-        });
-
-        if (!userDoc?.admin) {
-            return NextResponse.json(
-                { error: "Forbidden - Admin access required" },
-                { status: 403 }
-            );
+        if (!await isAdmin()) {
+            return NextResponse.json({ error: "Forbidden - Admin access required" }, { status: 403 });
         }
 
         const { id } = await req.json();
 
         if (!id) {
-            return NextResponse.json(
-                { error: "Coupon ID is required" },
-                { status: 400 }
-            );
+            return NextResponse.json({ error: "Coupon ID is required" }, { status: 400 });
         }
 
-        // Validate ObjectId
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            return NextResponse.json(
-                { error: "Invalid coupon ID" },
-                { status: 400 }
-            );
-        }
-
+        await dbConnect();
         const deletedCoupon = await Coupon.findByIdAndDelete(id);
 
         if (!deletedCoupon) {
-            return NextResponse.json(
-                { error: "Coupon not found" },
-                { status: 404 }
-            );
+            return NextResponse.json({ error: "Coupon not found" }, { status: 404 });
         }
 
         return NextResponse.json({
@@ -322,9 +166,6 @@ export async function DELETE(req: NextRequest) {
         });
     } catch (error) {
         console.error("Error deleting coupon:", error);
-        return NextResponse.json(
-            { error: "Failed to delete coupon" },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: "Failed to delete coupon" }, { status: 500 });
     }
 }

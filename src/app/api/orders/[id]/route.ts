@@ -77,13 +77,15 @@ export async function GET(
          * Converts MongoDB-specific types to JSON-compatible formats:
          * - ObjectId → string
          * - Date objects → ISO string format
-         * - Preserves null/undefined values for optional fields
+         * - Excludes internal security fields (securityHash)
          */
+        const { securityHash: _, ...rest } = order;
         const safe = {
-            ...order,
-            _id: order._id.toString(), // Convert ObjectId to string
-            createdAt: order.createdAt?.toISOString(), // Convert Date to ISO string
-            canceledAt: order.canceledAt?.toISOString(), // Handle optional canceled date
+            ...rest,
+            _id: order._id.toString(),
+            createdAt: order.createdAt instanceof Date ? order.createdAt.toISOString() : order.createdAt,
+            canceledAt: order.canceledAt instanceof Date ? order.canceledAt.toISOString() : order.canceledAt,
+            verifiedAt: order.verifiedAt instanceof Date ? order.verifiedAt.toISOString() : order.verifiedAt,
         };
 
         // Return successful response with serialized order data

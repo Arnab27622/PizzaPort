@@ -49,11 +49,11 @@ export default function CouponForm({ coupon, onClose, onSuccess }: CouponFormPro
             const body = {
                 ...formData,
                 id: coupon?._id,
-                // Optional fields should be undefined if empty string
-                minOrderValue: formData.minOrderValue || undefined,
-                maxDiscount: formData.maxDiscount || undefined,
+                discountValue: Number(formData.discountValue),
+                minOrderValue: formData.minOrderValue ? Number(formData.minOrderValue) : undefined,
+                maxDiscount: formData.maxDiscount ? Number(formData.maxDiscount) : undefined,
                 expiryDate: formData.expiryDate || undefined,
-                usageLimit: formData.usageLimit || undefined,
+                usageLimit: formData.usageLimit ? Number(formData.usageLimit) : undefined,
             };
 
             const response = await fetch('/api/coupon', {

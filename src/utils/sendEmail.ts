@@ -77,9 +77,9 @@ export const sendEmail = async ({ name, email, message }: {
         // Template parameters
         {
             from_name: name,
-            to_name: "Arnab",
+            to_name: "Pizza Delivery Support",
             from_email: email,
-            to_email: "arnabdeysonamukhi@gmail.com",
+            to_email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "support@pizzadelivery.com",
             message,
             reply_to: email,
             date,

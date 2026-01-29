@@ -75,6 +75,31 @@ export async function POST(request: NextRequest) {
     const { id, admin } = await request.json();
 
     /**
+     * ID Format Validation
+     * Ensures the provided ID is a valid MongoDB ObjectId
+     * Prevents invalid queries and improper error handling
+     */
+    if (!ObjectId.isValid(id)) {
+        return NextResponse.json(
+            { error: 'Invalid user ID format' },
+            { status: 400 } // Bad Request
+        );
+    }
+
+    /**
+     * Self-Demotion Prevention
+     * Prevent the currently logged-in admin from revoking their own admin privileges.
+     * This ensures at least one active admin remains to manage the system.
+     */
+    if (session.user && "id" in session.user && session.user.id === id && admin === false) {
+        return NextResponse.json(
+            { error: "You cannot revoke your own admin privileges" },
+            { status: 400 } // Bad Request
+        );
+    }
+
+
+    /**
      * Database Update Operation
      * Updates the target user's admin flag in the database
      * Uses MongoDB ObjectId for precise document targeting

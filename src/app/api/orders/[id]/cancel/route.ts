@@ -3,89 +3,64 @@ import clientPromise from "@/lib/mongoConnect";
 import { ORDER_STATUS } from "@/types/order";
 import { PAYMENT_STATUS } from "@/types/payment";
 import { ObjectId } from "mongodb";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../../auth/[...nextauth]/authOptions";
 
 /**
  * PATCH /api/orders/[id]/cancel
- * Cancels a specific order by ID
- * 
- * This endpoint marks an order as canceled and initiates refund process.
- * It updates multiple order properties to reflect cancellation status.
- * 
- * @param {NextRequest} req - The incoming request object
- * @param {Object} context - Context object containing route parameters
- * @param {Promise<{id: string}>} context.params - Promise containing the order ID from URL
- * 
- * @returns {Promise<NextResponse>}
- *   Success: { success: true }
- *   Error: { success: false, error: string } with 500 status
- * 
- * @throws {Error} Database connection issues, invalid order ID
- * 
- * @example
- * // Successful cancellation
- * PATCH /api/orders/67a1b2c3d4e5f67890123456/cancel → 200
- * {
- *   "success": true
- * }
- * 
- * @example
- * // Error response
- * PATCH /api/orders/67a1b2c3d4e5f67890123456/cancel → 500
- * {
- *   "success": false,
- *   "error": "Failed to cancel order"
- * }
+ * Cancels a specific order by ID (Owner or Admin only)
  */
 export async function PATCH(
     req: NextRequest,
     context: { params: Promise<{ id: string }> }
 ) {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     try {
-        /**
-         * Extract order ID from route parameters
-         * Note: In Next.js App Router, params is a Promise that needs to be awaited
-         * We rename 'id' to 'orderId' for clarity
-         */
         const { id: orderId } = await context.params;
 
-        // Establish database connection
         const client = await clientPromise;
         const db = client.db();
 
+        // Fetch order to check ownership
+        const order = await db.collection("orders").findOne({ _id: new ObjectId(orderId) });
+
+        if (!order) {
+            return NextResponse.json({ error: "Order not found" }, { status: 404 });
+        }
+
+        // Authorization check: Admin or Order Owner
+        const isAdmin = session.user?.admin;
+        const isOwner = order.userEmail === session.user?.email;
+
+        if (!isAdmin && !isOwner) {
+            return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+
         /**
          * Update order to canceled status with multiple field changes
-         * This atomic operation ensures all changes happen together
-         * 
-         * Fields updated:
-         * - status: Set to "canceled" to indicate order cancellation
-         * - canceledAt: Timestamp when cancellation occurred
-         * - paymentStatus: Set to "refund_initiated" to trigger refund process
          */
         await db.collection("orders").updateOne(
-            { _id: new ObjectId(orderId) }, // Find order by MongoDB ObjectId
+            { _id: new ObjectId(orderId) },
             {
                 $set: {
-                    status: ORDER_STATUS.CANCELED,           // Mark order as canceled
-                    canceledAt: new Date(),       // Record cancellation timestamp
-                    paymentStatus: PAYMENT_STATUS.REFUND_INITIATED, // Initiate refund workflow
+                    status: ORDER_STATUS.CANCELED,
+                    canceledAt: new Date(),
+                    paymentStatus: PAYMENT_STATUS.REFUND_INITIATED,
                 },
             }
         );
 
-        // Return success response
         return NextResponse.json({ success: true });
     } catch (error) {
-        /**
-         * Handle various error scenarios:
-         * - Invalid ObjectId format
-         * - Database connection issues
-         * - Order not found (updateOne doesn't throw if no document matches)
-         * - Network errors
-         */
         console.error("Error canceling order:", error);
         return NextResponse.json(
             { success: false, error: "Failed to cancel order" },
-            { status: 500 } // Internal Server Error
+            { status: 500 }
         );
     }
 }

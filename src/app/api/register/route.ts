@@ -1,5 +1,5 @@
 import User from "@/app/models/User";
-import mongoose from "mongoose";
+import dbConnect from "@/lib/mongoose";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -69,21 +69,11 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: NextRequest) {
     try {
         /**
-         * Environment Variable Validation
-         * Ensure MongoDB connection string is available
-         * Critical for database operations
-         */
-        const mongoUrl = process.env.MONGO_URL;
-        if (!mongoUrl) {
-            throw new Error("MONGO_URL environment variable is not defined");
-        }
-
-        /**
          * Database Connection
          * Establish connection to MongoDB using Mongoose
-         * Connection is reused if already established
+         * Connection is cached for reuse
          */
-        await mongoose.connect(mongoUrl);
+        await dbConnect();
 
         /**
          * Request Data Parsing & Validation
@@ -132,28 +122,12 @@ export async function POST(request: NextRequest) {
         );
 
     } catch (err: unknown) {
-        /**
-         * Comprehensive Error Handling
-         * Handles various error types including:
-         * - Database connection errors
-         * - Mongoose validation errors
-         * - JSON parsing errors
-         * - Environment variable issues
-         */
         console.error('❌ Error in register:', err);
 
-        /**
-         * Safe Error Message Extraction
-         * Uses type guard to safely extract error message
-         * Prevents exposing sensitive internal error details to client
-         */
-        const errorMessage = (err instanceof Error && err.message)
-            ? err.message
-            : 'Registration failed';
-
+        // Return a generic error message to the client to avoid leaking sensitive system information
         return NextResponse.json(
-            { error: errorMessage },
-            { status: 500 } // Internal Server Error
+            { error: 'Registration failed. Please try again later.' },
+            { status: 500 }
         );
     }
 }

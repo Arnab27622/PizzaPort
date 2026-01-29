@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongoConnect';
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/authOptions";
 
 /**
  * GET /api/analytics
@@ -9,48 +11,22 @@ import clientPromise from '@/lib/mongoConnect';
  * - Key performance metrics (sales, orders, customer analytics)
  * - Daily revenue trends for time series analysis
  * - Top performing products by quantity sold
- * 
- * Supports date range filtering via query parameters for flexible reporting
- * 
- * @param {Request} request - The incoming request object
- * 
- * @queryParams {string} [from] - Start date for analytics filter (ISO string format)
- *            If not provided, defaults to beginning of time (all data)
- * 
- * @returns {Promise<NextResponse>}
- *   Success: Comprehensive analytics report object
- *   Error: { error: string } with 500 status
- * 
- * @throws {Error} Database connection errors, aggregation pipeline errors
- * 
- * @example
- * // Get all-time analytics
- * GET /api/analytics
- * 
- * @example
- * // Get analytics from specific date
- * GET /api/analytics?from=2024-01-01T00:00:00.000Z
- * 
- * @example
- * // Successful response structure
- * {
- *   "metrics": {
- *     "totalSales": 12500.50,
- *     "totalOrders": 150,
- *     "totalGuests": 45,
- *     "avgOrderValue": 83.34
- *   },
- *   "dailyRevenue": [
- *     { "date": "2024-01-15", "revenue": 450.75 },
- *     { "date": "2024-01-16", "revenue": 620.25 }
- *   ],
- *   "topProducts": [
- *     { "name": "Margherita Pizza", "quantity": 45 },
- *     { "name": "Pepperoni Pizza", "quantity": 38 }
- *   ]
- * }
  */
 export async function GET(request: Request) {
+    /**
+     * Authentication & Authorization Check
+     * Access is restricted to authenticated administrators only
+     */
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!session.user?.admin) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     /**
      * Date Range Configuration
      * Parse 'from' query parameter or default to beginning of time (Unix epoch)

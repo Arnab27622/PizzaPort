@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
 import LoadingSpinner from "@/components/icons/LoadingSpinner";
 import BackButton from "@/components/layout/BackButton";
@@ -176,9 +177,6 @@ export default function OrdersPage() {
      * @function
      * @param {string} orderId - Payment gateway order ID for navigation
      */
-    const handleOrderClick = useCallback((orderId: string) => {
-        router.push(`/user-orders/${orderId}`);
-    }, [router]);
 
     /**
      * Data Fetching Retry Handler
@@ -327,18 +325,10 @@ export default function OrdersPage() {
 
                         return (
                             /* Individual Order Card */
-                            <div
+                            <Link
                                 key={order._id}
-                                className="bg-[#1a1108] border border-amber-900 rounded-lg p-6 hover:bg-[#2c1a0d] transition-colors cursor-pointer"
-                                onClick={() => handleOrderClick(order.razorpayOrderId)}
-                                role="button"
-                                tabIndex={0}
-                                onKeyDown={(e) => {
-                                    // Enable keyboard navigation for accessibility
-                                    if (e.key === "Enter" || e.key === " ") {
-                                        handleOrderClick(order.razorpayOrderId);
-                                    }
-                                }}
+                                href={`/user-orders/${order.razorpayOrderId}`}
+                                className="bg-[#1a1108] border border-amber-900 rounded-lg p-6 hover:bg-[#2c1a0d] transition-colors cursor-block block"
                                 aria-label={`View order details for order ${order.razorpayOrderId}`}
                             >
                                 {/* Order Header - Basic Information */}
@@ -391,7 +381,7 @@ export default function OrdersPage() {
                                         </span>
                                     )}
                                 </div>
-                            </div>
+                            </Link>
                         );
                     })}
                 </div>

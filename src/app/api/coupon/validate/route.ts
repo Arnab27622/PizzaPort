@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { Coupon } from "@/app/models/Coupon";
 import clientPromise from "@/lib/mongoConnect";
-import mongoose from "mongoose";
+import dbConnect from "@/lib/mongoose";
+import { z } from "zod";
+
+const ValidateCouponSchema = z.object({
+    code: z.string().min(1, "Please enter a coupon code").toUpperCase(),
+    subtotal: z.number().positive("Invalid order amount"),
+});
 
 /**
  * POST /api/coupon/validate - Validate a coupon code
@@ -22,33 +28,22 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // Connect to MongoDB
-        if (mongoose.connection.readyState === 0) {
-            await mongoose.connect(process.env.MONGO_URL!);
-        }
-        await clientPromise;
-
         const body = await req.json();
-        const { code, subtotal } = body;
+        const validation = ValidateCouponSchema.safeParse(body);
 
-        if (!code) {
+        if (!validation.success) {
             return NextResponse.json({
                 valid: false,
-                message: "Please enter a coupon code"
+                message: validation.error.issues[0].message
             });
         }
 
-        if (!subtotal || subtotal <= 0) {
-            return NextResponse.json({
-                valid: false,
-                message: "Invalid order amount"
-            });
-        }
+        const { code, subtotal } = validation.data;
+
+        await dbConnect();
 
         // Find the coupon
-        const coupon = await Coupon.findOne({
-            code: code.toUpperCase()
-        });
+        const coupon = await Coupon.findOne({ code });
 
         if (!coupon) {
             return NextResponse.json({
@@ -78,7 +73,7 @@ export async function POST(req: NextRequest) {
             const client = await clientPromise;
             const db = client.db();
             const userUsageCount = await db.collection("orders").countDocuments({
-                userEmail: session.user?.email,
+                userEmail: session.user.email,
                 couponCode: coupon.code,
                 paymentStatus: { $in: ["verified", "completed"] }
             });
@@ -110,12 +105,7 @@ export async function POST(req: NextRequest) {
                 discount = coupon.maxDiscount;
             }
         } else if (coupon.discountType === "fixed") {
-            discount = coupon.discountValue;
-
-            // Ensure discount doesn't exceed subtotal
-            if (discount > subtotal) {
-                discount = subtotal;
-            }
+            discount = Math.min(coupon.discountValue, subtotal);
         }
 
         return NextResponse.json({

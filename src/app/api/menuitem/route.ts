@@ -112,6 +112,7 @@ export async function POST(req: NextRequest) {
         } = validation.data;
 
         let imageUrl: string | undefined;
+        let cloudinaryPublicId: string | undefined;
         const file = form.get('image') as Blob | null;
 
         // Handle image upload if present
@@ -129,6 +130,7 @@ export async function POST(req: NextRequest) {
             });
 
             imageUrl = result.secure_url;
+            cloudinaryPublicId = result.public_id;
         }
 
         // Construct menu item object
@@ -140,6 +142,7 @@ export async function POST(req: NextRequest) {
             sizeOptions,
             extraIngredients,
             imageUrl,
+            cloudinaryPublicId,
             createdAt: new Date(),
             updatedAt: new Date(),
         };
@@ -214,6 +217,7 @@ export async function PUT(req: NextRequest) {
             });
 
             update.imageUrl = result.secure_url;
+            update.cloudinaryPublicId = result.public_id;
         }
 
         const col = await getCollection();
@@ -263,6 +267,7 @@ export async function DELETE(req: NextRequest) {
         }
 
         const col = await getCollection();
+        const db = (await clientPromise).db();
 
         // Get the menu item to retrieve its image URL before deletion
         const item = await col.findOne({ _id: new ObjectId(id) });
@@ -271,15 +276,22 @@ export async function DELETE(req: NextRequest) {
             return NextResponse.json({ error: 'Menu item not found' }, { status: 404 });
         }
 
-        // Delete image from Cloudinary if it exists
-        if (item.imageUrl) {
-            try {
-                // Extract public ID from Cloudinary URL
-                const urlParts = item.imageUrl.split('/');
-                const filename = urlParts[urlParts.length - 1];
-                const publicId = `pizza-delivery/menuitems/${filename.split('.')[0]}`;
+        // Check if menu item is referenced in any orders
+        const ordersWithItem = await db.collection("orders").countDocuments({
+            "cart._id": id
+        });
 
-                await cloudinary.uploader.destroy(publicId);
+        if (ordersWithItem > 0) {
+            return NextResponse.json(
+                { error: `Cannot delete menu item used in ${ordersWithItem} orders. Mark as inactive instead or delete orders first.` },
+                { status: 400 }
+            );
+        }
+
+        // Delete image from Cloudinary if it exists
+        if (item.cloudinaryPublicId) {
+            try {
+                await cloudinary.uploader.destroy(item.cloudinaryPublicId);
             } catch (cloudinaryError) {
                 console.error('Error deleting image from Cloudinary:', cloudinaryError);
                 // Continue with deletion even if Cloudinary deletion fails

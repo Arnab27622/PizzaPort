@@ -24,6 +24,7 @@ const MenuItemSchema = new Schema<IMenuItem>(
         sizeOptions: { type: [OptionEntrySchema], default: [] },
         extraIngredients: { type: [OptionEntrySchema], default: [] },
         imageUrl: { type: String },
+        cloudinaryPublicId: { type: String }, // Store Cloudinary public_id for reliable deletion
     },
     { timestamps: true }
 );

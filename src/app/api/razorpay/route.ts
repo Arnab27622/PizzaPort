@@ -5,10 +5,13 @@ import crypto from 'crypto';
 import { CartProduct } from "@/types/cart";
 import { RazorpayOrderResponse } from "@/types/payment";
 import { z } from "zod";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/authOptions";
+import { ObjectId } from "mongodb";
+import { MenuItemDB } from "@/types/menu";
 
 const RazorpayOrderSchema = z.object({
     name: z.string().min(1, 'Name is required'),
-    email: z.string().email('Invalid email address'),
     address: z.string().min(5, 'Address is too short'),
     cart: z.array(z.any()).min(1, 'Cart is empty'),
     couponCode: z.string().optional(),
@@ -21,82 +24,27 @@ const RazorpayOrderSchema = z.object({
  * Creates a Razorpay payment order and stores order details in database
  * 
  * This endpoint handles the initial payment order creation flow:
- * 1. Validates user data and cart contents
- * 2. Calculates order totals (subtotal, tax, delivery)
+ * 1. Validates user authentication
+ * 2. Recalculates order totals server-side using database prices (SECURITY CRITICAL)
  * 3. Creates Razorpay payment order
  * 4. Generates security hash for cart integrity
  * 5. Stores order in MongoDB for future reference
- * 
- * @param {Request} req - The incoming request containing order details in JSON format
- * 
- * @requestBody {Object} payload - Order creation payload
- * @requestBody {string} payload.name - Customer's full name
- * @requestBody {string} payload.email - Customer's email address
- * @requestBody {CartProduct[]} payload.cart - Array of cart products with pricing details
- * @requestBody {string} payload.address - Delivery address
- * 
- * @returns {Promise<NextResponse>}
- *   Success: { success: true, order: OrderData, razorpayOrderId: string, amount: number, securityHash: string }
- *   Client Error: { success: false, error: string } with 400 status
- *   Server Error: { success: false, error: string } with 500 status
- * 
- * @throws {Error} Razorpay API errors, database connection errors, calculation errors
- * 
- * @example
- * // Successful order creation
- * POST /api/payment/create-order
- * Request Body:
- * {
- *   "name": "John Doe",
- *   "email": "john@example.com",
- *   "cart": [...],
- *   "address": "123 Main St, City, Country"
- * }
- * 
- * Response: 200
- * {
- *   "success": true,
- *   "order": { ... },
- *   "razorpayOrderId": "order_123456",
- *   "amount": 25000,
- *   "securityHash": "a1b2c3d4..."
- * }
- * 
- * @example
- * // Missing required fields
- * POST /api/payment/create-order → 400
- * {
- *   "success": false,
- *   "error": "Missing user data"
- * }
- * 
- * @example
- * // Razorpay API failure
- * POST /api/payment/create-order → 500
- * {
- *   "success": false,
- *   "error": "Failed to create Razorpay order"
- * }
  */
 export async function POST(req: Request) {
-    /**
-     * Establish database connection
-     * Connection is established early to fail fast if database is unavailable
-     */
-    const clientDB = await clientPromise;
+    const session = await getServerSession(authOptions);
 
-    /**
-     * Parse request payload containing order details
-     * Expected to contain user information, cart items, and delivery address
-     */
+    if (!session?.user?.email) {
+        return NextResponse.json(
+            { success: false, error: "Unauthorized. Please log in." },
+            { status: 401 }
+        );
+    }
+
+    const email = session.user.email;
+    const clientDB = await clientPromise;
+    const db = clientDB.db();
     const payload = await req.json();
 
-
-    /**
-     * Input Validation
-     * Check for required user identification and order details
-     * Uses Zod for comprehensive schema validation
-     */
     const validation = RazorpayOrderSchema.safeParse(payload);
 
     if (!validation.success) {
@@ -106,48 +54,79 @@ export async function POST(req: Request) {
         );
     }
 
-    const { name, email, cart, address, couponCode, discountAmount } = validation.data;
+    const { name, cart, address, couponCode } = validation.data;
 
     /**
-     * Order Amount Calculation
-     * Recalculate all amounts server-side to prevent client-side tampering
-     * This ensures pricing integrity and security
+     * SECURE PRICE CALCULATION
+     * Fetch actual prices from database to prevent client-side tampering
      */
-    const subtotal = cart.reduce((sum: number, item: CartProduct) => {
-        // Use discountPrice if available and valid
-        const basePrice = (item.discountPrice && item.discountPrice < item.basePrice)
-            ? item.discountPrice
-            : item.basePrice;
+    let subtotal = 0;
+    try {
+        // Collect all unique item IDs from the cart
+        const itemIds = cart.map((item: CartProduct) => new ObjectId(item._id));
+        const dbItems = await db.collection<MenuItemDB>("menuitems").find({
+            _id: { $in: itemIds }
+        }).toArray();
 
-        const sizePrice = item.size?.extraPrice || 0;
-        const extrasPrice = item.extras?.reduce((s: number, e) => s + e.extraPrice, 0) || 0;
-        return sum + basePrice + sizePrice + extrasPrice;
-    }, 0);
+        // Create a map for quick lookup
+        const itemsMap = new Map(dbItems.map(item => [item._id.toString(), item]));
+
+        for (const cartItem of cart) {
+            const dbItem = itemsMap.get(cartItem._id);
+            if (!dbItem) {
+                throw new Error(`Item ${cartItem.name} no longer exists.`);
+            }
+
+            // Use database prices
+            const basePrice = (dbItem.discountPrice && dbItem.discountPrice < dbItem.basePrice)
+                ? dbItem.discountPrice
+                : dbItem.basePrice;
+
+            let itemTotal = basePrice;
+
+            // Validate size
+            if (cartItem.size) {
+                const dbSize = dbItem.sizeOptions.find(so => so.name === cartItem.size?.name);
+                if (!dbSize) throw new Error(`Invalid size for ${cartItem.name}`);
+                itemTotal += dbSize.extraPrice;
+            }
+
+            // Validate extras
+            if (cartItem.extras && cartItem.extras.length > 0) {
+                for (const extra of cartItem.extras) {
+                    const dbExtra = dbItem.extraIngredients.find(ei => ei.name === extra.name);
+                    if (!dbExtra) throw new Error(`Invalid extra ingredient for ${cartItem.name}`);
+                    itemTotal += dbExtra.extraPrice;
+                }
+            }
+
+            subtotal += itemTotal;
+        }
+    } catch (err) {
+        return NextResponse.json(
+            { success: false, error: (err as Error).message || "Pricing validation failed" },
+            { status: 400 }
+        );
+    }
 
     // Apply tax (5%) and conditional delivery fee
-    const tax = Math.round(subtotal * 0.05); // 5% tax rate
-    const deliveryFee = subtotal >= 400 ? 0 : 50; // Free delivery for orders above 400
-
-    // Calculate total with coupon discount
-    console.log(`Subtotal: ${subtotal}, Tax: ${tax}, Delivery: ${deliveryFee}, Discount: ${discountAmount}`);
+    const tax = Math.round(subtotal * 0.05);
+    const deliveryFee = subtotal >= 400 ? 0 : 50;
 
     let finalDiscount = 0;
     let validatedCouponCode = null;
 
     if (couponCode) {
         try {
-            const db = clientDB.db();
             const coupon = await db.collection("coupons").findOne({
                 code: couponCode.toUpperCase(),
                 isActive: true
             });
 
             if (coupon) {
-                // Check if coupon is valid (not expired)
                 const now = new Date();
                 const isNotExpired = !coupon.expiryDate || new Date(coupon.expiryDate) > now;
 
-                // PER-USER usage limit check
                 const userUsageCount = await db.collection("orders").countDocuments({
                     userEmail: email,
                     couponCode: coupon.code,
@@ -173,18 +152,12 @@ export async function POST(req: Request) {
             }
         } catch (error) {
             console.error("Error validating coupon server-side:", error);
-            // Fallback to 0 discount if validation fails to be safe
             finalDiscount = 0;
         }
     }
 
     const total = Math.max(0, subtotal + tax + deliveryFee - finalDiscount);
 
-    /**
-     * Initialize Razorpay client
-     * Uses environment variables for API credentials
-     * Key ID and Secret Key are required for Razorpay API authentication
-     */
     const razorpay = new Razorpay({
         key_id: process.env.RAZORPAY_KEY_ID!,
         key_secret: process.env.RAZORPAY_SECRET_KEY!,
@@ -192,91 +165,58 @@ export async function POST(req: Request) {
 
     let order: RazorpayOrderResponse;
 
-    /**
-     * Razorpay Order Creation
-     * Creates a payment order in Razorpay system
-     */
     try {
         order = (await razorpay.orders.create({
-            amount: Math.round(total * 100), // Convert to paise (smallest INR unit)
-            currency: "INR",                 // Indian Rupees
-            receipt: `receipt_${Date.now()}`, // Unique receipt identifier
-            payment_capture: true,           // Auto-capture payment after authorization
+            amount: Math.round(total * 100),
+            currency: "INR",
+            receipt: `receipt_${Date.now()}`,
+            payment_capture: true,
         }) as unknown) as RazorpayOrderResponse;
     } catch (err) {
-        /**
-         * Handle Razorpay API errors
-         * This could be due to invalid credentials, network issues, or API limits
-         */
         console.error("Razorpay order creation failed:", err);
         return NextResponse.json(
             { success: false, error: "Failed to create Razorpay order" },
-            { status: 500 }, // Internal Server Error
+            { status: 500 },
         );
     }
 
-    /**
-     * Security Hash Generation
-     * Creates a hash to verify cart integrity during payment verification
-     * Prevents tampering with cart contents between order creation and payment
-     */
     const securityHash = crypto
         .createHash("sha256")
-        .update(JSON.stringify(cart) + total)
+        .update(JSON.stringify(cart) + "|" + total)
         .digest("hex");
 
-    /**
-     * Order Data Preparation
-     * Comprehensive order object for database storage
-     * Contains all necessary information for order processing and fulfillment
-     */
     const orderData = {
-        userName: name,              // Customer name
-        userEmail: email,            // Customer email
-        address,                     // Delivery address
-        cart,                        // Complete cart with product details
-        subtotal,                    // Calculated subtotal
-        tax,                         // Calculated tax amount
-        deliveryFee,                 // Delivery fee (0 for free delivery)
-        couponCode: validatedCouponCode,                  // Applied coupon code (server-validated)
-        discountAmount: finalDiscount, // Discount amount
-        total,                       // Final total amount
-        razorpayOrderId: order.id,   // Razorpay's order identifier
-        securityHash,                // Security hash for cart verification
-        paymentStatus: "pending",    // Initial payment status
-        createdAt: new Date(),       // Order creation timestamp
+        userName: name,
+        userEmail: email,
+        address,
+        cart,
+        subtotal,
+        tax,
+        deliveryFee,
+        couponCode: validatedCouponCode,
+        discountAmount: finalDiscount,
+        total,
+        razorpayOrderId: order.id,
+        securityHash,
+        paymentStatus: "pending",
+        createdAt: new Date(),
     };
 
-    /**
-     * Database Storage
-     * Save order details to MongoDB for record keeping and future processing
-     */
     try {
-        const db = clientDB.db();
         const result = await db.collection("orders").insertOne(orderData);
 
-        /**
-         * Success Response
-         * Returns order details including database ID and Razorpay information
-         * Frontend uses this data to initialize Razorpay checkout
-         */
         return NextResponse.json({
             success: true,
-            order: { ...orderData, _id: result.insertedId }, // Include MongoDB document ID
-            razorpayOrderId: order.id,     // Razorpay order ID for payment processing
-            amount: order.amount,          // Amount in paise for Razorpay checkout
-            securityHash,                  // Security hash for client-side verification
+            order: { ...orderData, _id: result.insertedId },
+            razorpayOrderId: order.id,
+            amount: order.amount,
+            securityHash,
         });
     } catch (err) {
-        /**
-         * Handle database insertion errors
-         * Order creation in Razorpay succeeded but database storage failed
-         * This requires manual reconciliation
-         */
         console.error("Mongo insert failed:", err);
         return NextResponse.json(
             { success: false, error: "Order insertion failed" },
-            { status: 500 }, // Internal Server Error
+            { status: 500 },
         );
     }
 }

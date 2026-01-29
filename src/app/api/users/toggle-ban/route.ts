@@ -76,6 +76,30 @@ export async function POST(request: NextRequest) {
     const { id, banned } = await request.json();
 
     /**
+     * ID Format Validation
+     * Ensures the provided ID is a valid MongoDB ObjectId
+     * Prevents invalid queries and improper error handling
+     */
+    if (!ObjectId.isValid(id)) {
+        return NextResponse.json(
+            { error: 'Invalid user ID format' },
+            { status: 400 } // Bad Request
+        );
+    }
+
+    /**
+     * Self-Ban Prevention
+     * Prevent the currently logged-in admin from banning themselves.
+     * This ensures admins cannot accidentally lock themselves out.
+     */
+    if (session.user && "id" in session.user && session.user.id === id && banned === true) {
+        return NextResponse.json(
+            { error: "You cannot ban yourself" },
+            { status: 400 } // Bad Request
+        );
+    }
+
+    /**
      * Database Update Operation
      * Updates the target user's banned flag in the database
      * This flag is checked during authentication to prevent banned users from logging in
