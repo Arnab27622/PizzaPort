@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useIsAdmin } from "@/hooks/useAdmin";
 import BackButton from "@/components/layout/BackButton";
@@ -57,6 +59,8 @@ export default function AdminOrdersPage() {
      * Redirects unauthorized users automatically
      */
     const { isAdmin, isLoading: isAdminLoading } = useIsAdmin();
+    const { status } = useSession();
+    const router = useRouter();
 
     /**
      * Component State Management
@@ -87,6 +91,22 @@ export default function AdminOrdersPage() {
         }
         // eslint-disable-next-line
     }, [isAdmin]);
+
+    /**
+     * Admin Access Enforcement Effect
+     * 
+     * Redirects non-admin users to home page automatically
+     * Prevents unauthorized access to order management functionality
+     */
+    useEffect(() => {
+        if (!isAdminLoading && !isAdmin) {
+            if (status === "unauthenticated") {
+                router.replace("/login");
+            } else {
+                router.replace("/");
+            }
+        }
+    }, [isAdminLoading, isAdmin, status, router]);
 
     /**
      * Orders Data Fetcher
@@ -232,7 +252,7 @@ export default function AdminOrdersPage() {
      * Aggregates admin verification and data loading states
      * Ensures proper loading UX during initial render
      */
-    const isLoading = isAdminLoading || loading;
+    const isLoading = isAdminLoading || (isAdmin && loading);
 
     const initialScrollDone = React.useRef(false);
     React.useLayoutEffect(() => {
@@ -269,14 +289,7 @@ export default function AdminOrdersPage() {
      * Prevents access to order management features
      */
     if (!isAdmin) {
-        return (
-            <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100">
-                <h2 className="text-2xl font-bold mb-6 text-primary heading-border">
-                    Admin Access Required
-                </h2>
-                <p>You must be an administrator to view this page.</p>
-            </div>
-        );
+        return null;
     }
 
     /**
