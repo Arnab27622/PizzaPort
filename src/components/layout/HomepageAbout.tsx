@@ -5,19 +5,8 @@ import SectionHeader from './SectionHeader';
 import BackgroundCircle from '../icons/BackgroundCircle';
 
 /**
- * HomepageAbout component that displays the "About Us" section
- * 
- * @component
- * @description 
- * - Provides anchor point for navigation (#about)
- * - Features a visually appealing about section with decorative elements
- * - Uses gradient backgrounds and backdrop blur for modern glassmorphism effect
- * - Includes multiple paragraphs describing the company's values and differentiators
- * 
- * @example
- * return <HomepageAbout />
- * 
- * @returns {JSX.Element} About section with company story and values
+ * HomepageAbout component
+ * Displays the "About Us" section with company story and values.
  */
 function HomepageAbout() {
     return (

@@ -1,3 +1,15 @@
+/**
+ * This component displays a single menu item as a card.
+ * 
+ * It shows:
+ * - The pizza image (clickable to zoom).
+ * - Name, description, and price.
+ * - "Add to Cart" button.
+ * 
+ * If the item has customization options (sizes/toppings), clicking "Add to Cart"
+ * opens a popup to let the user choose before adding.
+ */
+
 "use client";
 
 import React, { useContext, useState } from "react";

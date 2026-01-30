@@ -6,53 +6,8 @@ import { authOptions } from '../../auth/[...nextauth]/authOptions';
 
 /**
  * POST /api/admin/users/admin
- * Updates a user's administrator privileges (Super Admin only)
- * 
- * This endpoint allows authorized administrators to grant or revoke admin privileges
- * for other users. Requires the requesting user to have admin privileges.
- * 
- * @param {NextRequest} request - The incoming request containing update data
- * 
- * @requestBody {Object} JSON payload
- * @requestBody {string} id - MongoDB ObjectId of the target user
- * @requestBody {boolean} admin - New admin status (true to grant, false to revoke)
- * 
- * @returns {Promise<NextResponse>}
- *   Success: { success: true }
- *   Unauthorized: { error: 'Not authorized' } with 403 status
- *   Error: Internal server error (handled by Next.js)
- * 
- * @security Requires authenticated session with admin privileges
- * @validation Validates MongoDB ObjectId format
- * 
- * @example
- * // Grant admin privileges
- * POST /api/admin/users/admin
- * Request Body: 
- * {
- *   "id": "67a1b2c3d4e5f67890123456",
- *   "admin": true
- * }
- * 
- * Response: 200
- * { "success": true }
- * 
- * @example
- * // Revoke admin privileges  
- * POST /api/admin/users/admin
- * Request Body:
- * {
- *   "id": "67a1b2c3d4e5f67890123456", 
- *   "admin": false
- * }
- * 
- * @example
- * // Insufficient privileges
- * POST /api/admin/users/admin → 403
- * { "error": "Not authorized" }
- * 
- * @warning Granting admin privileges provides full system access
- * @note Consider adding additional safeguards for self-demotion prevention
+ * Updates a user's administrator privileges (Super Admin only).
+ * Allows granting or revoking admin access.
  */
 export async function POST(request: NextRequest) {
     /**

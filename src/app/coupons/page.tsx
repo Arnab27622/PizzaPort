@@ -1,3 +1,12 @@
+/**
+ * This is the Admin Coupon Management Page.
+ * 
+ * Admins use this to manage discount codes:
+ * 1. Create new coupons (e.g., "SUMMER20").
+ * 2. Set discount amount (Percentage or Fixed).
+ * 3. Set expiry dates and usage limits.
+ */
+
 "use client";
 
 import React, { useState, useCallback, useMemo, useEffect } from "react";

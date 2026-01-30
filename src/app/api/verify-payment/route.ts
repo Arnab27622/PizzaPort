@@ -6,57 +6,7 @@ import { PAYMENT_STATUS } from "@/types/payment";
 
 /**
  * POST /api/payment/verify
- * Verifies Razorpay payment authenticity and updates order status
- * 
- * This endpoint performs critical security validations after payment completion:
- * 1. Verifies Razorpay payment signature to prevent fraud
- * 2. Validates security hash to detect order tampering
- * 3. Updates order status to "placed" and marks payment as verified
- * 
- * @param {NextRequest} req - The incoming request containing payment verification data
- * 
- * @requestBody {Object} body - Payment verification payload
- * @requestBody {string} body.razorpay_order_id - Razorpay order ID
- * @requestBody {string} body.razorpay_payment_id - Razorpay payment ID
- * @requestBody {string} body.razorpay_signature - Razorpay payment signature for verification
- * @requestBody {string} body.securityHash - Security hash generated during order creation
- * @requestBody {string} body.orderId - Internal order identifier (Razorpay order ID)
- * 
- * @returns {Promise<NextResponse>}
- *   Success: { success: true }
- *   Invalid Signature: { success: false, error: "Invalid signature" } with 400 status
- *   Order Not Found: { success: false, error: "Order not found" } with 404 status
- *   Tampering Detected: { success: false, error: "Order tampering detected" } with 400 status
- * 
- * @security Critical security endpoint - validates payment authenticity and order integrity
- * 
- * @example
- * // Successful verification
- * POST /api/payment/verify
- * Request Body:
- * {
- *   "razorpay_order_id": "order_123456",
- *   "razorpay_payment_id": "pay_789012",
- *   "razorpay_signature": "a1b2c3d4...",
- *   "securityHash": "e5f6g7h8...",
- *   "orderId": "order_123456"
- * }
- * 
- * Response: 200
- * { "success": true }
- * 
- * @example
- * // Invalid signature (potential fraud)
- * POST /api/payment/verify → 400
- * { "success": false, "error": "Invalid signature" }
- * 
- * @example
- * // Order tampering detected
- * POST /api/payment/verify → 400
- * { "success": false, "error": "Order tampering detected" }
- * 
- * @warning This endpoint is critical for payment security - never disable validations
- * @note Double verification (signature + security hash) prevents both external and internal tampering
+ * Verifies Razorpay payment authenticity and updates order status.
  */
 export async function POST(req: NextRequest) {
     /**

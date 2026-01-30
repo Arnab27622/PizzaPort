@@ -1,3 +1,13 @@
+/**
+ * This is the Order Tracking Page for customers.
+ * 
+ * After placing an order, customers land here (or navigate via "My Orders").
+ * It shows:
+ * 1. A Progress Bar (Placed -> Preparing -> Delivered).
+ * 2. What they ordered.
+ * 3. Total amount paid.
+ */
+
 'use client';
 
 import React from 'react';

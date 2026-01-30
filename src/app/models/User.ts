@@ -1,35 +1,44 @@
-// User.ts
+/**
+ * This file defines the "User" model.
+ * A User represents anyone who has an account on our website, including
+ * regular customers and administrators.
+ */
+
 import mongoose, { Schema, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
-
 import { IUserDoc } from '@/types/user';
 
 /**
- * Mongoose schema for User model.
+ * UserSchema defines what information we store for each person.
  */
 const UserSchema = new Schema<IUserDoc>(
     {
-        name: { type: String, required: true, trim: true },
-        email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-        password: { type: String, minlength: 6, select: false },
-        admin: { type: Boolean, default: false },
-        banned: { type: Boolean, default: false },
-        image: { type: String },
-        address: { type: String },
-        gender: { type: String },
+        name: { type: String, required: true, trim: true }, // The user's full name
+        email: { type: String, required: true, unique: true, lowercase: true, trim: true }, // Unique login email
+        password: { type: String, minlength: 6, select: false }, // Hashed password (hidden by default)
+        admin: { type: Boolean, default: false },   // True if the user is an admin
+        banned: { type: Boolean, default: false },  // True if the user is blocked from the site
+        image: { type: String },                    // Profile picture URL
+        address: { type: String },                  // Saved delivery address
+        gender: { type: String },                   // User's gender (optional)
     },
-    { timestamps: true }
+    { timestamps: true } // Adds createdAt and updatedAt automatically
 );
 
-// Hash password before saving
+/**
+ * Before saving a user to the database, we "hash" their password.
+ * This is a security feature that turns a plain password into a scrambled string
+ * so that even if the database is leaked, the actual passwords are safe.
+ */
 UserSchema.pre('save', async function () {
+    // Only hash the password if it's new or being changed
     if (!this.isModified('password') || !this.password) {
         return;
     }
 
     try {
-        const salt = await bcrypt.genSalt(10);
-        const hash = await bcrypt.hash(this.password, salt);
+        const salt = await bcrypt.genSalt(10); // Generate a random "salt" for extra security
+        const hash = await bcrypt.hash(this.password, salt); // Scramble the password
         this.password = hash;
     } catch (error: unknown) {
         throw error as Error;
@@ -37,9 +46,7 @@ UserSchema.pre('save', async function () {
 });
 
 /**
- * Compares a candidate password with the user's hashed password.
- * @param candidate - The password candidate to compare.
- * @returns {Promise<boolean>} True if passwords match, false otherwise.
+ * This function checks if a password typed by a user matches the scrambled one in the database.
  */
 UserSchema.methods.comparePassword = async function (
     candidate: string
@@ -47,6 +54,9 @@ UserSchema.methods.comparePassword = async function (
     return bcrypt.compare(candidate, this.password || '');
 };
 
+/**
+ * The User model represents the "users" collection in MongoDB.
+ */
 const User: Model<IUserDoc> =
     mongoose.models.User || mongoose.model<IUserDoc>('User', UserSchema);
 

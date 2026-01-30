@@ -1,86 +1,75 @@
+/**
+ * This file defines the "Order" model.
+ * An Order records everything about a customer's purchase, including what they bought,
+ * where it should be delivered, and the payment status.
+ */
+
 import mongoose from "mongoose";
 import { ORDER_STATUS } from "@/types/order";
 import { PAYMENT_STATUS } from "@/types/payment";
 
 /**
- * Represents an order in the system.
- * @typedef {Object} Order
- * @property {string} userEmail - The email of the user who placed the order.
- * @property {string} userName - The name of the user who placed the order.
- * @property {string} address - The delivery address for the order.
- * @property {Array} cart - The items in the order cart.
- * @property {string} cart._id - The menu item ID.
- * @property {string} cart.name - The name of the menu item.
- * @property {number} cart.basePrice - The base price of the menu item.
- * @property {string} [cart.imageUrl] - The image URL of the menu item.
- * @property {Object} [cart.size] - The selected size option.
- * @property {string} cart.size.name - The name of the size.
- * @property {number} cart.size.extraPrice - The extra price for the size.
- * @property {Array} cart.extras - The selected extra ingredients.
- * @property {string} cart.extras.name - The name of the extra ingredient.
- * @property {number} cart.extras.extraPrice - The extra price for the ingredient.
- * @property {number} subtotal - The order subtotal amount.
- * @property {number} tax - The tax amount.
- * @property {number} deliveryFee - The delivery fee.
- * @property {number} total - The total order amount.
- * @property {string} paymentStatus - The payment status of the order.
- * @property {string} [razorpayOrderId] - Razorpay order ID for payment processing.
- * @property {string} [razorpayPaymentId] - Razorpay payment ID for payment processing.
- * @property {string} [securityHash] - Security hash for payment verification.
- * @property {boolean} [webhookReceived] - Whether payment webhook was received.
- * @property {Date} [verifiedAt] - When the payment was verified.
- * @property {string} status - The current status of the order.
- * @property {Date} [canceledAt] - When the order was canceled.
- * @property {Date} createdAt - When the order was created.
- * @property {Date} updatedAt - When the order was last updated.
+ * OrderSchema defines the structure of an order in our database.
  */
 const OrderSchema = new mongoose.Schema(
     {
-        userEmail: { type: String, required: true },
-        userName: { type: String, required: true },
-        address: { type: String, required: true },
+        // Customer Information
+        userEmail: { type: String, required: true }, // The email of the person who placed the order
+        userName: { type: String, required: true },  // The name of the person who placed the order
+        address: { type: String, required: true },   // Where the pizza should be delivered
+
+        // Items in the Cart
         cart: [
             {
-                _id: { type: String, required: true },
-                name: { type: String, required: true },
-                basePrice: { type: Number, required: true },
-                imageUrl: { type: String },
+                _id: { type: String, required: true },       // Unique ID for the menu item
+                name: { type: String, required: true },      // Name of the item
+                basePrice: { type: Number, required: true },  // Price before any extras
+                imageUrl: { type: String },                  // Photo of the item (optional)
                 size: {
-                    name: String,
-                    extraPrice: Number,
+                    name: String,       // Selected size (e.g., "Large")
+                    extraPrice: Number, // Extra cost for the size
                 },
                 extras: [
                     {
-                        name: String,
-                        extraPrice: Number,
+                        name: String,       // Selected topping (e.g., "Extra Cheese")
+                        extraPrice: Number, // Extra cost for the topping
                     },
                 ],
             },
         ],
-        subtotal: Number,
-        tax: Number,
-        deliveryFee: Number,
-        couponCode: String,
-        discountAmount: Number,
-        total: Number,
+
+        // Pricing Summary
+        subtotal: Number,       // Sum of all items and extras
+        tax: Number,            // Calculated tax amount
+        deliveryFee: Number,    // Cost for delivery
+        couponCode: String,     // The discount code used (if any)
+        discountAmount: Number, // Total money saved by the coupon
+        total: Number,          // Final amount the user paid (subtotal + tax + delivery - discount)
+
+        // Payment Details
         paymentStatus: {
             type: String,
             enum: Object.values(PAYMENT_STATUS),
-            default: PAYMENT_STATUS.PENDING
+            default: PAYMENT_STATUS.PENDING // Status can be PENDING, COMPLETED, or FAILED
         },
-        razorpayOrderId: String,
-        razorpayPaymentId: String,
-        securityHash: String,
-        webhookReceived: Boolean,
-        verifiedAt: Date,
+        razorpayOrderId: String,   // Unique ID from the payment provider (Razorpay)
+        razorpayPaymentId: String, // ID for the specific payment transaction
+        securityHash: String,      // Used to verify that the payment info hasn't been tampered with
+        webhookReceived: Boolean,  // Whether we received confirmation from Razorpay's server
+        verifiedAt: Date,           // When the payment was officially confirmed
+
+        // Order Progress
         status: {
             type: String,
             enum: Object.values(ORDER_STATUS),
-            default: ORDER_STATUS.PLACED
+            default: ORDER_STATUS.PLACED // Status can be PLACED, PREPARING, OUT_FOR_DELIVERY, etc.
         },
-        canceledAt: Date
+        canceledAt: Date // If the order was canceled, we record the time here
     },
-    { timestamps: true }
+    { timestamps: true } // Automatically adds "createdAt" and "updatedAt"
 );
 
+/**
+ * The Order model represents the "orders" collection in MongoDB.
+ */
 export default mongoose.models.Order || mongoose.model("Order", OrderSchema);

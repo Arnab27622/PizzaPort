@@ -9,31 +9,6 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
  * 
  * This lightweight endpoint provides efficient status checking for order polling
  * or real-time status updates. It returns minimal data for performance optimization.
- * Useful for order tracking pages and status update components.
- * 
- * @param {Request} req - The incoming request object
- * @param {Object} context - Context object containing route parameters
- * @param {Promise<{id: string}>} context.params - Promise containing the order ID
- * 
- * @returns {Promise<NextResponse>}
- *   Success: { status: string } with current order status
- *   Unauthorized: { success: false, error: "Unauthorized" } with 401 status
- *   Not Found: { success: false, error: "Order not found" } with 404 status
- * 
- * @security Requires authenticated session and order ownership verification
- * 
- * @example
- * // Successful response
- * GET /api/user-orders/order_123456/status → 200
- * {
- *   "status": "preparing"
- * }
- * 
- * @example
- * // Order status values may include:
- * // - "pending", "confirmed", "preparing", "ready", "delivered", "canceled"
- * 
- * @performance Uses projection to fetch only status field, minimizing data transfer
  */
 export async function GET(
     req: Request,

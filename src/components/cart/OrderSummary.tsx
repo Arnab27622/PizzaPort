@@ -1,3 +1,9 @@
+/**
+ * This component displays the final bill summary.
+ * It shows the subtotal, taxes, delivery fee, and the grand total.
+ * It also has the "Submit Order" button to start the payment.
+ */
+
 import React from 'react';
 import LoadingSpinner from '@/components/icons/LoadingSpinner';
 import { OrderSummaryProps } from '@/types/cart';
@@ -56,3 +62,4 @@ export default function OrderSummary({
         </div>
     );
 }
+

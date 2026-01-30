@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+// Map status to a progress step number (1 to 5)
 const PROGRESS_VALUES: Record<string, number> = {
     placed: 1,
     confirmed: 2,
@@ -8,9 +9,13 @@ const PROGRESS_VALUES: Record<string, number> = {
 };
 
 interface OrderProgressBarProps {
-    status: string;
+    status: string; // The current status of the order (e.g., "preparing")
 }
 
+/**
+ * A visual progress bar that shows how far along an order is.
+ * Steps: Placed -> Confirmed -> Preparing -> On the Way -> Delivered
+ */
 const OrderProgressBar: React.FC<OrderProgressBarProps> = ({ status }) => {
     const progressValue = useMemo(() => PROGRESS_VALUES[status] || 0, [status]);
 

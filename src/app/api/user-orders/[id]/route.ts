@@ -1,4 +1,3 @@
-//app/api/user-orders/[id]/route.ts
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongoConnect";
@@ -7,45 +6,8 @@ import { authOptions } from "../../auth/[...nextauth]/authOptions";
 /**
  * GET /api/user-orders/[id]
  * Retrieves detailed information for a specific user order
- * 
  * This endpoint provides comprehensive order details for a single order,
- * identified by Razorpay order ID. It ensures users can only access their own orders.
- * Includes complete order data for order detail pages and receipts.
- * 
- * @param {Request} req - The incoming request object
- * @param {Object} params - Route parameters object
- * @param {Promise<{id: string}>} params.params - Promise containing the order ID
- * 
- * @returns {Promise<NextResponse>}
- *   Success: Complete order object with all details
- *   Unauthorized: { success: false, error: "Unauthorized" } with 401 status
- *   Not Found: { success: false, error: "Order not found" } with 404 status
- *   Error: { success: false, error: "Failed to fetch order" } with 500 status
- * 
- * @security Requires authenticated session and order ownership verification
- * 
- * @example
- * // Successful response
- * GET /api/user-orders/order_123456 → 200
- * {
- *   "_id": "67a1b2c3d4e5f67890123456",
- *   "razorpayOrderId": "order_123456",
- *   "userName": "John Doe",
- *   "userEmail": "john@example.com",
- *   "total": 1250.50,
- *   "status": "delivered",
- *   "createdAt": "2024-01-15T10:30:00.000Z",
- *   "cart": [...],
- *   "address": {...}
- * }
- * 
- * @example
- * // Order not found or doesn't belong to user
- * GET /api/user-orders/invalid_id → 404
- * {
- *   "success": false,
- *   "error": "Order not found"
- * }
+ * Ensures users can only access their own orders.
  */
 export async function GET(
     req: Request,

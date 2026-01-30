@@ -30,38 +30,6 @@ export const dynamic = 'force-dynamic';
  * This endpoint allows authenticated users to update their profile details:
  * - Name, address, and gender (required)
  * - Profile picture (optional)
- * 
- * @param {Request} req - The incoming request containing FormData
- * 
- * @returns {Promise<NextResponse>}
- *   Success: { ok: true }
- *   Unauthorized: { error: 'Unauthorized' } with 401 status
- *   Not Found: { error: 'User not found' } with 404 status
- *   Error: Server error with appropriate status code
- * 
- * @throws {Error} File system errors, database connection issues
- * 
- * @example
- * // Successful update
- * POST /api/profile/update
- * FormData:
- *   - name: "John Doe"
- *   - address: "123 Main St"
- *   - gender: "male"
- *   - profilePic: [File]
- * 
- * Response: 200
- * { "ok": true }
- * 
- * @example
- * // Unauthorized request
- * POST /api/profile/update → 401
- * { "error": "Unauthorized" }
- * 
- * @example
- * // User not found in database
- * POST /api/profile/update → 404
- * { "error": "User not found" }
  */
 export async function POST(req: Request) {
     /**

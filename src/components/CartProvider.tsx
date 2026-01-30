@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * This file manages the Shopping Cart for the entire website.
+ * It remembers what items are in the cart even if you refresh the page.
+ */
+
 import React, {
     createContext,
     ReactNode,
@@ -12,7 +17,8 @@ import { useSession } from "next-auth/react";
 import { CartProduct, CartContextType } from "@/types/cart";
 
 /**
- * Cart context for managing shopping cart state across the application
+ * Creates a "Context" so any component (like the Header or Menu)
+ * can access and update the cart.
  */
 export const CartContext = createContext<CartContextType>({
     cartProducts: [],
@@ -23,15 +29,17 @@ export const CartContext = createContext<CartContextType>({
 });
 
 /**
- * Cart provider component that handles cart persistence tied to the user session
+ * The main component that holds the logic for the cart.
  */
 export default function CartProvider({ children }: { children: ReactNode }) {
     const { data: session, status } = useSession();
     const [cartProducts, setCartProducts] = useState<CartProduct[]>([]);
-    const [isLoaded, setIsLoaded] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false); // True once we've read from LocalStorage
 
     /**
-     * Determine the localStorage key based on user email or guest status
+     * Determines where to save the cart.
+     * If logged in, we use the email in the key name to keep carts separate.
+     * If guest, we use a generic "guest" key.
      */
     const storageKey = useMemo(() => {
         if (status === "authenticated" && session?.user?.email) {
@@ -41,7 +49,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
     }, [session?.user?.email, status]);
 
     /**
-     * Load cart products from localStorage whenever the storageKey changes
+     * Load items from the browser's storage when the page loads.
      */
     useEffect(() => {
         setIsLoaded(false);
@@ -60,7 +68,7 @@ export default function CartProvider({ children }: { children: ReactNode }) {
     }, [storageKey]);
 
     /**
-     * Persist cart products to localStorage whenever they change
+     * Whenever the cart changes, save it back to the browser's storage.
      */
     useEffect(() => {
         if (isLoaded) {
@@ -68,6 +76,9 @@ export default function CartProvider({ children }: { children: ReactNode }) {
         }
     }, [cartProducts, storageKey, isLoaded]);
 
+    /**
+     * Adds an item to the cart.
+     */
     const addToCart = useCallback((
         product: CartProduct,
         size: CartProduct["size"] = null,
@@ -77,15 +88,22 @@ export default function CartProvider({ children }: { children: ReactNode }) {
         setCartProducts((prev) => [...prev, cartItem]);
     }, []);
 
+    /**
+     * Removes all items from the cart.
+     */
     const clearCart = useCallback(() => {
         setCartProducts([]);
         localStorage.removeItem(storageKey);
     }, [storageKey]);
 
+    /**
+     * Removes a single item based on its position in the list.
+     */
     const removeCartProduct = useCallback((index: number) => {
         setCartProducts((prev) => prev.filter((_, i) => i !== index));
     }, []);
 
+    // Bundle all the data and functions together to pass down to children
     const contextValue = useMemo(() => ({
         cartProducts,
         setCartProducts,
@@ -100,3 +118,4 @@ export default function CartProvider({ children }: { children: ReactNode }) {
         </CartContext.Provider>
     );
 }
+

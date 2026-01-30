@@ -7,18 +7,8 @@ import { CustomConfirmProps } from "@/types/common";
 type Props = ConfirmDialogProps<CustomConfirmProps, boolean>;
 
 /**
- * A confirmation dialog component for delete operations
- * 
- * @component
- * @param {Props} props - Component properties
- * @param {boolean} props.show - Controls dialog visibility
- * @param {Function} props.proceed - Callback to resolve the confirmation promise
- * @param {string} props.message - The confirmation message to display
- * 
- * @example
- * const result = await confirm({
- *   message: "Are you sure you want to delete this item?"
- * });
+ * A popup that asks "Are you sure you want to delete this?"
+ * Shows Cancel and Delete buttons.
  */
 const ConfirmDialog: React.FC<Props> = ({ show, proceed, message }) => {
     if (!show) return null;
@@ -55,21 +45,8 @@ const ConfirmDialog: React.FC<Props> = ({ show, proceed, message }) => {
 const confirmInstance = createConfirmation(confirmable(ConfirmDialog));
 
 /**
- * Opens a confirmation dialog and returns a promise that resolves to a boolean
- * 
- * @function
- * @param {CustomConfirmProps} props - Dialog properties
- * @param {string} props.message - The confirmation message to display
- * @returns {Promise<boolean>} Promise that resolves to true if confirmed, false if cancelled
- * 
- * @example
- * const userConfirmed = await confirm({
- *   message: "Are you sure you want to delete this item?"
- * });
- * 
- * if (userConfirmed) {
- *   // Perform delete operation
- * }
+ * Shows a confirmation dialog before deleting something.
+ * Returns true if user clicks "Delete", false if they click "Cancel".
  */
 export const confirm = (props: CustomConfirmProps): Promise<boolean> => {
     return confirmInstance(props as Props);

@@ -11,15 +11,7 @@ import SearchIcon from '@/components/icons/SearchIcon';
 
 import { User } from '@/types/user';
 
-/**
- * Data Fetcher for SWR
- * 
- * Handles API requests for user data with error handling
- * Used by SWR for intelligent caching and background revalidation
- * 
- * @param {string} url - API endpoint to fetch data from
- * @returns {Promise<User[]>} Array of user objects
- */
+// Helper function to fetch user data from the API
 const fetcher = async (url: string) => {
     const res = await fetch(url);
     if (!res.ok) {
@@ -30,84 +22,29 @@ const fetcher = async (url: string) => {
 };
 
 /**
- * UsersPage Component
+ * This is the Admin User Management Page.
  * 
- * Comprehensive user management interface for restaurant administrators
- * Provides user search, filtering, and administrative privilege management
- * 
- * @component
- * @features
- * - Advanced user search by name and email
- * - Multi-criteria filtering (all users, admins, banned users)
- * - Flexible sorting (name, join date, activity)
- * - Administrative privilege management
- * - User account suspension/restoration
- * - Responsive design for all device sizes
- * 
- * @security
- * - Admin-only access enforcement through useIsAdmin hook
- * - Protected API endpoints with server-side validation
- * - Confirmation modals for destructive operations
- * - No sensitive data exposure in client-side rendering
- * - Automatic redirection for unauthorized users
- * 
- * @performance
- * - SWR caching with background revalidation for optimal performance
- * - Memoized calculations prevent unnecessary re-renders
- * - Efficient filtering and sorting with dependency optimization
- * - Optimized image loading with Next.js Image component
- * 
- * @user_experience
- * - Real-time search with instant filtering
- * - Intuitive user interface with clear visual hierarchy
- * - Confirmation dialogs for critical operations
- * - Comprehensive loading and processing states
- * - Accessible interface with proper ARIA labels
- * 
- * @example
- * // Renders complete user management dashboard for admins
- * <UsersPage />
+ * Admins use this to:
+ * 1. See a list of all registered users.
+ * 2. Search for users by Name or Email.
+ * 3. Promotes users to "Admin" status.
+ * 4. Ban users from the platform.
  */
 function UsersPage() {
-    /**
-     * Admin Access Control Hook
-     * 
-     * Validates user permissions before rendering user management features
-     * Provides loading state during authentication verification
-     */
     const { isAdmin, isLoading } = useIsAdmin();
 
-    /**
-     * User Data Fetching with SWR
-     * 
-     * Intelligent data fetching with caching and automatic revalidation
-     * Provides real-time user data synchronization
-     */
+    // Fetch all users from the API
     const { data, error: swrError, isLoading: swrLoading, mutate } = useSWR<User[]>('/api/users', fetcher);
     const users = useMemo(() => Array.isArray(data) ? data : [], [data]);
 
-    /**
-     * Error Handling for Data Fetching
-     * 
-     * Displays a toast notification if the API request fails
-     */
+    // Show error message if fetching fails
     useEffect(() => {
         if (swrError) {
             toast.error(swrError.message || "Failed to fetch users");
         }
     }, [swrError]);
 
-    /**
-     * Component State Management
-     * 
-     * @state selectedUser - Currently selected user for detail view/operations
-     * @state confirmOpen - Controls ban/unban confirmation modal visibility
-     * @state adminConfirmOpen - Controls admin privilege confirmation modal visibility
-     * @state processing - Tracks ongoing operations to prevent duplicate requests
-     * @state search - Search query for user filtering
-     * @state filter - Current filter criteria (all, admins, banned)
-     * @state sortKey - Current sorting criteria (name, createdAt, updatedAt)
-     */
+    // Component state
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [adminConfirmOpen, setAdminConfirmOpen] = useState(false);
@@ -116,31 +53,14 @@ function UsersPage() {
     const [filter, setFilter] = useState<"all" | "admins" | "banned">("all");
     const [sortKey, setSortKey] = useState<"name" | "createdAt" | "updatedAt">("name");
 
-    /**
-     * Admin Access Enforcement Effect
-     * 
-     * Redirects non-admin users to home page automatically
-     * Prevents unauthorized access to user management functionality
-     */
+    // Redirect non-admins to home page
     useEffect(() => {
         if (!isLoading && !isAdmin) {
             window.location.href = '/';
         }
     }, [isLoading, isAdmin]);
 
-    /**
-     * User Filtering and Sorting Hook
-     * 
-     * Applies search, filter, and sort criteria to user data
-     * Memoized to prevent unnecessary recalculations on every render
-     * 
-     * @returns {User[]} Filtered and sorted array of users
-     * 
-     * @filter_logic
-     * - Search: Case-insensitive match against name and email
-     * - Filter: Matches against admin status or banned status
-     * - Sort: Alphabetical by name or chronological by date fields
-     */
+    // Filter and sort users based on search, filter, and sort criteria
     const filtered = useMemo(() => {
         return users
             .filter(u =>
@@ -196,15 +116,7 @@ function UsersPage() {
         }
     }, [selectedUser, mutate]);
 
-    /**
-     * User Ban Toggle Handler
-     * 
-     * Manages user account suspension and restoration
-     * Implements confirmation workflow and comprehensive error handling
-     * 
-     * @async
-     * @function
-     */
+    // Handle banning/unbanning a user
     const handleBanToggle = useCallback(async () => {
         if (!selectedUser) return;
 
@@ -234,26 +146,12 @@ function UsersPage() {
         }
     }, [selectedUser, mutate]);
 
-    /**
-     * Date Formatter
-     * 
-     * Converts ISO timestamps to localized date format
-     * Provides consistent date display throughout the interface
-     * 
-     * @function
-     * @param {string} dateString - ISO format date string
-     * @returns {string} Formatted date string
-     */
+    // Format date to readable format (DD/MM/YYYY)
     const formatDate = useCallback((dateString: string) => {
         return new Date(dateString).toLocaleDateString('en-GB');
     }, []);
 
-    /**
-     * Combined Loading State
-     * 
-     * Displays loading spinner during authentication and initial data fetch
-     * Provides consistent loading experience during critical operations
-     */
+    // Show loading spinner while data loads
     if (isLoading || swrLoading) {
         return (
             <div className="min-h-[80vh] p-6 mt-16 text-card">
@@ -266,24 +164,8 @@ function UsersPage() {
         );
     }
 
-    /**
-     * Access Denied State
-     * 
-     * Returns null during redirect for non-admin users
-     * Prevents flash of unauthorized content
-     */
     if (!isAdmin) return null;
 
-    /**
-     * Main Component Render
-     * 
-     * Implements comprehensive user management interface with:
-     * - Search, filter, and sort controls
-     * - User list with essential information
-     * - User detail modal with management actions
-     * - Confirmation dialogs for critical operations
-     * - Responsive layout for all device sizes
-     */
     return (
         <div className="min-h-[80vh] p-6 mt-16 text-card">
             {/* Page Header */}

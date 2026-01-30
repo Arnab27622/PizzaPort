@@ -1,3 +1,14 @@
+/**
+ * This is the Shopping Cart Page.
+ * 
+ * Ideally, customers come here to review their order before paying.
+ * Key Features:
+ * 1. Shows list of items added to cart.
+ * 2. Allows adding delivery address.
+ * 3. Lets users apply coupon codes for discounts.
+ * 4. Shows the final bill summary and "Proceed to Pay" button.
+ */
+
 "use client";
 
 import React, { useContext, useEffect } from "react";
@@ -20,6 +31,7 @@ import { useUserLocation } from "@/hooks/useUserLocation";
 import { useCartCalculations } from "@/hooks/useCartCalculations";
 import { useCartPayment } from "@/hooks/useCartPayment";
 
+// Validation for address field
 const CartSchema = z.object({
     address: z.string().min(1, 'Address is required').min(5, 'Please provide a more detailed address').max(200, 'Address is too long'),
 });

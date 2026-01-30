@@ -9,24 +9,8 @@ import { SalesReport } from '../../types/sales';
 Chart.register(...registerables);
 
 /**
- * SalesCharts component for displaying revenue and product performance data
- * 
- * @component
- * @description 
- * - Displays interactive charts for sales analytics using Chart.js
- * - Includes line chart for revenue trends over time
- * - Includes bar chart for top-selling products
- * - Features responsive design with dynamic chart adjustments
- * - Automatically adjusts label rotation based on container width
- * - Uses dark theme styling consistent with application design
- * 
- * @param {Object} props - Component properties
- * @param {SalesReport} props.report - Sales report data containing revenue and product information
- * 
- * @example
- * <SalesCharts report={salesReportData} />
- * 
- * @returns {JSX.Element} Responsive charts container with revenue and product performance data
+ * SalesCharts component
+ * Shows two charts: Line chart for daily revenue and Bar chart for top-selling items.
  */
 export default function SalesCharts({ report }: { report: SalesReport }) {
   const containerRef = useRef<HTMLDivElement>(null);

@@ -16,22 +16,17 @@ import GoogleIcon from '@/components/icons/GoogleIcon';
 import { useRouter } from 'next/navigation';
 
 /**
- * Registration Form Validation Schema
+ * This is the Registration Page (Sign Up).
  * 
- * Comprehensive validation rules for user registration using Zod
- * Ensures data integrity and security through strict input validation
+ * New users can create an account here by providing:
+ * - Full Name
+ * - Email
+ * - Password (must be strong!)
  * 
- * @validation_rules
- * - Name: Required, 1-50 characters
- * - Email: Required, valid email format
- * - Password: 6-50 characters, requires lowercase, uppercase, and number
- * - Confirm Password: Must match password field exactly
- * 
- * @security
- * - Password complexity requirements prevent weak credentials
- * - Email validation prevents malformed email addresses
- * - Input length limits prevent DoS attacks through large payloads
+ * Or they can sign up instantly with Google.
  */
+
+// Rules for checking if the registration form is valid
 const RegisterSchema = z
     .object({
         name: z.string().min(1, 'Full Name is required').max(50, 'Name is too long'),
@@ -49,45 +44,6 @@ const RegisterSchema = z
 
 import { RegisterInput } from '@/types/user';
 
-/**
- * RegisterPage Component
- * 
- * Secure user registration interface with dual authentication options
- * Provides comprehensive form validation, real-time feedback, and OAuth integration
- * 
- * @component
- * @features
- * - Client-side form validation with real-time error display
- * - Password strength indicator with visual feedback
- * - Dual registration: Email/Password and Google OAuth
- * - Accessibility-compliant form controls
- * - Responsive design for all device sizes
- * - Loading states for all asynchronous operations
- * 
- * @security
- * - Zod validation prevents malformed data submission
- * - Password complexity requirements enforce secure credentials
- * - CSRF protection through proper API communication
- * - OAuth integration with secure redirect flows
- * - Input sanitization through controlled components
- * 
- * @performance
- * - Memoized callbacks prevent unnecessary re-renders
- * - Optimized form validation with react-hook-form
- * - Conditional rendering minimizes DOM operations
- * - Efficient password strength calculation
- * 
- * @user_experience
- * - Real-time validation feedback during typing
- * - Clear password requirements with strength indicator
- * - Toggle visibility for password fields
- * - Comprehensive error handling with user-friendly messages
- * - Seamless OAuth integration with proper loading states
- * 
- * @example
- * // Renders complete registration form with validation
- * <RegisterPage />
- */
 function RegisterPage() {
     const router = useRouter();
 
@@ -112,10 +68,7 @@ function RegisterPage() {
 
     /**
      * Component State Management
-     * 
-     * @state showPwd - Toggles password field visibility
-     * @state showConfirm - Toggles confirm password field visibility
-     * @state isGoogleSignIn - Tracks Google OAuth operation status
+     * Tracks visibility of password fields and Google sign-in status.
      */
     const [showPwd, setShowPwd] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
@@ -131,13 +84,7 @@ function RegisterPage() {
 
     /**
      * Registration Form Submission Handler
-     * 
-     * Processes email/password registration with comprehensive error handling
-     * Implements secure API communication and user feedback
-     * 
-     * @async
-     * @function
-     * @param {RegisterInput} data - Validated form data from Zod schema
+     * Sends the user's data to the server to create an account.
      */
     const onSubmit = useCallback(async (data: RegisterInput) => {
         try {
@@ -168,12 +115,7 @@ function RegisterPage() {
 
     /**
      * Google OAuth Authentication Handler
-     * 
-     * Initiates Google Sign-In flow with proper error handling
-     * Provides seamless third-party authentication experience
-     * 
-     * @async
-     * @function
+     * Allows users to sign in using their Google account.
      */
     const handleGoogleSignIn = useCallback(async () => {
         setIsGoogleSignIn(true);
@@ -191,13 +133,7 @@ function RegisterPage() {
 
     /**
      * Password Strength Calculator
-     * 
-     * Evaluates password complexity and provides visual feedback
-     * Implements multi-factor strength assessment for security
-     * 
-     * @function
-     * @param {string} password - Password string to evaluate
-     * @returns {Object} Strength score (0-5) and descriptive label
+     * Checks how strong the password is (0-5) and gives it a label like "Weak" or "Strong".
      */
     const getPasswordStrength = useCallback((password: string) => {
         if (password.length === 0) return { strength: 0, label: '' };
@@ -253,7 +189,7 @@ function RegisterPage() {
                             <p className="text-amber-200 text-lg mb-6">Join PizzaPort for exclusive deals and faster ordering</p>
                             <div className="mt-8 space-y-4">
                                 {[
-                                    'Exclusive members-only deals',
+                                    'Exclusive deals',
                                     'Faster checkout experience',
                                     'Early access to new menu items',
                                     'Personalized recommendations',

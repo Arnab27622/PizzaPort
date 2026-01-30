@@ -1,3 +1,8 @@
+/**
+ * The form where users can see and edit their profile information.
+ * It lets them change their Name, Address, Gender, and Profile Picture.
+ */
+
 import React, { useRef } from 'react';
 import Image from 'next/image';
 import LoadingSpinner from '@/components/icons/LoadingSpinner';

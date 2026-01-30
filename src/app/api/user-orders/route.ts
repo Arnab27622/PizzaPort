@@ -1,4 +1,3 @@
-//app/api/user-orders/route.ts
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongoConnect";
@@ -7,42 +6,8 @@ import { PAYMENT_STATUS } from "@/types/payment";
 
 /**
  * GET /api/user-orders
- * Retrieves the authenticated user's order history
- * 
- * This endpoint provides a paginated list of the current user's orders,
- * sorted by creation date (newest first). It includes essential order
- * information for display in order history pages.
- * 
- * @returns {Promise<NextResponse>}
- *   Success: Array of order objects with essential fields
- *   Unauthorized: { success: false, error: "Unauthorized" } with 401 status
- *   Error: { success: false, error: "Failed to fetch orders" } with 500 status
- * 
- * @security Requires authenticated session with valid user email
- * 
- * @example
- * // Successful response
- * GET /api/user-orders → 200
- * [
- *   {
- *     "_id": "67a1b2c3d4e5f67890123456",
- *     "razorpayOrderId": "order_123456",
- *     "total": 1250.50,
- *     "status": "delivered",
- *     "createdAt": "2024-01-15T10:30:00.000Z",
- *     "cart": [
- *       { "name": "Margherita Pizza", "imageUrl": "/uploads/pizza.jpg" }
- *     ]
- *   }
- * ]
- * 
- * @example
- * // Unauthorized access
- * GET /api/user-orders → 401
- * {
- *   "success": false,
- *   "error": "Unauthorized"
- * }
+ * Retrieves the authenticated user's order history.
+ * Returns a paginated list of orders, sorted by newest first.
  */
 export async function GET() {
     /**

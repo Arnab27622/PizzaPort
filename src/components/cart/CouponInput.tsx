@@ -1,3 +1,9 @@
+/**
+ * This component allows users to enter a Discount Code (Coupon).
+ * It sends the code to the server to check if it's valid.
+ * If valid, it updates the total price; otherwise, it shows an error.
+ */
+
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '@/components/icons/LoadingSpinner';
@@ -12,9 +18,12 @@ export default function CouponInput({
     appliedCode,
     isDisabled
 }: CouponInputProps) {
-    const [code, setCode] = useState('');
-    const [isValidating, setIsValidating] = useState(false);
+    const [code, setCode] = useState(''); // The text typed by the user
+    const [isValidating, setIsValidating] = useState(false); // Spinner while checking the code
 
+    /**
+     * Checks if the entered coupon is valid.
+     */
     const handleApply = async () => {
         if (!code.trim()) {
             toast.warning('Please enter a coupon code');
@@ -23,6 +32,7 @@ export default function CouponInput({
 
         setIsValidating(true);
         try {
+            // Send the code and the current cart total to the server
             const res = await fetch('/api/coupon/validate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -33,7 +43,7 @@ export default function CouponInput({
 
             if (data.valid) {
                 toast.success(data.message);
-                onCouponApplied(data);
+                onCouponApplied(data); // Tell the parent component to update the price
                 setCode(''); // Clear input on success
             } else {
                 toast.error(data.message || 'Invalid coupon');
@@ -46,6 +56,7 @@ export default function CouponInput({
         }
     };
 
+    // If a coupon is already applied, show a "Success" box instead of the input field
     if (appliedCode) {
         return (
             <div className="bg-green-900/20 border border-green-800 p-4 rounded-lg flex items-center justify-between shadow-sm">
@@ -97,3 +108,4 @@ export default function CouponInput({
         </div>
     );
 }
+

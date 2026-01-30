@@ -1,3 +1,13 @@
+/**
+ * This is the Admin Order Detail Page (e.g., /orders/123).
+ * 
+ * It shows EVERY detail about a single order:
+ * - List of items ordered.
+ * - Delivery address.
+ * - Payment status.
+ * - Option to print receipt (if we add that later).
+ */
+
 import React from "react";
 import SectionHeader from "@/components/layout/SectionHeader";
 import BackButton from "@/components/layout/BackButton";

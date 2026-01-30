@@ -1,3 +1,8 @@
+/**
+ * This component displays the list of menu items for the Admin.
+ * It shows items in a grid with their images, names, prices, and options to Edit or Delete.
+ */
+
 import React from 'react';
 import Image from 'next/image';
 import LoadingSpinner from '@/components/icons/LoadingSpinner';
@@ -108,3 +113,4 @@ export default function MenuItemGrid({
         </div>
     );
 }
+

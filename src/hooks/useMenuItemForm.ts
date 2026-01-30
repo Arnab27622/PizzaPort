@@ -1,9 +1,18 @@
+/**
+ * This custom hook handles the logic for the "Create or Edit Menu Item" form.
+ * It manages text fields, image uploads, and lists of sizes and toppings.
+ */
+
 import { useState, useCallback, useEffect, ChangeEvent, FormEvent } from 'react';
 import { MenuItem, MenuItemFormState, UseMenuItemFormProps } from '@/types/menu';
 import { toast } from 'react-toastify';
 
+/**
+ * useMenuItemForm Hook
+ * Takes success and close handlers to call after form submission.
+ */
 export function useMenuItemForm({ onSuccess, onClose }: UseMenuItemFormProps) {
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false); // True when saving to the server
     const [form, setForm] = useState<MenuItemFormState>({
         id: "",
         name: "",
@@ -17,7 +26,10 @@ export function useMenuItemForm({ onSuccess, onClose }: UseMenuItemFormProps) {
         extraIngredients: []
     });
 
-    // Cleanup object URL on unmount or preview change
+    /**
+     * When we show an image preview, we create a temporary URL.
+     * This cleanup function removes that URL when it's no longer needed to save memory.
+     */
     useEffect(() => {
         return () => {
             if (form.imagePreview) {
@@ -26,6 +38,10 @@ export function useMenuItemForm({ onSuccess, onClose }: UseMenuItemFormProps) {
         };
     }, [form.imagePreview]);
 
+    /**
+     * Fills the form with data if we are EDITING an item, 
+     * or resets it if we are ADDING a new one.
+     */
     const initializeForm = useCallback((item?: MenuItem) => {
         if (item) {
             setForm({
@@ -62,11 +78,13 @@ export function useMenuItemForm({ onSuccess, onClose }: UseMenuItemFormProps) {
         }
     }, []);
 
+    // Handles changes for normal text inputs
     const handleChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setForm(prev => ({ ...prev, [name]: value }));
     }, []);
 
+    // Handles picking an image file from the computer
     const handleFileChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] ?? null;
         if (form.imagePreview && form.imageFile) {
@@ -76,6 +94,9 @@ export function useMenuItemForm({ onSuccess, onClose }: UseMenuItemFormProps) {
         setForm(prev => ({ ...prev, imageFile: file, imagePreview: preview }));
     }, [form.imagePreview, form.imageFile]);
 
+    /**
+     * Handles changes for "Options" (sizes or toppings).
+     */
     const handleOptionChange = useCallback((
         key: "sizeOptions" | "extraIngredients",
         idx: number,
@@ -89,6 +110,7 @@ export function useMenuItemForm({ onSuccess, onClose }: UseMenuItemFormProps) {
         });
     }, []);
 
+    // Adds a new blank option row
     const addOption = useCallback((key: "sizeOptions" | "extraIngredients") => {
         setForm(prev => ({
             ...prev,
@@ -96,6 +118,7 @@ export function useMenuItemForm({ onSuccess, onClose }: UseMenuItemFormProps) {
         }));
     }, []);
 
+    // Removes an option row
     const removeOption = useCallback((key: "sizeOptions" | "extraIngredients", idx: number) => {
         setForm(prev => {
             const arr = [...prev[key]];
@@ -104,6 +127,10 @@ export function useMenuItemForm({ onSuccess, onClose }: UseMenuItemFormProps) {
         });
     }, []);
 
+    /**
+     * Submits the form data to the server.
+     * Uses FormData because we need to upload an image.
+     */
     const handleSubmit = useCallback(async (e: FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -118,6 +145,7 @@ export function useMenuItemForm({ onSuccess, onClose }: UseMenuItemFormProps) {
             }
             fd.append("description", form.description);
 
+            // Convert option arrays to JSON strings so they can be sent via FormData
             const sizeOptions = form.sizeOptions.map(o => ({
                 name: o.name,
                 extraPrice: parseFloat(o.extraPrice) || 0
@@ -134,6 +162,7 @@ export function useMenuItemForm({ onSuccess, onClose }: UseMenuItemFormProps) {
             if (form.imageFile) fd.append("image", form.imageFile);
             if (form.id) fd.append("id", form.id);
 
+            // Use PUT if editing, POST if creating new
             const method = form.id ? "PUT" : "POST";
             const response = await fetch("/api/menuitem", { method, body: fd });
 
@@ -146,7 +175,6 @@ export function useMenuItemForm({ onSuccess, onClose }: UseMenuItemFormProps) {
             onSuccess();
             onClose();
 
-            // Cleanup on success if needed, though onClose/initialize usually handles reset
         } catch (error) {
             console.error("Error saving menu item:", error);
             toast.error(error instanceof Error ? error.message : "Failed to save menu item");
@@ -167,3 +195,4 @@ export function useMenuItemForm({ onSuccess, onClose }: UseMenuItemFormProps) {
         handleSubmit
     };
 }
+

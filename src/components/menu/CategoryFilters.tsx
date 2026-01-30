@@ -1,9 +1,16 @@
+"use client";
+
+/**
+ * This component shows buttons for each category (like "Pizza", "Drinks").
+ * Clicking a button filters the menu to show only items from that category.
+ */
+
 import React from "react";
 
 interface CategoryFiltersProps {
-    categories: string[];
-    activeCategory: string;
-    onCategoryChange: (category: string) => void;
+    categories: string[]; // List of all available categories
+    activeCategory: string; // The currently selected category (empty means "All")
+    onCategoryChange: (category: string) => void; // Function to update the selected category
 }
 
 const CategoryFilters: React.FC<CategoryFiltersProps> = ({
@@ -11,10 +18,12 @@ const CategoryFilters: React.FC<CategoryFiltersProps> = ({
     activeCategory,
     onCategoryChange
 }) => {
+    // If there are no categories, don't show anything
     if (categories.length === 0) return null;
 
     return (
         <div className="flex flex-wrap justify-center gap-3 mb-10">
+            {/* Button to show All items */}
             <button
                 key="all"
                 onClick={() => onCategoryChange("")}
@@ -25,6 +34,7 @@ const CategoryFilters: React.FC<CategoryFiltersProps> = ({
             >
                 All Items
             </button>
+            {/* Buttons for each category */}
             {categories.map((cat) => (
                 <button
                     key={cat}
@@ -42,3 +52,4 @@ const CategoryFilters: React.FC<CategoryFiltersProps> = ({
 };
 
 export default CategoryFilters;
+

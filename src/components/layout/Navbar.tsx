@@ -1,5 +1,14 @@
 "use client";
 
+/**
+ * The main Navigation Bar at the top of every page.
+ * It stays visible (fixed) as you scroll down.
+ * It handles:
+ * - Switching between "Admin" and "Customer" links.
+ * - Showing the Logo.
+ * - Opening/Closing the mobile menu on small screens.
+ */
+
 import Link from "next/link";
 import React, { useState, useEffect, useContext } from "react";
 import { signOut, useSession } from "next-auth/react";
@@ -23,21 +32,23 @@ export default function Navbar() {
         }
     }, [status, user]);
 
+    // Check if the user is an Admin
     const isAdmin = (status === 'loading' && lastKnownAdmin !== null)
         ? lastKnownAdmin
         : !!user?.admin;
 
-    // Cart Context
+    // Cart Context to show number of items
     const { cartProducts } = useContext(CartContext);
 
-    // State
-    const [isOpen, setIsOpen] = useState(false);
-    const [scrolled, setScrolled] = useState(false);
+    // State for Mobile Menu and Scroll Effect
+    const [isOpen, setIsOpen] = useState(false); // Mobile menu open/close
+    const [scrolled, setScrolled] = useState(false); // True if user scrolled down
 
-    // Format user name
+    // Format user name (e.g., "John Doe" -> "John")
     let userName = user?.name ?? "";
     if (userName.includes(" ")) userName = userName.split(" ")[0];
 
+    // Close mobile menu if clicking outside
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (isOpen && !(e.target as Element).closest("nav, button")) {
@@ -56,6 +67,7 @@ export default function Navbar() {
         };
     }, [isOpen]);
 
+    // Helper to secure redirects
     const handleNavigation = (href: string, e: React.MouseEvent) => {
         if (href === '/login' || href === '/register') return;
         if (status !== 'authenticated') {
@@ -64,6 +76,7 @@ export default function Navbar() {
         }
     };
 
+    // Define which links to show based on user role
     const links = isAdmin
         ? [
             { href: "/menuitem", label: "Menu" },
@@ -109,7 +122,7 @@ export default function Navbar() {
                     </Link>
                 )}
 
-                {/* Desktop Navigation */}
+                {/* Desktop Navigation (Hidden on small screens) */}
                 <DesktopNav
                     links={links}
                     status={status}
@@ -120,7 +133,7 @@ export default function Navbar() {
                     onLogout={signOut}
                 />
 
-                {/* Mobile Menu Toggle Button */}
+                {/* Mobile Menu Toggle Button (Hidden on large screens) */}
                 <button
                     className="md:hidden flex flex-col items-center justify-center w-10 h-10 cursor-pointer"
                     onClick={() => setIsOpen(!isOpen)}
@@ -133,7 +146,7 @@ export default function Navbar() {
                 </button>
             </div>
 
-            {/* Mobile Navigation */}
+            {/* Mobile Navigation Dropdown */}
             <MobileNav
                 isOpen={isOpen}
                 links={links}
@@ -148,3 +161,4 @@ export default function Navbar() {
         </header>
     );
 }
+

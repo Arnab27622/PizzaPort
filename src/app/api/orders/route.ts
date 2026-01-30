@@ -6,39 +6,8 @@ import { PAYMENT_STATUS } from "@/types/payment";
 
 /**
  * GET /api/orders
- * Retrieves all orders from the database (Admin only)
- * 
- * This endpoint fetches all orders sorted by creation date (newest first)
- * and converts MongoDB ObjectId to string for client-side compatibility.
- * 
- * @returns {Promise<NextResponse>} 
- *   Success: JSON array of order objects with string _id
- *   Unauthorized: 401 if not logged in
- *   Forbidden: 403 if not an admin
- *   Error: JSON error response with 500 status code
- * 
- * @security Admin access required
- * 
- * @example
- * // Successful response
- * GET /api/orders → 200
- * [
- *   {
- *     "_id": "67a1b2c3d4e5f67890123456",
- *     "items": [...],
- *     "total": 29.99,
- *     "createdAt": "2024-01-15T10:30:00.000Z",
- *     ...
- *   }
- * ]
- * 
- * @example
- * // Error response
- * GET /api/orders → 500
- * {
- *   "success": false,
- *   "error": "Failed to fetch orders"
- * }
+ * Retrieves all orders from the database (Admin only).
+ * Sorted by creation date (newest first).
  */
 export async function GET() {
     const session = await getServerSession(authOptions);

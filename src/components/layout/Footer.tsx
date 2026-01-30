@@ -1,17 +1,12 @@
 "use client";
 
+/**
+ * The Footer appears at the very bottom of every page.
+ * It shows the copyright year (which updates automatically) and credits.
+ */
+
 import React, { memo } from 'react'
 
-/**
- * Footer component that displays copyright information and attribution
- * 
- * @component
- * @description A reusable footer with dynamic year display and styling
- * @example
- * return <Footer />
- * 
- * @returns {JSX.Element} Footer element with copyright and attribution
- */
 function Footer() {
   // Get current year for dynamic copyright display
   const currentYear = new Date().getFullYear();
@@ -31,5 +26,5 @@ function Footer() {
   )
 }
 
-// Export memoized component to prevent unnecessary re-renders
+// Export using "memo" so it doesn't re-render unnecessarily (since it rarely changes)
 export default memo(Footer)

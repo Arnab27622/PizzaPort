@@ -1,3 +1,10 @@
+/**
+ * This page shows "My Coupons" for customers.
+ * 
+ * It lists all the special deals available to them (like "50% OFF").
+ * They can copy the code to use it at checkout.
+ */
+
 'use client';
 
 import React from 'react';

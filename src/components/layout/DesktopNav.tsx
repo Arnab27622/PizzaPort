@@ -1,3 +1,8 @@
+/**
+ * This component displays the menu links for larger screens (Laptops, Desktops).
+ * It changes based on whether you are logged in, logged out, or an admin.
+ */
+
 import React from 'react';
 import Link from 'next/link';
 import Cart from '@/components/icons/Cart';
@@ -96,3 +101,4 @@ export default function DesktopNav({
         </nav>
     );
 }
+

@@ -10,10 +10,12 @@ import LoadingSpinner from "@/components/icons/LoadingSpinner";
 import AdminOrderCard from "@/components/orders/AdminOrderCard";
 
 /**
- * AdminOrdersPage Component
+ * This is the Admin Orders Dashboard.
  * 
- * Comprehensive order management interface for restaurant administrators
- * Provides real-time order monitoring, status updates, and cancellation capabilities
+ * Admins come here to manage all incoming orders:
+ * 1. View a list of live orders.
+ * 2. Update status (Preparing, Out for Delivery, etc.).
+ * 3. Cancel orders if needed.
  */
 export default function AdminOrdersPage() {
     const { isAdmin, isLoading: isAdminLoading } = useIsAdmin();

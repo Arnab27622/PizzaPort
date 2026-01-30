@@ -1,31 +1,10 @@
 /**
- * Home Page Component
+ * This is the Home Page (/).
  * 
- * Landing page for authenticated users with restaurant overview
- * Provides navigation to key sections and featured content
- * 
- * @file page.tsx
- * 
- * @features
- * - Server-side session validation for security
- * - Automatic redirection for unauthenticated users
- * - Modular section components for maintainability
- * - Progressive content revelation for optimal user experience
- * 
- * @security
- * - Server-side authentication checking prevents client-side exposure
- * - Protected route with automatic redirect to login
- * - Session validation through NextAuth.js
- * 
- * @performance
- * - Server-side rendering for optimal initial load
- * - Component-level code splitting for efficient bundling
- * - Optimized image loading and lazy loading for below-fold content
- * 
- * @user_experience
- * - Immediate feedback through automatic redirection
- * - Clear information hierarchy with prominent calls-to-action
- * - Consistent branding and visual design throughout
+ * It behaves differently depending on who you are:
+ * 1. If you are NOT logged in -> It sends you to the Login page.
+ * 2. If you are an ADMIN -> It sends you to the Orders page (dashboard).
+ * 3. If you are a CUSTOMER -> It shows you the delicious Pizza Homepage.
  */
 
 import { getServerSession } from "next-auth/next";
@@ -38,16 +17,10 @@ import { authOptions } from "./api/auth/[...nextauth]/authOptions";
 
 /**
  * Home Component
- * 
- * Server-rendered landing page that requires user authentication
- * Composes multiple section components for comprehensive restaurant overview
- * 
- * @async
- * @function
- * 
- * @returns {Promise<JSX.Element>} Complete home page with all sections
- * 
- * @throws {Redirect} Redirects to login page if user is not authenticated
+ * Server-rendered landing page. Redirects based on user role:
+ * - Unauthenticated -> Login
+ * - Admin -> Admin Dashboard
+ * - Customer -> Homepage
  */
 export default async function Home() {
   /**

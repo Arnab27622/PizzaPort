@@ -1,3 +1,13 @@
+/**
+ * This is the Admin Menu Management Page.
+ * 
+ * Admins use this page to:
+ * 1. View all menu items in a grid.
+ * 2. Add new items (using the "+ New Item" button).
+ * 3. Edit existing items (change price, image, etc.).
+ * 4. Delete items that no longer sell.
+ */
+
 "use client";
 
 import React, { useState, useCallback, useMemo, useEffect } from "react";

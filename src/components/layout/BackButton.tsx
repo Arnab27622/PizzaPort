@@ -5,22 +5,8 @@ import React from 'react';
 import { BackButtonProps } from '@/types/common';
 
 /**
- * BackButton Component
- * 
- * Reusable back navigation button with responsive styling
- * Provides consistent navigation experience across all pages
- * 
- * @component
- * @example
- * <BackButton />
- * <BackButton label="Back to Menu" />
- * 
- * @features
- * - Responsive sizing for all devices
- * - Accessibility support with proper ARIA labels
- * - Smooth hover transitions
- * - Mobile-friendly touch targets
- * - Keyboard navigation support
+ * A simple "Back" button that takes you to the previous page.
+ * You can customize the text by passing a different label.
  */
 export default function BackButton({
   className = '',

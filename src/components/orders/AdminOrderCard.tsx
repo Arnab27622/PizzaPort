@@ -1,3 +1,9 @@
+/**
+ * This card is used by Admins to view a summary of an order.
+ * It shows key info like Order ID, Customer Name, Address, and Total Price.
+ * Admins can also quickly change the order status (e.g., to "Preparing") or cancel it directly from this card.
+ */
+
 import React from "react";
 import Link from "next/link";
 import LocationIcon from "@/components/icons/LocationIcon";
@@ -6,11 +12,11 @@ import { Order, OrderStatus, STATUS_COLORS } from "@/types/order";
 import OrderStatusSelector from "./OrderStatusSelector";
 
 interface AdminOrderCardProps {
-    order: Order;
-    isUpdating: boolean;
-    isCanceling: boolean;
-    onStatusChange: (orderId: string, status: OrderStatus, e: React.ChangeEvent<HTMLSelectElement>) => void;
-    onCancel: (orderId: string, e: React.MouseEvent) => void;
+    order: Order; // The order to display
+    isUpdating: boolean; // True if status is currently being saved
+    isCanceling: boolean; // True if order is currently being canceled
+    onStatusChange: (orderId: string, status: OrderStatus, e: React.ChangeEvent<HTMLSelectElement>) => void; // Function to update status
+    onCancel: (orderId: string, e: React.MouseEvent) => void; // Function to cancel order
 }
 
 const AdminOrderCard: React.FC<AdminOrderCardProps> = ({

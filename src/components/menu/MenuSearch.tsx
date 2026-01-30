@@ -1,17 +1,27 @@
+"use client";
+
+/**
+ * A simple search bar for the menu.
+ * It lets users type text to filter items (e.g., type "Pepperoni" to find it).
+ */
+
 import React from "react";
 import SearchIcon from "@/components/icons/SearchIcon";
 
 interface MenuSearchProps {
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    value: string; // The current text in the search box
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; // Function called when text changes
 }
 
 const MenuSearch: React.FC<MenuSearchProps> = ({ value, onChange }) => {
     return (
         <div className="mb-6 max-w-md mx-auto relative">
+            {/* Search Icon */}
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-amber-500/50">
                 <SearchIcon />
             </div>
+
+            {/* Input Field */}
             <input
                 type="text"
                 placeholder="Search for pizza..."
@@ -25,3 +35,4 @@ const MenuSearch: React.FC<MenuSearchProps> = ({ value, onChange }) => {
 };
 
 export default MenuSearch;
+

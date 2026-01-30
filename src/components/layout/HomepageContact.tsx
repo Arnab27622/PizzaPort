@@ -12,35 +12,18 @@ import InstagramIcon from '../icons/InstagramIcon';
 import EmailIcon from '../icons/EmailIcon';
 
 /**
- * CSS class names for consistent styling across form elements
- * @constant {Object}
+ * CSS styles for the input and button elements.
  */
 const inputStyles = "w-full p-2 bg-gradient-to-br from-[#2c1a0d] to-[#1a1108] border border-amber-900 text-amber-100 rounded";
 const buttonStyles = "px-6 py-3 rounded-lg transition inline-flex gap-2 items-center justify-center";
 
 /**
- * HomepageContact component for displaying contact information and contact form
- * 
- * @component
- * @description 
- * - Provides contact information with direct call/email buttons
- * - Includes a contact form with validation and submission handling
- * - Displays social media links and business information
- * - Features toast notifications for user feedback
- * - Memoized for performance optimization
- * 
- * @example
- * return <HomepageContact />
- * 
- * @returns {JSX.Element} Contact section with form and contact information
+ * HomepageContact component
+ * Shows our phone, email, and social links, along with a "Send us a message" form.
  */
 function HomepageContact() {
     /**
-     * State for form data
-     * @state {Object} formState
-     * @property {string} name - User's name
-     * @property {string} email - User's email address
-     * @property {string} message - User's message content
+     * State for form data (Name, Email, Message).
      */
     const [formState, setFormState] = useState({ name: '', email: '', message: '' });
 
@@ -57,10 +40,7 @@ function HomepageContact() {
     const [loading, setLoading] = useState(false);
 
     /**
-     * Handles form input changes and updates form state
-     * @function handleChange
-     * @param {React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>} e - Input change event
-     * @returns {void}
+     * Updates the form text when the user types.
      */
     const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -68,18 +48,7 @@ function HomepageContact() {
     }, []);
 
     /**
-     * Handles form submission with validation and email sending
-     * @function handleSubmit
-     * @async
-     * @param {React.FormEvent} e - Form submission event
-     * @returns {Promise<void>}
-     * 
-     * @description
-     * - Validates all form fields
-     * - Shows toast notifications for validation errors
-     * - Sends email via sendEmail utility
-     * - Handles success/error states with toast notifications
-     * - Resets form on successful submission
+     * Checks if the form is valid, then sends the email.
      */
     const handleSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
@@ -118,9 +87,7 @@ function HomepageContact() {
     }, [formState]);
 
     /**
-     * Contact action buttons configuration
-     * @constant {Array}
-     * @memoized
+     * List of contact buttons (Call and Email).
      */
     const contactButtons = useMemo(() => [
         {
@@ -138,9 +105,7 @@ function HomepageContact() {
     ], []);
 
     /**
-     * Social media links configuration
-     * @constant {Array}
-     * @memoized
+     * List of social media links.
      */
     const socialLinks = useMemo(() => [
         { href: "https://www.instagram.com/pizzaport", label: "Instagram", icon: <InstagramIcon /> },

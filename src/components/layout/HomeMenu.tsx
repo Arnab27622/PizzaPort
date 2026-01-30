@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * This section on the home page shows the "Best Sellers" or featured menu items.
+ * It automatically fetches the top items from the server and displays them.
+ */
+
 import React, { useState, useCallback } from 'react';
 import useSWR from 'swr';
 import SectionHeader from './SectionHeader';
@@ -11,15 +16,17 @@ import SharedImageModal from '../common/SharedImageModal';
 
 import { MenuItem } from '@/types/menu';
 
+// Helper function to fetch data from a URL
 const fetcher = (url: string) => fetch(url).then(res => {
     if (!res.ok) throw new Error('Failed to fetch data');
     return res.json();
 });
 
 function HomeMenu() {
+    // Fetch bestsellers from the API
     const { data: menuItems = [], error, isLoading } = useSWR<MenuItem[]>('/api/menuitem/bestsellers', fetcher, {
-        refreshInterval: 120000,
-        revalidateOnFocus: false,
+        refreshInterval: 120000, // Refresh every 2 minutes
+        revalidateOnFocus: false, // Don't refresh just because the user clicked the window
     });
 
     const [fullImageUrl, setFullImageUrl] = useState<string | null>(null);
@@ -28,6 +35,7 @@ function HomeMenu() {
         setFullImageUrl(null);
     }, []);
 
+    // Show spinner while loading
     if (isLoading) {
         return (
             <section className='px-4 py-12'>
@@ -42,6 +50,7 @@ function HomeMenu() {
         );
     }
 
+    // Show error message if fetch fails
     if (error) {
         return (
             <section className='px-4 py-12'>
@@ -63,6 +72,7 @@ function HomeMenu() {
             <div className='relative max-w-6xl mx-auto'>
                 <SectionHeader subHeader="Check out" mainHeader="Our Best Sellers" />
 
+                {/* Grid of menu items */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     {menuItems.map(item => (
                         <MenuItemCard
@@ -83,6 +93,7 @@ function HomeMenu() {
                     </Link>
                 </div>
 
+                {/* Modal for viewing images full screen */}
                 <SharedImageModal imageUrl={fullImageUrl} onClose={closeModal} />
             </div>
         </section>

@@ -1,9 +1,15 @@
+/**
+ * This component is a popup form used to CREATE or EDIT a discount coupon.
+ * It handles all the fields like code, discount amount, expiry date, etc.
+ * When submitted, it sends the data to the server to save.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { CouponFormProps } from '@/types/coupon';
 import { toast } from 'react-toastify';
 
 export default function CouponForm({ coupon, onClose, onSuccess }: CouponFormProps) {
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false); // Spinner while saving
     const [formData, setFormData] = useState({
         code: '',
         discountType: 'percentage', // 'percentage' | 'fixed'
@@ -15,6 +21,9 @@ export default function CouponForm({ coupon, onClose, onSuccess }: CouponFormPro
         isActive: true
     });
 
+    /**
+     * If we are EDITING an existing coupon, fill the form with its data.
+     */
     useEffect(() => {
         if (coupon) {
             setFormData({
@@ -30,6 +39,7 @@ export default function CouponForm({ coupon, onClose, onSuccess }: CouponFormPro
         }
     }, [coupon]);
 
+    // Handles user typing in the form fields
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
         if (type === 'checkbox') {
@@ -40,12 +50,13 @@ export default function CouponForm({ coupon, onClose, onSuccess }: CouponFormPro
         }
     };
 
+    // Submits the form to the server
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
 
         try {
-            const method = coupon ? 'PUT' : 'POST';
+            const method = coupon ? 'PUT' : 'POST'; // Use PUT for update, POST for create
             const body = {
                 ...formData,
                 id: coupon?._id,
@@ -239,3 +250,4 @@ export default function CouponForm({ coupon, onClose, onSuccess }: CouponFormPro
         </div>
     );
 }
+

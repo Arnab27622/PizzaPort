@@ -17,54 +17,7 @@ export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/register
- * Handles user registration by creating a new user account
- * 
- * This endpoint validates user input, checks for existing users, and creates new user accounts
- * Uses Mongoose ODM for MongoDB operations and includes proper error handling
- * 
- * @param {NextRequest} request - The incoming request containing user registration data
- * 
- * @requestBody {Object} data - User registration data
- * @requestBody {string} data.name - User's full name
- * @requestBody {string} data.email - User's email address (used for authentication)
- * @requestBody {string} data.password - User's password (will be hashed by User model)
- * 
- * @returns {Promise<NextResponse>}
- *   Success: { success: true, userId: string } with 201 status
- *   Client Error: { error: 'Email already exists' } with 400 status
- *   Server Error: { error: string } with 500 status
- * 
- * @throws {Error} Database connection errors, validation errors, environment variable issues
- * 
- * @example
- * // Successful registration
- * POST /api/register
- * Request Body:
- * {
- *   "name": "John Doe",
- *   "email": "john@example.com",
- *   "password": "securepassword123"
- * }
- * 
- * Response: 201
- * {
- *   "success": true,
- *   "userId": "67a1b2c3d4e5f67890123456"
- * }
- * 
- * @example
- * // Email already exists
- * POST /api/register → 400
- * {
- *   "error": "Email already exists"
- * }
- * 
- * @example
- * // Server error
- * POST /api/register → 500
- * {
- *   "error": "Registration failed"
- * }
+ * Handles user registration by creating a new user account.
  */
 export async function POST(request: NextRequest) {
     try {

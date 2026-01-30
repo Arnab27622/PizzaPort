@@ -1,10 +1,15 @@
+/**
+ * The top section of the Order Detail page.
+ * It shows the big "Order #123" title and the current status (e.g., "Preparing").
+ */
+
 import React from "react";
 import OrderStatusBadge from "./OrderStatusBadge";
 import { Order, OrderStatus } from "@/types/order";
 import { formatDate } from "@/lib/formatters";
 
 interface OrderHeaderProps {
-    order: Order;
+    order: Order; // The order object containing ID, status, and date
 }
 
 const OrderHeader: React.FC<OrderHeaderProps> = ({ order }) => {

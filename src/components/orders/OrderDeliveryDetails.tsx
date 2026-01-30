@@ -1,3 +1,8 @@
+/**
+ * Shows where the order should be delivered.
+ * Includes Customer Name, Email, and the full Address.
+ */
+
 import React from "react";
 
 interface OrderDeliveryDetailsProps {

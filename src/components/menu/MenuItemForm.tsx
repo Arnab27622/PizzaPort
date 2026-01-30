@@ -1,3 +1,8 @@
+/**
+ * This component is a big form that Admins use to add new Pizzas or edit existing ones.
+ * It lets them change the name, price, description, image, sizes, and extra toppings.
+ */
+
 import React, { useEffect } from 'react';
 import Image from 'next/image';
 import { MenuItemFormProps } from '@/types/menu';
@@ -5,6 +10,7 @@ import { useMenuItemForm } from '@/hooks/useMenuItemForm';
 import MenuItemOptionFields from './MenuItemOptionFields';
 
 export default function MenuItemForm({ item, onClose, onSuccess }: MenuItemFormProps) {
+    // This custom hook handles all the form logic (typing, uploading images, saving)
     const {
         form,
         isSubmitting,
@@ -17,11 +23,12 @@ export default function MenuItemForm({ item, onClose, onSuccess }: MenuItemFormP
         handleSubmit
     } = useMenuItemForm({ onSuccess, onClose });
 
+    // If we are editing an existing item, load its data into the form
     useEffect(() => {
         initializeForm(item || undefined);
     }, [item, initializeForm]);
 
-    // Handle ESC key to close
+    // Handle ESC key to close the form
     useEffect(() => {
         const handleEsc = (e: KeyboardEvent) => {
             if (e.key === 'Escape') onClose();
@@ -198,3 +205,4 @@ export default function MenuItemForm({ item, onClose, onSuccess }: MenuItemFormP
         </div>
     );
 }
+

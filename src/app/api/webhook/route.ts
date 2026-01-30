@@ -19,43 +19,7 @@ if (!WEBHOOK_SECRET) {
 
 /**
  * POST /api/webhooks/razorpay
- * Handles Razorpay webhook events for real-time payment status updates
- * 
- * This endpoint processes asynchronous payment notifications from Razorpay:
- * - Payment captured (successful payments)
- * - Payment failed (failed payment attempts)
- * - Other payment lifecycle events
- * 
- * Webhooks provide reliable payment status updates independent of client-side verification.
- * 
- * @param {NextRequest} req - The incoming webhook request with raw body
- * 
- * @headers {string} x-razorpay-signature - HMAC signature for webhook verification
- * 
- * @returns {Promise<NextResponse>}
- *   Success: { success: true }
- *   Missing Signature: { success: false, error: "Missing signature" } with 400 status
- *   Signature Mismatch: { success: false, error: "Signature mismatch" } with 400 status
- *   Processing Error: { success: false, error: "Processing error" } with 500 status
- * 
- * @security Webhook verification is critical - prevents spoofed payment notifications
- * 
- * @example
- * // Webhook payload structure
- * {
- *   "event": "payment.captured",
- *   "payload": {
- *     "payment": {
- *       "entity": {
- *         "order_id": "order_123456",
- *         "status": "captured"
- *       }
- *     }
- *   }
- * }
- * 
- * @note Webhooks provide backup verification if client-side verification fails
- * @important Always verify webhook signatures to prevent fake payment notifications
+ * Handles Razorpay webhook events for real-time payment status updates.
  */
 export async function POST(req: NextRequest) {
     /**

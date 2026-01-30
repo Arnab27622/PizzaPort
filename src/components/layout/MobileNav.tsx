@@ -1,3 +1,9 @@
+/**
+ * This component displays the menu for mobile devices (Phones).
+ * It slides open when the hamburger button is clicked.
+ * It shows the same links as the desktop menu but in a vertical list.
+ */
+
 import React from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -122,3 +128,4 @@ export default function MobileNav({
         </AnimatePresence>
     );
 }
+

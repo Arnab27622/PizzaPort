@@ -4,22 +4,8 @@ import React from 'react';
 import { ConfirmModalProps } from '@/types/common';
 
 /**
- * A reusable confirmation modal component for admin actions
- * 
- * @component
- * @param {ConfirmModalProps} props - Component properties
- * @param {boolean} props.show - Controls modal visibility
- * @param {() => void} props.onClose - Callback when modal is closed/cancelled
- * @param {() => void} props.onConfirm - Callback when action is confirmed
- * @param {string} props.message - The confirmation message to display
- * 
- * @example
- * <ConfirmModal
- *   show={isModalVisible}
- *   onClose={handleClose}
- *   onConfirm={handleConfirmAction}
- *   message="Are you sure you want to perform this action?"
- * />
+ * A confirmation popup for admin actions (like banning users or changing roles).
+ * Shows Cancel and Confirm buttons.
  */
 export default function ConfirmModal({ show, onClose, onConfirm, message }: ConfirmModalProps) {
     // Don't render if not visible

@@ -16,57 +16,24 @@ import ShieldIcon from '@/components/icons/ShieldIcon';
 import GoogleIcon from '@/components/icons/GoogleIcon';
 
 /**
- * Login Form Validation Schema
+ * This is the Login Page.
  * 
- * Defines form validation rules using Zod schema validation
- * Ensures data integrity and provides user-friendly error messages
+ * It allows users to sign in to their account.
+ * You can login with:
+ * 1. Email and Password.
+ * 2. Google Account (one-click login).
  */
+
+// Validation rules for the login form (Email required, Password > 6 chars)
 const LoginSchema = z.object({
   email: z.string()
-    .min(1, 'Email is required')                    // Required field validation
-    .email('Invalid email address'),               // Email format validation
+    .min(1, 'Email is required')
+    .email('Invalid email address'),
   password: z.string()
-    .min(6, 'Password must be at least 6 characters'), // Minimum length requirement
+    .min(6, 'Password must be at least 6 characters'),
 });
 
-/**
- * Type Inference from Zod Schema
- * 
- * Automatically generates TypeScript types from validation schema
- * Ensures type safety throughout the form handling logic
- */
 type LoginInput = z.infer<typeof LoginSchema>;
-
-/**
- * LoginPage Component
- * 
- * Authentication interface providing both email/password and Google OAuth login
- * Features responsive design, form validation, and secure authentication flows
- * 
- * @component
- * @example
- * <LoginPage />
- * 
- * @features
- * - Email/password authentication with validation
- * - Google OAuth integration
- * - Password visibility toggle
- * - Form error handling with user-friendly messages
- * - Responsive two-column layout
- * - Loading states and disabled form during submission
- * 
- * @security
- * - Client-side form validation
- * - Secure credential handling via NextAuth
- * - Protected against CSRF through NextAuth
- * - Error message sanitization
- * 
- * @accessibility
- * - ARIA labels for form fields
- * - Semantic HTML structure
- * - Keyboard navigation support
- * - Screen reader compatible
- */
 function LoginPage() {
   /**
    * Router instance for post-login navigation
@@ -92,21 +59,14 @@ function LoginPage() {
 
   /**
    * Component State Management
-   * 
-   * @state showPwd - Toggles password visibility
-   * @state isGoogleSignIn - Tracks Google OAuth submission state
+   * Tracks password visibility and Google sign-in status.
    */
   const [showPwd, setShowPwd] = useState(false);
   const [isGoogleSignIn, setIsGoogleSignIn] = useState(false);
 
   /**
    * Email/Password Login Handler
-   * 
-   * Processes credential-based authentication through NextAuth
-   * Handles both success and error states with appropriate user feedback
-   * 
-   * @param {LoginInput} data - Validated form data from user input
-   * @throws {Error} Authentication errors from NextAuth provider
+   * Logs the user in with their email and password using NextAuth.
    */
   const onSubmit = async (data: LoginInput) => {
     // Clear previous server errors before new submission
@@ -165,9 +125,7 @@ function LoginPage() {
 
   /**
    * Google OAuth Login Handler
-   * 
-   * Initiates Google OAuth authentication flow
-   * Handles loading state and error scenarios
+   * Logs the user in using their Google account.
    */
   const handleGoogleSignIn = async () => {
     setIsGoogleSignIn(true);

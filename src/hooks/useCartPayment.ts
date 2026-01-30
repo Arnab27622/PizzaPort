@@ -1,10 +1,19 @@
+/**
+ * This custom hook handles the entire checkout and payment process.
+ * It talks to our server to create an order and then opens the Razorpay
+ * payment window for the user.
+ */
+
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { UseCartPaymentProps } from '@/types/cart';
 import { RazorpayResponse, RazorpayOptions } from '@/types/payment';
 
-
+/**
+ * useCartPayment Hook
+ * Takes all the checkout data (cart, address, user info) and handles payment processing.
+ */
 export function useCartPayment({
     cartProducts,
     address,
@@ -14,14 +23,19 @@ export function useCartPayment({
     couponCode,
     discountAmount
 }: UseCartPaymentProps) {
-    const [isProcessing, setIsProcessing] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false); // True when payment logic is running
     const router = useRouter();
 
+    /**
+     * The main function called when the user clicks "Pay Now".
+     */
     const handleSubmitOrder = useCallback(async () => {
+        // Prevent submission if cart is empty or address is missing
         if (cartProducts.length === 0 || !address.trim()) return;
 
         setIsProcessing(true);
         try {
+            // 1. Prepare the cart data for the server
             const trimmedCart = cartProducts.map((item) => ({
                 _id: item._id,
                 name: item.name,
@@ -36,6 +50,7 @@ export function useCartPayment({
                     : [],
             }));
 
+            // 2. Create an order on our server
             const resp = await fetch("/api/razorpay", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -53,6 +68,7 @@ export function useCartPayment({
 
             const order = await resp.json();
 
+            // 3. Ensure Razorpay is ready
             if (!order?.razorpayOrderId || typeof order.amount !== "number") {
                 toast.error("Failed to create Razorpay order");
                 return;
@@ -63,6 +79,7 @@ export function useCartPayment({
                 return;
             }
 
+            // 4. Configure the Razorpay payment window
             const options: RazorpayOptions = {
                 key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
                 amount: order.amount,
@@ -71,6 +88,7 @@ export function useCartPayment({
                 description: "Order Payment",
                 order_id: order.razorpayOrderId,
                 handler: async function (response: RazorpayResponse) {
+                    // This runs AFTER the user pays. We must verify it on our server.
                     try {
                         const verifyResp = await fetch("/api/verify-payment", {
                             method: "POST",
@@ -86,8 +104,8 @@ export function useCartPayment({
 
                         if (verifyResult.success) {
                             toast.success("Payment verified and successful!");
-                            clearCart();
-                            router.push(`/user-orders/${order.razorpayOrderId}`);
+                            clearCart(); // Empty the cart
+                            router.push(`/user-orders/${order.razorpayOrderId}`); // Go to the order tracking page
                         } else {
                             toast.error("Payment verification failed!");
                         }
@@ -103,6 +121,7 @@ export function useCartPayment({
                 theme: { color: "#F59E0B" },
             };
 
+            // 5. Open the payment window
             const rzp = new window.Razorpay(options);
 
             rzp.on("payment.failed", function (response) {
@@ -120,3 +139,4 @@ export function useCartPayment({
 
     return { handleSubmitOrder, isProcessing };
 }
+

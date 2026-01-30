@@ -5,39 +5,8 @@ import { authOptions } from "../auth/[...nextauth]/authOptions";
 
 /**
  * GET /api/admin/users
- * Retrieves a list of all users in the system (Admin only)
- * 
- * This endpoint provides comprehensive user management data for administrative purposes.
- * It returns all user accounts with essential profile and account status information.
- * 
- * @returns {Promise<NextResponse>} 
- *   Success: Array of user objects with projected fields
- *   Unauthorized: 401 if not logged in
- *   Forbidden: 403 if not an admin
- *   Error: Internal server error (handled by Next.js)
- * 
- * @security Admin access required
- * 
- * @example
- * // Successful response
- * GET /api/admin/users → 200
- * [
- *   {
- *     "_id": "67a1b2c3d4e5f67890123456",
- *     "name": "John Doe",
- *     "email": "john@example.com",
- *     "image": "/uploads/profile.jpg",
- *     "gender": "male",
- *     "address": "123 Main St",
- *     "admin": false,
- *     "banned": false,
- *     "createdAt": "2024-01-15T10:30:00.000Z",
- *     "updatedAt": "2024-01-20T14:22:00.000Z"
- *   }
- * ]
- * 
- * @data_security Only returns non-sensitive user fields
- * @performance Uses projection to limit returned fields and improve response time
+ * Retrieves a list of all users in the system (Admin only).
+ * Returns essential profile and account status information.
  */
 export async function GET() {
   const session = await getServerSession(authOptions);

@@ -13,15 +13,7 @@ const fetcher = (url: string) => fetch(url).then(res => {
     return res.json();
 });
 
-/**
- * Date Range Calculator
- * 
- * Computes start date for sales data based on selected filter
- * Provides consistent date calculations across the application
- * 
- * @param {FilterType} filter - Selected time period filter
- * @returns {Date} Start date for data query
- */
+// Calculate the start date based on the selected filter (today, 7 days, month, all-time)
 function computeFrom(filter: FilterType): Date {
     const now = new Date();
     if (filter === 'today') return new Date(now.setHours(0, 0, 0, 0));          // Start of current day
@@ -30,15 +22,7 @@ function computeFrom(filter: FilterType): Date {
     return new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);                      // 7 days ago from now
 }
 
-/**
- * Currency Formatter for INR
- * 
- * Formats numerical amounts to Indian Rupees display format
- * Supports proper localization and consistent currency display
- * 
- * @param {number} amount - Numerical amount to format
- * @returns {string} Locale-formatted currency string
- */
+// Format numbers as Indian Rupees (₹)
 const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat('en-IN', {
         style: 'currency',
@@ -49,52 +33,16 @@ const formatCurrency = (amount: number): string => {
 };
 
 /**
- * SalesPage Component
+ * This is the Admin Sales Report Page.
  * 
- * Comprehensive sales analytics dashboard for restaurant administrators
- * Provides real-time business intelligence with visual data representations
- * 
- * @component
- * @features
- * - Multi-period sales analysis (today, 7 days, month)
- * - Key performance indicator metrics display
- * - Interactive charts and data visualizations
- * - Real-time data updates with intelligent caching
- * - Responsive design for all device sizes
- * - Role-based access control
- * 
- * @security
- * - Admin-only access enforcement through useIsAdmin hook
- * - Protected API endpoints with server-side validation
- * - No sensitive data exposure in client-side rendering
- * - Automatic redirection for unauthorized users
- * 
- * @performance
- * - SWR caching with background revalidation for optimal performance
- * - Memoized calculations prevent unnecessary re-renders
- * - Efficient date computations with proper dependency management
- * - Conditional data fetching based on authentication status
- * 
- * @user_experience
- * - Intuitive time period filtering with visual feedback
- * - Comprehensive loading and error states
- * - Accessible interface with proper ARIA labels
- * - Clear visual hierarchy with metric cards and charts
- * - Responsive grid layouts for all screen sizes
- * 
- * @example
- * // Renders complete sales analytics dashboard for admins
- * <SalesPage />
+ * It shows charts and numbers about how the business is doing:
+ * - Total Revenue (Today, This Month, All Time).
+ * - Number of Orders.
+ * - Best Selling pizzas.
  */
 export default function SalesPage() {
     const router = useRouter();
 
-    /**
-     * Admin Access Control Hook
-     * 
-     * Validates user permissions before rendering sales analytics
-     * Provides loading state during authentication verification
-     */
     const { isAdmin, isLoading: isAdminLoading } = useIsAdmin();
 
     /**
@@ -112,15 +60,7 @@ export default function SalesPage() {
      */
     const from = useMemo(() => computeFrom(filter).toISOString(), [filter]);
 
-    /**
-     * Sales Data Fetching with SWR
-     * 
-     * Intelligent data fetching with caching and error handling
-     * Conditionally fetches data only when admin access is confirmed
-     * 
-     * @config revalidateOnFocus:false - Prevents disruptive refetching
-     * @config onError - Comprehensive error logging for debugging
-     */
+    // Fetch sales data from API
     const { data: report, isLoading: swrLoading, error } = useSWR<SalesReport>(
         isAdmin ? `/api/sales?from=${from}` : null,
         fetcher,
@@ -130,24 +70,14 @@ export default function SalesPage() {
         }
     );
 
-    /**
-     * Admin Access Enforcement Effect
-     * 
-     * Redirects non-admin users to home page automatically
-     * Prevents unauthorized access to sensitive sales data
-     */
+    // Redirect non-admins to home page
     useEffect(() => {
         if (!isAdminLoading && !isAdmin) {
             router.replace('/');
         }
     }, [isAdminLoading, isAdmin, router]);
 
-    /**
-     * Filter Change Handler
-     * 
-     * Updates time period filter with callback optimization
-     * Triggers automatic data refetch through SWR dependency
-     */
+    // Handle filter change (today, 7 days, month, all-time)
     const handleFilterChange = useCallback((newFilter: FilterType) => {
         setFilter(newFilter);
     }, []);

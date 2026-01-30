@@ -6,23 +6,8 @@ import { authOptions } from "../../auth/[...nextauth]/authOptions";
 
 /**
  * GET /api/orders/[id]
- * Retrieves a specific order by its ID
- * 
- * This endpoint fetches a single order using the provided order ID from the URL parameters.
- * It converts MongoDB-specific types (ObjectId, Date) to serializable formats for JSON response.
- * 
- * @param {Request} req - The incoming request object
- * @param {Object} context - Context object containing route parameters
- * @param {Promise<{id: string}>} context.params - Promise containing the route parameters
- * 
- * @returns {Promise<NextResponse>}
- *   Success: JSON object of the requested order with serialized fields
- *   Unauthorized: 401 if not logged in
- *   Forbidden: 403 if user is not authorized to see this order
- *   Not Found: 404 status with error message
- *   Error: 500 status with generic server error message
- * 
- * @security Admins can access any order. Regular users can only access their own orders.
+ * Retrieves a specific order by its ID.
+ * Admins can access any order; regular users can only see their own.
  */
 export async function GET(
     req: Request,
@@ -79,6 +64,7 @@ export async function GET(
          * - Date objects → ISO string format
          * - Excludes internal security fields (securityHash)
          */
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { securityHash: _, ...rest } = order;
         const safe = {
             ...rest,

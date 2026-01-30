@@ -1,8 +1,15 @@
+/**
+ * This component displays all the coupons in a nice grid layout.
+ * Each card shows the coupon code, discount details, and active status.
+ * It also provides buttons to Edit or Delete each coupon.
+ */
+
 import React from 'react';
 import { CouponListProps } from '@/types/coupon';
 import TrashIcon from '../icons/TrashIcon';
 
 export default function CouponList({ coupons, onEdit, onDelete, isDeletingId }: CouponListProps) {
+    // If there are no coupons, show a friendly message
     if (!coupons.length) {
         return (
             <div className="text-center py-20 bg-[#1a1108]/50 rounded-xl border border-amber-900/30">
@@ -80,3 +87,4 @@ export default function CouponList({ coupons, onEdit, onDelete, isDeletingId }: 
         </div>
     );
 }
+

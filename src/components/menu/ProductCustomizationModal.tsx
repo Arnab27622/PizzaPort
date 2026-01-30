@@ -1,3 +1,9 @@
+/**
+ * A popup window that lets customers customize their order.
+ * They can choose options like Size (Small, Medium, Large) and Extra Toppings.
+ * It appears when they click on a menu item.
+ */
+
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Cart from '@/components/icons/Cart';
@@ -120,3 +126,4 @@ export default function ProductCustomizationModal({
         </div>
     );
 }
+

@@ -1,9 +1,16 @@
+/**
+ * This component shows the list of all items the user currently has in their shopping cart.
+ * It displays the image, name, size, toppings, and price for each item.
+ * Users can also remove items from here.
+ */
+
 import React, { useCallback } from 'react';
 import Image from 'next/image';
 import TrashIcon from '@/components/icons/TrashIcon';
 import { GroupedCartItem, CartItemListProps } from '@/types/cart';
 
 export default function CartItemList({ groupedItems, onRemove }: CartItemListProps) {
+    // Calculates the total price for a single item (Base + Size + Extras)
     const getItemTotal = useCallback((item: GroupedCartItem['item']) => {
         const sizePrice = item.size?.extraPrice ?? 0;
         const extrasPrice = item.extras?.reduce((s, e) => s + e.extraPrice, 0) ?? 0;
@@ -74,3 +81,4 @@ export default function CartItemList({ groupedItems, onRemove }: CartItemListPro
         </ul>
     );
 }
+

@@ -44,8 +44,7 @@ import { MenuItemDB } from '@/types/menu';
 
 /**
  * Database Collection Helper
- * Establishes connection and returns the menu items collection
- * @returns {Promise<Collection<MenuItemDB>>} MongoDB collection instance
+ * Establishes connection and returns the menu items collection.
  */
 async function getCollection() {
     const client = await clientPromise;
@@ -56,8 +55,7 @@ async function getCollection() {
 
 /**
  * GET /api/menu-items
- * Retrieves all menu items from database
- * @returns {Promise<NextResponse>} JSON array of menu items, sorted by creation date (newest first)
+ * Retrieves all menu items from database, sorted by newest first.
  */
 export async function GET() {
     try {
@@ -72,9 +70,7 @@ export async function GET() {
 
 /**
  * POST /api/menu-items
- * Creates a new menu item with optional image upload
- * @param {NextRequest} req - Request object containing FormData
- * @returns {Promise<NextResponse>} Newly created menu item with _id
+ * Creates a new menu item with optional image upload.
  */
 export async function POST(req: NextRequest) {
     const session = await getServerSession(authOptions);
@@ -159,9 +155,7 @@ export async function POST(req: NextRequest) {
 
 /**
  * PUT /api/menu-items
- * Updates an existing menu item with optional image replacement
- * @param {NextRequest} req - Request object containing FormData with item ID and updates
- * @returns {Promise<NextResponse>} Updated menu item or error response
+ * Updates an existing menu item with optional image replacement.
  */
 export async function PUT(req: NextRequest) {
     const session = await getServerSession(authOptions);
@@ -243,9 +237,7 @@ export async function PUT(req: NextRequest) {
 
 /**
  * DELETE /api/menu-items
- * Removes a menu item from the database and deletes its image from Cloudinary
- * @param {NextRequest} req - Request object containing JSON with item ID
- * @returns {Promise<NextResponse>} Success confirmation or error response
+ * Removes a menu item from the database and deletes its image from Cloudinary.
  */
 export async function DELETE(req: NextRequest) {
     const session = await getServerSession(authOptions);

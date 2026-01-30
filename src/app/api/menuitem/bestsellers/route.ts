@@ -8,26 +8,6 @@ import { PAYMENT_STATUS } from '@/types/payment';
  * 
  * This endpoint analyzes order history to determine which menu items
  * are most popular and returns their complete details for display
- * 
- * @returns {Promise<NextResponse>}
- *   Success: Array of top 6 menu items with full details
- *   Error: { error: string } with 500 status
- * 
- * @example
- * // Successful response structure
- * [
- *   {
- *     "_id": "...",
- *     "name": "Margherita Pizza",
- *     "description": "Classic pizza with tomato and mozzarella",
- *     "basePrice": 12.99,
- *     "imageUrl": "https://...",
- *     "sizeOptions": [...],
- *     "extraIngredients": [...],
- *     "totalSold": 45
- *   },
- *   ...
- * ]
  */
 export async function GET() {
     try {
@@ -115,6 +95,7 @@ export async function GET() {
 
         // Ensure we only return 6 items and remove internal analytics data
         const finalResult = sortedBestSellers.slice(0, 6).map(item => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { totalSold, ...rest } = item;
             return rest;
         });

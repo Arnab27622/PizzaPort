@@ -8,7 +8,10 @@ import { useUserOrders } from "@/hooks/useUserOrders";
 import UserOrderCard from "@/components/orders/UserOrderCard";
 
 /**
- * OrdersPage Component
+ * This is the "My Orders" page for customers.
+ * 
+ * It lists all the past orders the user has placed.
+ * They can click on any order to track its status or view details.
  */
 export default function OrdersPage() {
     const router = useRouter();

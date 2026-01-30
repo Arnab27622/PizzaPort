@@ -1,3 +1,9 @@
+/**
+ * This component displays the form where the user confirms their delivery details.
+ * It shows their name and email (which cannot be changed here) and allows them
+ * to enter or auto-detect their delivery address.
+ */
+
 import React from 'react';
 import LocationIcon from '@/components/icons/LocationIcon';
 import LoadingSpinner from '@/components/icons/LoadingSpinner';
@@ -24,6 +30,7 @@ export default function DeliveryForm({
                     readOnly
                     className="w-full px-4 py-2 rounded bg-[#2c1a0d] border border-amber-800 text-gray-300 cursor-not-allowed"
                     aria-readonly="true"
+                    title="You can't change your name here"
                 />
             </div>
 
@@ -36,6 +43,7 @@ export default function DeliveryForm({
                     readOnly
                     className="w-full px-4 py-2 rounded bg-[#2c1a0d] border border-amber-800 text-gray-300 cursor-not-allowed"
                     aria-readonly="true"
+                    title="You can't change your email here"
                 />
             </div>
 
@@ -69,3 +77,4 @@ export default function DeliveryForm({
         </div>
     );
 }
+

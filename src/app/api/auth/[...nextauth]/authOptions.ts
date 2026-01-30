@@ -18,12 +18,8 @@ cloudinary.config({
 
 /**
  * Upload external image to Cloudinary
- * Downloads image from URL and uploads to Cloudinary
- * Used for Google OAuth profile pictures and other external images
- * 
- * @param {string} imageUrl - External image URL to download and upload
- * @param {string} folder - Cloudinary folder path for organization
- * @returns {Promise<string | null>} Cloudinary secure URL or null if failed
+ * Downloads image from URL and uploads to Cloudinary.
+ * Used for Google OAuth profile pictures.
  */
 async function uploadExternalImageToCloudinary(
     imageUrl: string,

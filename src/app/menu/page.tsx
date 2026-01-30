@@ -1,3 +1,13 @@
+/**
+ * This is the public Menu Page for customers.
+ * 
+ * It shows all the delicious food items available for order.
+ * Features:
+ * - Search bar to find items by name (e.g., "Pepperoni").
+ * - Filter buttons for specific categories (e.g., "Beverages").
+ * - Clicking an item opens a popup to see its picture.
+ */
+
 "use client";
 
 import React, { useState, useCallback, useEffect } from "react";
@@ -11,7 +21,6 @@ import MenuSearch from "@/components/menu/MenuSearch";
 import CategoryFilters from "@/components/menu/CategoryFilters";
 import SharedImageModal from "@/components/common/SharedImageModal";
 import { useMenuFiltering } from "@/hooks/useMenuFiltering";
-
 import { MenuItem } from "@/types/menu";
 
 const fetcher = (url: string) => fetch(url).then((res) => {

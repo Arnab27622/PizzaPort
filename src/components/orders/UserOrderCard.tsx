@@ -1,3 +1,8 @@
+/**
+ * This card displays a summary of a past order for a Customer.
+ * It shows the Order ID, Date, Total Price, Status, and a preview of items.
+ */
+
 import React, { useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";

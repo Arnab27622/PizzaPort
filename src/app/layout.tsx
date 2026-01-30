@@ -1,34 +1,12 @@
 /**
- * Root Layout Component
+ * This is the "Root Layout" - the main shell of our entire application.
+ * Every page in the website (Home, Menu, Profile) is wrapped inside this file.
  * 
- * Application shell that wraps all pages with consistent structure
- * Provides global context, navigation, and essential dependencies
- * 
- * @file layout.tsx
- * 
- * @features
- * - Font optimization with Google Fonts preloading
- * - Payment gateway integration (Razorpay)
- * - Global state management with React Context
- * - Progressive loading with top progress indicator
- * - Toast notification system
- * - Dynamic background management
- * 
- * @performance
- * - Font preloading for optimal typography performance
- * - Script optimization with strategic loading priorities
- * - Component-level code splitting and lazy loading
- * - Efficient re-render optimization with proper context structure
- * 
- * @security
- * - Content Security Policy compliance for external scripts
- * - XSS protection through proper React sanitization
- * - Secure authentication context propagation
- * 
- * @seo
- * - Comprehensive metadata for search engine optimization
- * - Semantic HTML structure for accessibility
- * - Open Graph and social media meta tags
+ * What it does:
+ * 1. Sets up the fonts (Sedgwick, Oswald, Open Sans).
+ * 2. Adds the Navbar at the top and Footer at the bottom of every page.
+ * 3. Connects to Global State (AppContext) so we can share data like the Cart across pages.
+ * 4. Loads global styles (CSS) and scripts (like Razorpay for payments).
  */
 
 import type { Metadata } from "next";
@@ -85,11 +63,6 @@ export const metadata: Metadata = {
  * 
  * Wraps entire application with essential providers and global components
  * Implements consistent structure across all application routes
- * 
- * @param {Object} props - Component properties
- * @param {React.ReactNode} props.children - Page content to render
- * 
- * @returns {JSX.Element} Complete application shell with global wrappers
  */
 export default function RootLayout({
   children,

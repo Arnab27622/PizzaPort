@@ -1,3 +1,9 @@
+/**
+ * This custom hook manages the "Order Details" page for a customer.
+ * It fetches the order data, automatically clears the cart after a purchase,
+ * and keeps checking the server for status updates (like "Preparing" or "Out for Delivery").
+ */
+
 import { useContext, useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -5,21 +11,27 @@ import { toast } from "react-toastify";
 import { Order } from "@/types/order";
 import { CartContext } from "@/components/CartProvider";
 
+/**
+ * useUserOrderDetail Hook
+ */
 export function useUserOrderDetail() {
-    const params = useParams<{ id?: string }>();
+    const params = useParams<{ id?: string }>(); // Get the Order ID from the URL
     const orderId = params.id;
     const router = useRouter();
     const { data: session, status: authStatus } = useSession({ required: true });
     const { clearCart } = useContext(CartContext);
 
-    const [order, setOrder] = useState<Order | null>(null);
-    const [loadingOrder, setLoadingOrder] = useState(true);
-    const [statusText, setStatusText] = useState<string>('');
+    const [order, setOrder] = useState<Order | null>(null); // The order data
+    const [loadingOrder, setLoadingOrder] = useState(true); // True while first loading
+    const [statusText, setStatusText] = useState<string>(''); // Current status (e.g., "preparing")
 
-    const hasClearedCart = useRef(false);
-    const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-    const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const hasClearedCart = useRef(false); // To ensure we only empty the cart once per order
+    const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null); // For the automatic status checker
+    const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null); // For retrying if the server is slow
 
+    /**
+     * Fetches the order details from the database.
+     */
     const fetchOrder = useCallback(async (isRetry = false) => {
         if (!orderId) return;
 
@@ -43,7 +55,7 @@ export function useUserOrderDetail() {
             setOrder(data as Order);
             setStatusText(data.status);
 
-            // Clear cart for newly placed orders (one-time operation)
+            // 1. CLEAR CART: If the order was just placed, empty the shopping cart.
             if (data.status === 'placed' && !hasClearedCart.current) {
                 clearCart();
                 hasClearedCart.current = true;
@@ -53,6 +65,7 @@ export function useUserOrderDetail() {
         } catch (err: unknown) {
             console.error('Order fetch error', err);
 
+            // If it fails, try again once after 2 seconds (sometimes database updates are slow)
             if (!isRetry) {
                 if (retryTimeoutRef.current) {
                     clearTimeout(retryTimeoutRef.current);
@@ -67,6 +80,9 @@ export function useUserOrderDetail() {
         }
     }, [orderId, clearCart]);
 
+    /**
+     * Initial startup: Check if user is logged in, then fetch the order.
+     */
     useEffect(() => {
         if (authStatus === 'loading') return;
 
@@ -89,6 +105,10 @@ export function useUserOrderDetail() {
         };
     }, [authStatus, session, router, orderId, fetchOrder]);
 
+    /**
+     * POLLING: Every 10 seconds, check the server to see if the status has changed.
+     * This stops once the order is "delivered" or "canceled".
+     */
     useEffect(() => {
         if (!order || /^(completed|canceled)$/.test(statusText)) return;
 
@@ -103,6 +123,7 @@ export function useUserOrderDetail() {
 
                 const { status: newStatus } = await res.json();
 
+                // If the status changed on the server, update the screen
                 if (newStatus && newStatus !== statusText) {
                     setStatusText(newStatus);
 
@@ -114,7 +135,7 @@ export function useUserOrderDetail() {
             } catch (err) {
                 console.error('Polling failed', err);
             }
-        }, 10_000);
+        }, 10_000); // 10 seconds
 
         return () => {
             if (pollingIntervalRef.current) {
@@ -130,3 +151,4 @@ export function useUserOrderDetail() {
         fetchOrder
     };
 }
+

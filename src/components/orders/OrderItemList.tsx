@@ -1,10 +1,15 @@
+/**
+ * Displays the list of food items in the order.
+ * If the user ordered the same item multiple times (same size/toppings), it groups them together (e.g., "x2 Pepperoni Pizza").
+ */
+
 import React, { useMemo } from "react";
 import Image from "next/image";
 import { OrderItem } from "@/types/order";
 import { formatCurrency } from "@/lib/formatters";
 
 interface OrderItemListProps {
-    items: OrderItem[];
+    items: OrderItem[]; // List of items in the cart
 }
 
 const OrderItemList: React.FC<OrderItemListProps> = ({ items }) => {

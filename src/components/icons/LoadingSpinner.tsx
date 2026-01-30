@@ -1,9 +1,16 @@
 'use client';
 
+/**
+ * A reusable loading spinner component.
+ * It shows a rotating animation to let the user know something is happening in the background.
+ * You can customize how big it is (size) and what color it is.
+ */
+
 import React from 'react';
 import { LoadingSpinnerProps } from '@/types/common';
 
 function LoadingSpinner({ size = 'md', color = 'text-primary', className = '' }: LoadingSpinnerProps) {
+    // Maps simple size names like "sm" or "lg" to actual CSS classes
     const sizeMap = {
         xs: 'w-4 h-4',
         sm: 'w-6 h-6',
@@ -20,6 +27,7 @@ function LoadingSpinner({ size = 'md', color = 'text-primary', className = '' }:
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
             >
+                {/* Custom CSS animations for a smooth spinning effect */}
                 <style>{`
                     .spinner_V8m1{
                         transform-origin: center;
@@ -47,3 +55,4 @@ function LoadingSpinner({ size = 'md', color = 'text-primary', className = '' }:
 }
 
 export default LoadingSpinner
+

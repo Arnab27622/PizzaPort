@@ -1,20 +1,15 @@
 "use client";
 
+/**
+ * The "Hero" section is the first thing users see on the home page.
+ * It features a catchy headline, a picture of a pizza, and buttons to start ordering.
+ */
+
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import Right from "../icons/Right";
 
-/**
- * Hero section component for the main landing page
- * 
- * @component
- * @description The main hero banner featuring a headline, description, call-to-action buttons, and pizza image
- * @example
- * return <Hero />
- * 
- * @returns {JSX.Element} Hero section with text content and visual elements
- */
 function Hero() {
     return (
         <section className="px-4 md:px-8 py-16 md:py-20 flex flex-col lg:flex-row items-center justify-between gap-8 max-w-7xl mx-auto">

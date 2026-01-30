@@ -1,3 +1,9 @@
+/**
+ * This custom hook handles everything for the User Profile page.
+ * It manages the form for updating names, addresses, and profile pictures.
+ * It also has a cool feature to fetch the user's current location using GPS.
+ */
+
 import { useState, useCallback, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -7,6 +13,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ExtendedUser, ProfileFormState } from '@/types/user';
 
+/**
+ * Validation rules for the Profile Form.
+ * We use "Zod" to make sure the user enters valid information.
+ */
 const ProfileSchema = z.object({
     name: z.string().min(1, 'Full Name is required').max(50, 'Name is too long'),
     email: z.string().email('Invalid email address'),
@@ -14,10 +24,15 @@ const ProfileSchema = z.object({
     gender: z.string().min(1, 'Please select a gender'),
 });
 
+/**
+ * useProfile Hook
+ */
 export function useProfile() {
+    // 1. Get the current session (user info) and the update function
     const { data: session, status, update } = useSession({ required: true });
     const router = useRouter();
 
+    // 2. Set up the form handling with react-hook-form
     const {
         register,
         handleSubmit,
@@ -30,13 +45,16 @@ export function useProfile() {
         mode: 'onChange'
     });
 
-    const [preview, setPreview] = useState<string | null>(null);
-    const [uploadingImage, setUploadingImage] = useState(false);
-    const [isFetchingLocation, setIsFetchingLocation] = useState(false);
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [preview, setPreview] = useState<string | null>(null); // Image preview URL
+    const [uploadingImage, setUploadingImage] = useState(false); // Spinner for image upload
+    const [isFetchingLocation, setIsFetchingLocation] = useState(false); // Spinner for GPS
+    const [selectedFile, setSelectedFile] = useState<File | null>(null); // Actual file to upload
 
     const formValues = watch();
 
+    /**
+     * When the user's session is loaded, fill the form with their current data.
+     */
     useEffect(() => {
         if (status === 'authenticated' && session?.user) {
             const user = session.user as ExtendedUser;
@@ -49,6 +67,9 @@ export function useProfile() {
         }
     }, [status, session, reset]);
 
+    /**
+     * Clean up the temporary preview URL to save memory.
+     */
     useEffect(() => {
         return () => {
             if (preview) {
@@ -57,10 +78,14 @@ export function useProfile() {
         };
     }, [preview]);
 
+    /**
+     * Called when the user picks a new profile picture.
+     */
     const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        // Basic safety checks
         if (!file.type.startsWith('image/')) {
             toast.error('Please select an image file');
             return;
@@ -79,6 +104,9 @@ export function useProfile() {
         setPreview(URL.createObjectURL(file));
     }, [preview]);
 
+    /**
+     * USES GPS to find the user's address!
+     */
     const fetchUserLocation = useCallback(async () => {
         if (!navigator.geolocation) {
             toast.error("Geolocation is not supported by your browser");
@@ -87,6 +115,7 @@ export function useProfile() {
 
         setIsFetchingLocation(true);
         try {
+            // Get coordinates (Latitude/Longitude)
             const position = await new Promise<GeolocationPosition>((resolve, reject) => {
                 navigator.geolocation.getCurrentPosition(resolve, reject, {
                     timeout: 10000,
@@ -95,6 +124,8 @@ export function useProfile() {
             });
 
             const { latitude, longitude } = position.coords;
+
+            // Convert coordinates to a real address using a free API (Nominatim)
             const res = await fetch(
                 `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
             );
@@ -103,6 +134,7 @@ export function useProfile() {
 
             const data = await res.json();
             if (data.display_name) {
+                // Update the form field automatically
                 setValue('address', data.display_name, { shouldValidate: true });
                 toast.success("Location fetched successfully");
             }
@@ -114,6 +146,9 @@ export function useProfile() {
         }
     }, [setValue]);
 
+    /**
+     * Submits the updated profile to our server.
+     */
     const onSubmit = useCallback(async (data: ProfileFormState) => {
         try {
             const body = new FormData();
@@ -136,10 +171,12 @@ export function useProfile() {
                 throw new Error(errorData.error || `Server returned ${res.status}`);
             }
 
+            // Tell NextAuth to refresh the user session data
             await update();
             toast.success('Profile updated successfully');
             router.refresh();
 
+            // Clear the temporary file/preview
             if (preview) {
                 URL.revokeObjectURL(preview);
                 setPreview(null);
@@ -168,3 +205,4 @@ export function useProfile() {
         handleSubmit: handleSubmit(onSubmit)
     };
 }
+

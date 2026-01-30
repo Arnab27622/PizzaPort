@@ -1,3 +1,9 @@
+/**
+ * Shows the final bill for the order.
+ * Breakdown includes Subtotal, Tax, Delivery Fee, Discount (if any), and Grand Total.
+ * Also shows if it's Paid or Pending.
+ */
+
 import React from "react";
 import { formatCurrency } from "@/lib/formatters";
 

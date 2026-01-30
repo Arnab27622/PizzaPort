@@ -1,3 +1,10 @@
+/**
+ * This is the Profile Page.
+ * 
+ * It shows the logged-in user's details (Name, Email, Address, etc.).
+ * It uses the <ProfileForm> component to let them edit and save changes.
+ */
+
 'use client';
 
 import React from 'react';

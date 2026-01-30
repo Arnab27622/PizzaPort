@@ -1,3 +1,8 @@
+/**
+ * This helper component renders a list of inputs for "Sizes" or "Key Ingredients".
+ * It allows the Admin to add as many options as they want (e.g., Small, Medium, Large).
+ */
+
 import React from 'react';
 import { MenuItemOptionFieldsProps } from '@/types/menu';
 import TrashIcon from '../icons/TrashIcon';
@@ -51,3 +56,4 @@ export default function MenuItemOptionFields({
         </div>
     );
 }
+
