@@ -106,7 +106,7 @@ export default function CouponsPage() {
 
     if (isAdminLoading || swrLoading) {
         return (
-            <div className="min-h-[80vh] text-card p-6 lg:py-6 lg:px-15 mt-16 max-w-7xl mx-auto">
+            <div className="min-h-[75vh] text-card p-6 lg:py-6 lg:px-15 mt-16 max-w-7xl mx-auto">
                 <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                     <h1 className="text-3xl font-bold heading-border underline text-amber-50">Manage Coupons</h1>
                 </header>
@@ -121,7 +121,7 @@ export default function CouponsPage() {
     if (!isAdmin) return null;
 
     return (
-        <div className="min-h-[80vh] text-card p-6 lg:py-6 lg:px-15 mt-16 max-w-7xl mx-auto">
+        <div className="min-h-[75vh] text-card p-6 lg:py-6 lg:px-15 mt-16 max-w-7xl mx-auto">
             <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                 <h1 className="text-3xl font-bold heading-border underline text-amber-50">Manage Coupons</h1>
                 <div className="flex flex-row justify-between items-center w-full sm:w-auto gap-4">

@@ -178,203 +178,205 @@ function RegisterPage() {
      * - Responsive two-column layout
      */
     return (
-        <section className="mt-5 py-16 px-4">
-            <div className="max-w-6xl mx-auto">
-                <div className="flex flex-col lg:flex-row items-start gap-10">
-                    {/* Marketing & Benefits Column */}
-                    <div className="w-full lg:w-2/5">
-                        <div className="lg:sticky lg:top-24 heading-border">
-                            <h1 className="text-4xl font-bold text-primary mb-4">Create Account</h1>
-                            <p className="text-amber-200 text-lg mb-6">Join PizzaPort for exclusive deals and faster ordering</p>
-                            <div className="mt-8 space-y-4">
-                                {[
-                                    'Exclusive deals',
-                                    'Faster checkout experience',
-                                    'Early access to new menu items',
-                                    'Personalized recommendations',
-                                ].map((text, idx) => (
-                                    <div className="flex items-start" key={idx}>
-                                        <CheckIcon />
-                                        <p className="text-amber-300">{text}</p>
-                                    </div>
-                                ))}
+        <div className="flex-1 grow flex flex-col" style={{ backgroundImage: "url('/auth-bg.png')", backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+            <section className="pt-21 pb-5 px-4">
+                <div className="max-w-6xl mx-auto">
+                    <div className="flex flex-col lg:flex-row items-start gap-10">
+                        {/* Marketing & Benefits Column */}
+                        <div className="w-full lg:w-2/5">
+                            <div className="lg:sticky lg:top-24 heading-border">
+                                <h1 className="text-4xl font-bold text-primary mb-4">Create Account</h1>
+                                <p className="text-amber-200 text-lg mb-6">Join PizzaPort for exclusive deals and faster ordering</p>
+                                <div className="mt-8 space-y-4">
+                                    {[
+                                        'Exclusive deals',
+                                        'Faster checkout experience',
+                                        'Early access to new menu items',
+                                        'Personalized recommendations',
+                                    ].map((text, idx) => (
+                                        <div className="flex items-start" key={idx}>
+                                            <CheckIcon />
+                                            <p className="text-amber-300">{text}</p>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Registration Form Column */}
-                    <div className="w-full lg:w-3/5">
-                        <div className="bg-linear-to-br from-[#2e2e2e] to-[#000000]/80 backdrop-blur-sm border border-amber-900/30 rounded-2xl p-8">
-                            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-                                {/* Full Name Field */}
-                                <div>
-                                    <label htmlFor="name" className="block text-amber-200 mb-2">Full Name</label>
-                                    <input
-                                        {...register('name')}
-                                        id="name"
-                                        type="text"
-                                        disabled={isSubmitting}
-                                        className={inputClasses}
-                                        placeholder="Enter your Name"
-                                        aria-invalid={errors.name ? "true" : "false"}
-                                        aria-describedby={errors.name ? "name-error" : undefined}
-                                    />
-                                    {errors.name && (
-                                        <p id="name-error" className="text-red-500 text-sm mt-1">
-                                            {errors.name.message}
-                                        </p>
-                                    )}
-                                </div>
+                        {/* Registration Form Column */}
+                        <div className="w-full lg:w-3/5">
+                            <div className="bg-linear-to-br from-[#2e2e2e] to-[#000000]/80 backdrop-blur-sm border border-amber-900/30 rounded-2xl p-8">
+                                <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+                                    {/* Full Name Field */}
+                                    <div>
+                                        <label htmlFor="name" className="block text-amber-200 mb-2">Full Name</label>
+                                        <input
+                                            {...register('name')}
+                                            id="name"
+                                            type="text"
+                                            disabled={isSubmitting}
+                                            className={inputClasses}
+                                            placeholder="Enter your Name"
+                                            aria-invalid={errors.name ? "true" : "false"}
+                                            aria-describedby={errors.name ? "name-error" : undefined}
+                                        />
+                                        {errors.name && (
+                                            <p id="name-error" className="text-red-500 text-sm mt-1">
+                                                {errors.name.message}
+                                            </p>
+                                        )}
+                                    </div>
 
-                                {/* Email Field */}
-                                <div>
-                                    <label htmlFor="email" className="block text-amber-200 mb-2">Email</label>
-                                    <input
-                                        {...register('email')}
-                                        id="email"
-                                        type="email"
-                                        disabled={isSubmitting}
-                                        className={inputClasses}
-                                        placeholder="Enter your Email"
-                                        aria-invalid={errors.email ? "true" : "false"}
-                                        aria-describedby={errors.email ? "email-error" : undefined}
-                                    />
-                                    {errors.email && (
-                                        <p id="email-error" className="text-red-500 text-sm mt-1">
-                                            {errors.email.message}
-                                        </p>
-                                    )}
-                                </div>
+                                    {/* Email Field */}
+                                    <div>
+                                        <label htmlFor="email" className="block text-amber-200 mb-2">Email</label>
+                                        <input
+                                            {...register('email')}
+                                            id="email"
+                                            type="email"
+                                            disabled={isSubmitting}
+                                            className={inputClasses}
+                                            placeholder="Enter your Email"
+                                            aria-invalid={errors.email ? "true" : "false"}
+                                            aria-describedby={errors.email ? "email-error" : undefined}
+                                        />
+                                        {errors.email && (
+                                            <p id="email-error" className="text-red-500 text-sm mt-1">
+                                                {errors.email.message}
+                                            </p>
+                                        )}
+                                    </div>
 
-                                {/* Password Field with Strength Indicator */}
-                                <div className="relative">
-                                    <label htmlFor="password" className="block text-amber-200 mb-2">Password</label>
-                                    <input
-                                        {...register('password')}
-                                        id="password"
-                                        type={showPwd ? 'text' : 'password'}
-                                        disabled={isSubmitting}
-                                        className={inputClasses}
-                                        placeholder="••••••••"
-                                        aria-invalid={errors.password ? "true" : "false"}
-                                        aria-describedby={errors.password ? "password-error" : undefined}
-                                    />
-                                    {/* Password Visibility Toggle */}
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPwd((s) => !s)}
-                                        className="absolute right-4 top-11 text-amber-400 cursor-pointer"
-                                        disabled={isSubmitting}
-                                        aria-label={showPwd ? "Hide password" : "Show password"}
-                                        aria-pressed={showPwd}
-                                    >
-                                        {showPwd ? <Eyelash /> : <Eye />}
-                                    </button>
-                                    {errors.password && (
-                                        <p id="password-error" className="text-red-500 text-sm mt-1">
-                                            {errors.password.message}
-                                        </p>
-                                    )}
+                                    {/* Password Field with Strength Indicator */}
+                                    <div className="relative">
+                                        <label htmlFor="password" className="block text-amber-200 mb-2">Password</label>
+                                        <input
+                                            {...register('password')}
+                                            id="password"
+                                            type={showPwd ? 'text' : 'password'}
+                                            disabled={isSubmitting}
+                                            className={inputClasses}
+                                            placeholder="••••••••"
+                                            aria-invalid={errors.password ? "true" : "false"}
+                                            aria-describedby={errors.password ? "password-error" : undefined}
+                                        />
+                                        {/* Password Visibility Toggle */}
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPwd((s) => !s)}
+                                            className="absolute right-4 top-11 text-amber-400 cursor-pointer"
+                                            disabled={isSubmitting}
+                                            aria-label={showPwd ? "Hide password" : "Show password"}
+                                            aria-pressed={showPwd}
+                                        >
+                                            {showPwd ? <Eyelash /> : <Eye />}
+                                        </button>
+                                        {errors.password && (
+                                            <p id="password-error" className="text-red-500 text-sm mt-1">
+                                                {errors.password.message}
+                                            </p>
+                                        )}
 
-                                    {/* Real-time Password Strength Indicator */}
-                                    {passwordValue.length > 0 && (
-                                        <div className="mt-2">
-                                            <div className="flex items-center justify-between mb-1">
-                                                <span className="text-xs text-amber-300">Password strength:</span>
-                                                <span className="text-xs font-medium text-amber-300">{passwordStrength.label}</span>
+                                        {/* Real-time Password Strength Indicator */}
+                                        {passwordValue.length > 0 && (
+                                            <div className="mt-2">
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <span className="text-xs text-amber-300">Password strength:</span>
+                                                    <span className="text-xs font-medium text-amber-300">{passwordStrength.label}</span>
+                                                </div>
+                                                <div className="w-full bg-amber-900/30 rounded-full h-1.5">
+                                                    <div
+                                                        className={`h-1.5 rounded-full ${passwordStrength.strength <= 1 ? 'bg-red-500' :
+                                                            passwordStrength.strength <= 3 ? 'bg-yellow-500' : 'bg-green-500'
+                                                            }`}
+                                                        style={{ width: `${(passwordStrength.strength / 5) * 100}%` }}
+                                                    ></div>
+                                                </div>
                                             </div>
-                                            <div className="w-full bg-amber-900/30 rounded-full h-1.5">
-                                                <div
-                                                    className={`h-1.5 rounded-full ${passwordStrength.strength <= 1 ? 'bg-red-500' :
-                                                        passwordStrength.strength <= 3 ? 'bg-yellow-500' : 'bg-green-500'
-                                                        }`}
-                                                    style={{ width: `${(passwordStrength.strength / 5) * 100}%` }}
-                                                ></div>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
+                                        )}
+                                    </div>
 
-                                {/* Confirm Password Field */}
-                                <div className="relative">
-                                    <label htmlFor="confirmPassword" className="block text-amber-200 mb-2">Confirm Password</label>
-                                    <input
-                                        {...register('confirmPassword')}
-                                        id="confirmPassword"
-                                        type={showConfirm ? 'text' : 'password'}
-                                        disabled={isSubmitting}
-                                        className={inputClasses}
-                                        placeholder="••••••••"
-                                        aria-invalid={errors.confirmPassword ? "true" : "false"}
-                                        aria-describedby={errors.confirmPassword ? "confirm-password-error" : undefined}
-                                    />
-                                    {/* Confirm Password Visibility Toggle */}
+                                    {/* Confirm Password Field */}
+                                    <div className="relative">
+                                        <label htmlFor="confirmPassword" className="block text-amber-200 mb-2">Confirm Password</label>
+                                        <input
+                                            {...register('confirmPassword')}
+                                            id="confirmPassword"
+                                            type={showConfirm ? 'text' : 'password'}
+                                            disabled={isSubmitting}
+                                            className={inputClasses}
+                                            placeholder="••••••••"
+                                            aria-invalid={errors.confirmPassword ? "true" : "false"}
+                                            aria-describedby={errors.confirmPassword ? "confirm-password-error" : undefined}
+                                        />
+                                        {/* Confirm Password Visibility Toggle */}
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConfirm((s) => !s)}
+                                            className="absolute right-4 top-11 text-amber-400 cursor-pointer"
+                                            disabled={isSubmitting}
+                                            aria-label={showConfirm ? "Hide password confirmation" : "Show password confirmation"}
+                                            aria-pressed={showConfirm}
+                                        >
+                                            {showConfirm ? <Eyelash /> : <Eye />}
+                                        </button>
+                                        {errors.confirmPassword && (
+                                            <p id="confirm-password-error" className="text-red-500 text-sm mt-1">
+                                                {errors.confirmPassword.message}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {/* Registration Submit Button */}
                                     <button
-                                        type="button"
-                                        onClick={() => setShowConfirm((s) => !s)}
-                                        className="absolute right-4 top-11 text-amber-400 cursor-pointer"
+                                        type="submit"
                                         disabled={isSubmitting}
-                                        aria-label={showConfirm ? "Hide password confirmation" : "Show password confirmation"}
-                                        aria-pressed={showConfirm}
-                                    >
-                                        {showConfirm ? <Eyelash /> : <Eye />}
-                                    </button>
-                                    {errors.confirmPassword && (
-                                        <p id="confirm-password-error" className="text-red-500 text-sm mt-1">
-                                            {errors.confirmPassword.message}
-                                        </p>
-                                    )}
-                                </div>
-
-                                {/* Registration Submit Button */}
-                                <button
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                    className="
+                                        className="
                                     w-full bg-primary text-white py-3 rounded-xl font-semibold transition-colors
                                     hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer mt-2
                                     "
-                                    aria-disabled={isSubmitting}
-                                >
-                                    {isSubmitting ? 'Creating Account...' : 'Create Account'}
-                                </button>
+                                        aria-disabled={isSubmitting}
+                                    >
+                                        {isSubmitting ? 'Creating Account...' : 'Create Account'}
+                                    </button>
 
-                                {/* Google OAuth Registration Alternative */}
-                                <button
-                                    type="button"
-                                    disabled={isSubmitting || isGoogleSignIn}
-                                    onClick={handleGoogleSignIn}
-                                    className="
+                                    {/* Google OAuth Registration Alternative */}
+                                    <button
+                                        type="button"
+                                        disabled={isSubmitting || isGoogleSignIn}
+                                        onClick={handleGoogleSignIn}
+                                        className="
                                         w-full mt-4 flex items-center justify-center gap-3 py-3 rounded-xl bg-white text-[#1a1108] font-semibold
                                         border border-amber-900/50 hover:bg-gray-100 transition-colors cursor-pointer
                                         disabled:opacity-50 disabled:cursor-not-allowed
                                     "
-                                    aria-disabled={isSubmitting || isGoogleSignIn}
-                                >
-                                    <GoogleIcon />
-                                    {isGoogleSignIn ? 'Redirecting...' : 'Continue with Google'}
-                                </button>
-                            </form>
-
-                            {/* Login Redirect */}
-                            <div className="mt-6 text-center">
-                                <p className="text-amber-400">
-                                    Already have an account?{' '}
-                                    <Link
-                                        href="/login"
-                                        className="text-primary hover:underline font-semibold"
-                                        tabIndex={isSubmitting ? -1 : 0}
-                                        aria-disabled={isSubmitting}
+                                        aria-disabled={isSubmitting || isGoogleSignIn}
                                     >
-                                        Sign in
-                                    </Link>
-                                </p>
+                                        <GoogleIcon />
+                                        {isGoogleSignIn ? 'Redirecting...' : 'Continue with Google'}
+                                    </button>
+                                </form>
+
+                                {/* Login Redirect */}
+                                <div className="mt-6 text-center">
+                                    <p className="text-amber-400">
+                                        Already have an account?{' '}
+                                        <Link
+                                            href="/login"
+                                            className="text-primary hover:underline font-semibold"
+                                            tabIndex={isSubmitting ? -1 : 0}
+                                            aria-disabled={isSubmitting}
+                                        >
+                                            Sign in
+                                        </Link>
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </div>
     );
 }
 

@@ -169,149 +169,151 @@ function LoginPage() {
    * - Right: Login form with authentication options
    */
   return (
-    <section className="mt-7 py-16 px-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col lg:flex-row items-start gap-10">
+    <div className="min-h-[86vh] flex flex-col" style={{ backgroundImage: "url('/auth-bg.png')", backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+      <section className="pt-21 pb-5 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col lg:flex-row items-start gap-10">
 
-          {/* Marketing/Content Column */}
-          <div className="w-full lg:w-2/5">
-            <div className="lg:sticky lg:top-24 heading-border">
-              {/* Page Header */}
-              <h1 className="text-4xl font-bold text-primary mb-4">Welcome Back</h1>
-              <p className="text-amber-200 text-lg mb-6">
-                Login to PizzaPort for exclusive offers and fast checkout
-              </p>
+            {/* Marketing/Content Column */}
+            <div className="w-full lg:w-2/5">
+              <div className="lg:sticky lg:top-24 heading-border">
+                {/* Page Header */}
+                <h1 className="text-4xl font-bold text-primary mb-4">Welcome Back</h1>
+                <p className="text-amber-200 text-lg mb-6">
+                  Login to PizzaPort for exclusive offers and fast checkout
+                </p>
 
-              {/* Value Proposition List */}
-              <div className="mt-8 space-y-4">
-                {[
-                  'Exclusive deals',
-                  'Faster checkout experience',
-                  'Early access to new menu items',
-                  'Personalized recommendations',
-                ].map((text, idx) => (
-                  <div className="flex items-start" key={idx}>
-                    <CheckIcon />
-                    <p className="text-amber-300">{text}</p>
-                  </div>
-                ))}
+                {/* Value Proposition List */}
+                <div className="mt-8 space-y-4">
+                  {[
+                    'Exclusive deals',
+                    'Faster checkout experience',
+                    'Early access to new menu items',
+                    'Personalized recommendations',
+                  ].map((text, idx) => (
+                    <div className="flex items-start" key={idx}>
+                      <CheckIcon />
+                      <p className="text-amber-300">{text}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Login Form Column */}
-          <div className="w-full lg:w-3/5">
-            <div className="bg-linear-to-br from-[#2e2e2e] to-[#000000]/80 backdrop-blur-sm border border-amber-900/30 rounded-2xl p-8">
+            {/* Login Form Column */}
+            <div className="w-full lg:w-3/5">
+              <div className="bg-linear-to-br from-[#2e2e2e] to-[#000000]/80 backdrop-blur-sm border border-amber-900/30 rounded-2xl p-8">
 
-              {/* Login Form */}
-              <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} noValidate>
+                {/* Login Form */}
+                <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} noValidate>
 
-                {/* Email Input Field */}
-                <div>
-                  <label htmlFor="email" className="block text-amber-200 mb-2">
-                    Email
-                  </label>
-                  <input
-                    {...register('email')}
-                    id="email"
-                    type="email"
-                    disabled={isSubmitting}
-                    className={inputClasses}
-                    placeholder="Enter your Email"
-                    aria-invalid={errors.email ? "true" : "false"}
-                    aria-describedby={errors.email ? "email-error" : undefined}
-                  />
-                  {/* Email Validation Error */}
-                  {errors.email && (
-                    <p id="email-error" className="text-red-500 text-sm mt-1">
-                      {errors.email.message}
-                    </p>
-                  )}
-                </div>
+                  {/* Email Input Field */}
+                  <div>
+                    <label htmlFor="email" className="block text-amber-200 mb-2">
+                      Email
+                    </label>
+                    <input
+                      {...register('email')}
+                      id="email"
+                      type="email"
+                      disabled={isSubmitting}
+                      className={inputClasses}
+                      placeholder="Enter your Email"
+                      aria-invalid={errors.email ? "true" : "false"}
+                      aria-describedby={errors.email ? "email-error" : undefined}
+                    />
+                    {/* Email Validation Error */}
+                    {errors.email && (
+                      <p id="email-error" className="text-red-500 text-sm mt-1">
+                        {errors.email.message}
+                      </p>
+                    )}
+                  </div>
 
-                {/* Password Input Field with Visibility Toggle */}
-                <div className="relative">
-                  <label htmlFor="password" className="block text-amber-200 mb-2">
-                    Password
-                  </label>
-                  <input
-                    {...register('password')}
-                    id="password"
-                    type={showPwd ? 'text' : 'password'}
-                    disabled={isSubmitting}
-                    className={inputClasses}
-                    placeholder="••••••••"
-                    aria-invalid={errors.password ? "true" : "false"}
-                    aria-describedby={errors.password ? "password-error" : undefined}
-                  />
-                  {/* Password Visibility Toggle Button */}
+                  {/* Password Input Field with Visibility Toggle */}
+                  <div className="relative">
+                    <label htmlFor="password" className="block text-amber-200 mb-2">
+                      Password
+                    </label>
+                    <input
+                      {...register('password')}
+                      id="password"
+                      type={showPwd ? 'text' : 'password'}
+                      disabled={isSubmitting}
+                      className={inputClasses}
+                      placeholder="••••••••"
+                      aria-invalid={errors.password ? "true" : "false"}
+                      aria-describedby={errors.password ? "password-error" : undefined}
+                    />
+                    {/* Password Visibility Toggle Button */}
+                    <button
+                      type="button"
+                      onClick={() => setShowPwd((s) => !s)}
+                      className="absolute right-4 top-11 text-amber-400"
+                      disabled={isSubmitting}
+                      aria-label={showPwd ? "Hide password" : "Show password"}
+                      aria-pressed={showPwd}
+                    >
+                      {showPwd ? <Eyelash /> : <Eye />}
+                    </button>
+                    {/* Password Validation Error */}
+                    {errors.password && (
+                      <p id="password-error" className="text-red-500 text-sm mt-1">
+                        {errors.password.message}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Email/Password Submit Button */}
                   <button
-                    type="button"
-                    onClick={() => setShowPwd((s) => !s)}
-                    className="absolute right-4 top-11 text-amber-400"
+                    type="submit"
                     disabled={isSubmitting}
-                    aria-label={showPwd ? "Hide password" : "Show password"}
-                    aria-pressed={showPwd}
-                  >
-                    {showPwd ? <Eyelash /> : <Eye />}
-                  </button>
-                  {/* Password Validation Error */}
-                  {errors.password && (
-                    <p id="password-error" className="text-red-500 text-sm mt-1">
-                      {errors.password.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Email/Password Submit Button */}
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="
+                    className="
                     w-full bg-primary text-white py-3 rounded-xl font-semibold transition-colors
                     hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer
                   "
-                  aria-disabled={isSubmitting}
-                >
-                  {isSubmitting ? 'Logging in…' : 'Login'}
-                </button>
+                    aria-disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Logging in…' : 'Login'}
+                  </button>
 
-                {/* Google OAuth Login Button */}
-                <button
-                  type="button"
-                  disabled={isSubmitting || isGoogleSignIn}
-                  onClick={handleGoogleSignIn}
-                  className="
+                  {/* Google OAuth Login Button */}
+                  <button
+                    type="button"
+                    disabled={isSubmitting || isGoogleSignIn}
+                    onClick={handleGoogleSignIn}
+                    className="
                     w-full mt-4 flex items-center justify-center gap-3 py-3 rounded-xl bg-white text-[#1a1108] font-semibold
                     border border-amber-900/50 hover:bg-gray-100 transition-colors cursor-pointer
                     disabled:opacity-50 disabled:cursor-not-allowed
                   "
-                  aria-disabled={isSubmitting || isGoogleSignIn}
-                >
-                  <GoogleIcon />
-                  {isGoogleSignIn ? 'Redirecting...' : 'Continue with Google'}
-                </button>
-              </form>
-
-              {/* Registration Link */}
-              <div className="mt-6 text-center">
-                <p className="text-amber-400">
-                  Don&apos;t have an account?{' '}
-                  <Link
-                    href="/register"
-                    className="text-primary hover:underline font-semibold"
-                    aria-disabled={isSubmitting}
-                    tabIndex={isSubmitting ? -1 : 0}
+                    aria-disabled={isSubmitting || isGoogleSignIn}
                   >
-                    Sign up
-                  </Link>
-                </p>
+                    <GoogleIcon />
+                    {isGoogleSignIn ? 'Redirecting...' : 'Continue with Google'}
+                  </button>
+                </form>
+
+                {/* Registration Link */}
+                <div className="mt-6 text-center">
+                  <p className="text-amber-400">
+                    Don&apos;t have an account?{' '}
+                    <Link
+                      href="/register"
+                      className="text-primary hover:underline font-semibold"
+                      aria-disabled={isSubmitting}
+                      tabIndex={isSubmitting ? -1 : 0}
+                    >
+                      Sign up
+                    </Link>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }
 

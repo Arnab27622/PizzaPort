@@ -154,7 +154,7 @@ function UsersPage() {
     // Show loading spinner while data loads
     if (isLoading || swrLoading) {
         return (
-            <div className="min-h-[80vh] p-6 mt-16 text-card">
+            <div className="min-h-[75vh] p-6 mt-16 text-card">
                 <h1 className="text-3xl font-bold heading-border underline mb-5">All Users</h1>
                 <div className="flex flex-col items-center justify-center mt-32">
                     <LoadingSpinner size="lg" color="text-primary" />
@@ -167,7 +167,7 @@ function UsersPage() {
     if (!isAdmin) return null;
 
     return (
-        <div className="min-h-[80vh] p-6 mt-16 text-card">
+        <div className="min-h-[75vh] p-6 mt-16 text-card">
             {/* Page Header */}
             <h1 className="text-3xl font-bold heading-border underline mb-5">All Users</h1>
 

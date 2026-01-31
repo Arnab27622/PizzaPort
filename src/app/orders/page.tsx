@@ -57,9 +57,9 @@ export default function AdminOrdersPage() {
 
     if (isLoading) {
         return (
-            <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100 min-h-[80vh]">
+            <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100 min-h-[90vh]">
                 <div className="flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-                    <h1 className="text-3xl font-bold heading-border underline">Manage Orders</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold heading-border underline">Manage Orders</h1>
                 </div>
                 <div className="flex flex-col items-center justify-center mt-32">
                     <LoadingSpinner size="lg" color="text-primary" />
