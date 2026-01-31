@@ -6,6 +6,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import LocationIcon from "@/components/icons/LocationIcon";
 import LoadingSpinner from "@/components/icons/LoadingSpinner";
 import { Order, OrderStatus, STATUS_COLORS } from "@/types/order";
@@ -28,7 +29,7 @@ const AdminOrderCard: React.FC<AdminOrderCardProps> = ({
 }) => {
 
     return (
-        <div className="relative p-4 sm:p-6 hover:bg-[#3a281a] transition-all active:bg-[#4a382a] group">
+        <div className="relative p-4 sm:p-6 hover:bg-[#232323] transition-all active:bg-[#2e2e2e] group">
             <Link
                 href={`/orders/${order._id}`}
                 className="absolute inset-0 z-10"
@@ -39,7 +40,7 @@ const AdminOrderCard: React.FC<AdminOrderCardProps> = ({
                 <div className="flex-1 space-y-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between lg:justify-start gap-4">
                         <div className="min-w-0">
-                            <h3 className="text-[10px] font-bold text-amber-500 uppercase tracking-widest mb-1">Order ID</h3>
+                            <h3 className="text-[12px] font-bold text-amber-500 uppercase tracking-widest mb-1">Order ID</h3>
                             <Link
                                 href={`/orders/${order._id}`}
                                 className="font-mono text-sm text-amber-100 break-all bg-black/20 px-2 py-1.5 rounded border border-amber-900/30 hover:border-primary/50 transition-colors block pointer-events-auto"
@@ -50,7 +51,7 @@ const AdminOrderCard: React.FC<AdminOrderCardProps> = ({
                         </div>
                         <div className="sm:text-right lg:text-left lg:ml-8">
                             <div className="text-2xl font-black text-amber-50">₹{order.total}</div>
-                            <div className="text-[10px] text-amber-400/60 font-medium">
+                            <div className="text-[12px] text-amber-400/60 font-medium">
                                 {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </div>
                         </div>
@@ -58,8 +59,18 @@ const AdminOrderCard: React.FC<AdminOrderCardProps> = ({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div className="flex items-start gap-3">
-                            <div className="w-10 h-10 rounded-full bg-amber-900/50 flex items-center justify-center shrink-0 border border-amber-700/30">
-                                <span className="text-amber-300 text-sm font-bold uppercase">{order.userName.charAt(0)}</span>
+                            <div className="w-10 h-10 rounded-full bg-amber-900/50 flex items-center justify-center shrink-0 border border-amber-700/30 overflow-hidden">
+                                {order.userImage ? (
+                                    <Image
+                                        src={order.userImage}
+                                        alt={order.userName}
+                                        width={40}
+                                        height={40}
+                                        className="object-cover w-full h-full"
+                                    />
+                                ) : (
+                                    <span className="text-amber-300 text-sm font-bold uppercase">{order.userName.charAt(0)}</span>
+                                )}
                             </div>
                             <div className="min-w-0">
                                 <div className="font-bold text-amber-100 truncate">{order.userName}</div>
@@ -67,7 +78,7 @@ const AdminOrderCard: React.FC<AdminOrderCardProps> = ({
                             </div>
                         </div>
 
-                        <div className="text-sm text-amber-200/80 bg-black/10 p-2.5 rounded-md flex gap-2 items-start hover:bg-black/20 transition-colors">
+                        <div className="text-sm text-amber-200/80 bg-black/10 border border-amber-600/20 p-2.5 rounded-md flex gap-2 items-start hover:bg-black/20 transition-colors">
                             <LocationIcon />
                             <span className="line-clamp-2 md:line-clamp-1 lg:line-clamp-2" title={order.address}>{order.address}</span>
                         </div>
@@ -110,7 +121,7 @@ const AdminOrderCard: React.FC<AdminOrderCardProps> = ({
                             <button
                                 onClick={(e) => onCancel(order._id, e)}
                                 disabled={isCanceling}
-                                className="w-full bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white font-bold py-2.5 rounded-lg border border-red-600/30 transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-wider pointer-events-auto"
+                                className="w-full bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white font-bold py-2.5 rounded-lg border border-red-600/30 transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-wider pointer-events-auto cursor-pointer"
                             >
                                 {isCanceling ? (
                                     <LoadingSpinner size="xs" color="text-white" />

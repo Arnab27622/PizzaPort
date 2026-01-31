@@ -46,10 +46,10 @@ const OrderItemList: React.FC<OrderItemListProps> = ({ items }) => {
                 {groupedItemsArray.map((group, idx) => (
                     <div
                         key={`${group.item.name}-${idx}`}
-                        className="bg-[#2c1a0d]/30 border border-amber-900/20 p-3 md:p-4 rounded-xl flex flex-col sm:flex-row items-center sm:items-start gap-4 transition-all hover:border-primary/30"
+                        className="bg-[#232323] border border-amber-900/80 p-3 md:p-4 rounded-xl flex flex-col sm:flex-row items-center sm:items-start gap-4 transition-all hover:border-primary/30"
                     >
                         {group.item.imageUrl && (
-                            <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0 border border-amber-900/30 shadow-md">
+                            <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0 border border-amber-900/60 shadow-md">
                                 <Image
                                     src={group.item.imageUrl}
                                     alt={group.item.name}

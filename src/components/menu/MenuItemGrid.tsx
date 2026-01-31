@@ -48,7 +48,7 @@ export default function MenuItemGrid({
             {items.map(item => (
                 <div
                     key={item._id}
-                    className="group bg-linear-to-br from-[#2c1a0d] to-[#1a1108] border border-amber-900/50 rounded-xl overflow-hidden shadow-xl hover:shadow-2xl hover:border-amber-700 transition-all duration-300 transform hover:-translate-y-1"
+                    className="group bg-[#151515] border border-amber-900/50 rounded-xl overflow-hidden shadow-xl hover:shadow-2xl hover:border-amber-700 transition-all duration-300 transform hover:-translate-y-1"
                 >
                     {/* Item Image */}
                     <div

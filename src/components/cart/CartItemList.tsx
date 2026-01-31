@@ -26,7 +26,7 @@ export default function CartItemList({ groupedItems, onRemove }: CartItemListPro
             {groupedItems.map((group) => (
                 <li
                     key={group.key}
-                    className="bg-[#2c1a0d] border border-amber-800 rounded-lg p-4 flex flex-col sm:flex-row justify-between gap-4"
+                    className="bg-[#151515] border border-amber-800 rounded-lg p-4 flex flex-col sm:flex-row justify-between gap-4"
                 >
                     {/* Item Details */}
                     <div className="flex gap-4">

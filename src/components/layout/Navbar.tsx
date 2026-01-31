@@ -97,8 +97,8 @@ export default function Navbar() {
     return (
         <header
             className={`fixed w-full top-0 z-50 py-4 px-4 transition-all duration-300 ${scrolled
-                ? "bg-[rgba(25,18,12,0.95)] shadow-lg"
-                : "bg-[rgba(25,18,12,0.85)]"
+                ? "bg-[rgba(17,15,13,0.95)] shadow-lg"
+                : "bg-[rgba(17,15,13,0.85)]"
                 }`}
             role="banner"
         >
@@ -106,7 +106,7 @@ export default function Navbar() {
                 {/* Logo/Brand */}
                 {isAdmin ? (
                     <span
-                        className="text-primary font-semibold text-3xl logo-text"
+                        className="text-primary font-semibold text-3xl lg:text-4xl logo-text"
                         aria-label="PizzaPort Home (Disabled for Admin)"
                     >
                         PizzaPort
@@ -115,7 +115,7 @@ export default function Navbar() {
                     <Link
                         href="/"
                         onClick={(e) => handleNavigation("/", e)}
-                        className="text-primary font-semibold text-3xl logo-text"
+                        className="text-primary font-semibold text-3xl lg:text-4xl logo-text"
                         aria-label="PizzaPort Home"
                     >
                         PizzaPort

@@ -90,7 +90,7 @@ export default async function OrderDetailPage({
 
             <OrderHeader order={order} />
 
-            <div className="bg-[#1a1108] border border-amber-900/50 rounded-xl shadow-2xl overflow-hidden mt-8">
+            <div className="bg-[#151515] border border-amber-900/50 rounded-xl shadow-2xl overflow-hidden mt-8">
                 <div className="p-4 sm:p-6 md:p-8 space-y-8 md:space-y-10">
                     <OrderItemList items={order.cart} />
 

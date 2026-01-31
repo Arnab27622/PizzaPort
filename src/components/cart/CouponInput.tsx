@@ -82,7 +82,7 @@ export default function CouponInput({
     }
 
     return (
-        <div className="bg-[#1a1108] border border-amber-900 p-6 rounded-lg shadow-lg space-y-4">
+        <div className="bg-[#151515] border border-amber-900 p-6 rounded-lg shadow-lg space-y-4">
             <h3 className="text-lg font-bold text-amber-50">Have a coupon?</h3>
             <div className="flex gap-2">
                 <input
@@ -91,7 +91,7 @@ export default function CouponInput({
                     onChange={(e) => setCode(e.target.value)}
                     placeholder="Enter discount code"
                     disabled={isDisabled || isValidating}
-                    className="flex-1 bg-[#2c1a0d] border border-amber-900 rounded-lg px-4 py-2 text-amber-100 placeholder:text-amber-900/50 focus:outline-hidden focus:border-primary transition-colors uppercase disabled:opacity-50"
+                    className="flex-1 bg-[#2e2e2e] border border-amber-900 rounded-lg px-4 py-2 text-amber-100 placeholder:text-card/50 focus:outline-hidden focus:border-primary transition-colors uppercase disabled:opacity-50"
                 />
                 <button
                     onClick={handleApply}

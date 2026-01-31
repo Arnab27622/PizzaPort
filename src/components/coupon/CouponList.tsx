@@ -24,7 +24,7 @@ export default function CouponList({ coupons, onEdit, onDelete, isDeletingId }: 
             {coupons.map((coupon) => (
                 <div
                     key={coupon._id}
-                    className={`bg-linear-to-br from-[#2c1a0d] to-[#1a1108] border ${coupon.isActive ? 'border-amber-900' : 'border-red-900/50 opacity-75'} rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1`}
+                    className={`bg-linear-to-br from-[#2e2e2e] to-[#151515] border ${coupon.isActive ? 'border-amber-900' : 'border-red-900/50 opacity-75'} rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1`}
                 >
                     <div className="p-5 flex flex-col h-full">
                         <div className="flex justify-between items-start mb-4">
@@ -64,7 +64,7 @@ export default function CouponList({ coupons, onEdit, onDelete, isDeletingId }: 
                         <div className="flex gap-3 mt-auto">
                             <button
                                 onClick={() => onEdit(coupon)}
-                                className="flex-1 py-2 bg-amber-900/50 hover:bg-amber-800/50 border border-amber-800 rounded-lg text-amber-100 text-sm font-medium transition-colors cursor-pointer"
+                                className="flex-1 py-2 bg-[#2e2e2e] hover:bg-[#2e2e2e]/50 border border-amber-800 rounded-lg text-amber-100 text-sm font-medium transition-colors cursor-pointer"
                             >
                                 Edit
                             </button>

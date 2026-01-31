@@ -17,7 +17,7 @@ const OrderDeliveryDetails: React.FC<OrderDeliveryDetailsProps> = ({
     address
 }) => {
     return (
-        <div className="bg-black/20 p-4 md:p-6 rounded-xl border border-amber-900/20">
+        <div className="bg-black/20 p-4 md:p-6 rounded-xl border border-amber-900/60">
             <h2 className="font-bold text-base md:text-lg mb-4 md:mb-6 flex items-center gap-2 text-amber-500 uppercase tracking-widest justify-center sm:justify-start">
                 Delivery Details
             </h2>

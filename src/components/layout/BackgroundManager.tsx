@@ -16,7 +16,7 @@ export default function BackgroundManager({ children }: { children: React.ReactN
 
         // Preload the background image
         const img = new Image();
-        img.src = '/hero-background.jpg';
+        img.src = '/website-background-dark.jpg';
 
         // When image loads, hide the spinner
         img.onload = () => {

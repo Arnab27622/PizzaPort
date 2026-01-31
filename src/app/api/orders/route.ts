@@ -31,22 +31,37 @@ export async function GET() {
          * - Sorts by createdAt in descending order (newest first)
          * - Converts cursor to array for JSON serialization
          */
-        const orders = await db.collection("orders")
-            .find({ paymentStatus: { $in: [PAYMENT_STATUS.VERIFIED, PAYMENT_STATUS.COMPLETED, PAYMENT_STATUS.REFUND_INITIATED] } })
-            .sort({ createdAt: -1 })
-            .toArray();
+        const orders = await db.collection("orders").aggregate([
+            {
+                $match: {
+                    paymentStatus: { $in: [PAYMENT_STATUS.VERIFIED, PAYMENT_STATUS.COMPLETED, PAYMENT_STATUS.REFUND_INITIATED] }
+                }
+            },
+            {
+                $sort: { createdAt: -1 }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userEmail",
+                    foreignField: "email",
+                    as: "userDetails"
+                }
+            },
+            {
+                $addFields: {
+                    userImage: { $arrayElemAt: ["$userDetails.image", 0] },
+                    _id: { $toString: "$_id" }
+                }
+            },
+            {
+                $project: {
+                    userDetails: 0
+                }
+            }
+        ]).toArray();
 
-        /**
-         * Convert MongoDB ObjectId to string for client compatibility
-         * MongoDB ObjectId is not serializable to JSON, so we convert to string
-         */
-        const ordersWithStringId = orders.map(order => ({
-            ...order,
-            _id: order._id.toString(), // Convert ObjectId to string
-        }));
-
-        // Return successful response with orders data
-        return NextResponse.json(ordersWithStringId);
+        return NextResponse.json(orders);
     } catch (error) {
         /**
          * Handle database errors and connection issues

@@ -23,7 +23,7 @@ const OrderHeader: React.FC<OrderHeaderProps> = ({ order }) => {
                 <div className='w-16 md:w-24 h-1 bg-primary mx-auto rounded-full mt-3 md:mt-4'></div>
             </div>
 
-            <div className="bg-[#2c1a0d]/50 p-4 sm:p-6 md:p-8 border-b border-amber-900/30">
+            <div className="bg-[#232323]/70 p-4 sm:p-6 md:p-8 border-b rounded border-amber-900/30">
                 <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start md:items-center gap-4 sm:gap-6">
                     <div className="space-y-1 text-center sm:text-left">
                         <OrderStatusBadge

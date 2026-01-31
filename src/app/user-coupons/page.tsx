@@ -58,7 +58,7 @@ export default function UserCouponsPage() {
                         {coupons.map((coupon) => (
                             <div
                                 key={coupon._id}
-                                className={`group relative overflow-hidden bg-linear-to-br from-[#2c1a0d] to-[#1a1108] border ${coupon.remainingUses === 0 ? 'border-red-900/30 opacity-75' : 'border-amber-900/50'} rounded-2xl shadow-2xl transition-all duration-500 hover:scale-[1.02] hover:shadow-primary/10`}
+                                className={`group relative overflow-hidden bg-linear-to-br from-[#151515] to-[#0e0904] border ${coupon.remainingUses === 0 ? 'border-red-900/30 opacity-75' : 'border-amber-900/50'} rounded-2xl shadow-2xl transition-all duration-500 hover:scale-[1.02] hover:shadow-primary/10`}
                             >
                                 {/* Decorative Background Elements */}
                                 <div className="absolute -top-12 -right-12 w-32 h-32 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-700" />

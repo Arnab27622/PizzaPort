@@ -18,7 +18,7 @@ export default function DeliveryForm({
     isFetchingLocation
 }: DeliveryFormProps) {
     return (
-        <div className="bg-[#1a1108] border border-amber-900 p-6 rounded-lg shadow-lg space-y-6">
+        <div className="bg-[#151515] border border-amber-900 p-6 rounded-lg shadow-lg space-y-6">
             <h2 className="text-2xl font-bold text-amber-50">Delivery Details</h2>
 
             {/* Name Field (Read-only) */}
@@ -28,7 +28,7 @@ export default function DeliveryForm({
                     type="text"
                     value={userName}
                     readOnly
-                    className="w-full px-4 py-2 rounded bg-[#2c1a0d] border border-amber-800 text-gray-300 cursor-not-allowed"
+                    className="w-full px-4 py-2 rounded bg-[#2e2e2e] border border-amber-800 text-gray-300 cursor-not-allowed"
                     aria-readonly="true"
                     title="You can't change your name here"
                 />
@@ -41,7 +41,7 @@ export default function DeliveryForm({
                     type="email"
                     value={userEmail}
                     readOnly
-                    className="w-full px-4 py-2 rounded bg-[#2c1a0d] border border-amber-800 text-gray-300 cursor-not-allowed"
+                    className="w-full px-4 py-2 rounded bg-[#2e2e2e] border border-amber-800 text-gray-300 cursor-not-allowed"
                     aria-readonly="true"
                     title="You can't change your email here"
                 />
@@ -52,7 +52,7 @@ export default function DeliveryForm({
                 <label className="block text-sm mb-1 text-amber-200">Delivery Address</label>
                 <textarea
                     {...register('address')}
-                    className="w-full px-4 py-2 rounded bg-[#2c1a0d] border border-amber-800 text-white resize-none focus:border-primary focus:ring-1 focus:ring-primary outline-hidden transition-all"
+                    className="w-full px-4 py-2 rounded bg-[#2e2e2e] border border-amber-800 text-white resize-none focus:border-primary focus:ring-1 focus:ring-primary outline-hidden transition-all"
                     rows={3}
                     placeholder="Enter your delivery address"
                 />

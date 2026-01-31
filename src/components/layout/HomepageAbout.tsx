@@ -30,7 +30,7 @@ function HomepageAbout() {
                     </div>
 
                     {/* Main content card with glassmorphism effect */}
-                    <div className="relative z-10 bg-linear-to-br from-[#2c1a0d]/50 to-[#1a1108]/90 backdrop-blur-sm border border-amber-900/30 rounded-2xl p-8 space-y-6">
+                    <div className="relative z-10 bg-black/70 backdrop-blur-sm border border-amber-900/30 rounded-2xl p-8 space-y-6">
                         {/* First paragraph - company passion and craftsmanship */}
                         <p className='text-amber-100 text-lg leading-relaxed'>
                             At PizzaPort, every slice tells a story — one of passion, flavor, and tradition. From our carefully crafted dough to our house-made sauces, we pay attention to every detail to give you a pizza that&apos;s unforgettable.

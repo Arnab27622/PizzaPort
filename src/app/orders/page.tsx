@@ -82,7 +82,7 @@ export default function AdminOrdersPage() {
 
             {/* Order Summary and Controls */}
             <div className="mb-4 flex justify-between items-center">
-                <p className="text-amber-300">
+                <p className="text-card">
                     {sortedOrders.length} order{sortedOrders.length !== 1 ? 's' : ''} found
                 </p>
                 <button
@@ -95,7 +95,7 @@ export default function AdminOrdersPage() {
 
             {/* Orders Display */}
             <div className="rounded-md bg-[#2c1a0d] border border-amber-800">
-                <div className="divide-y divide-amber-900/30">
+                <div className="divide-y bg-[#151515]">
                     {sortedOrders.length === 0 ? (
                         <p className="text-gray-400 p-6">No orders found.</p>
                     ) : (

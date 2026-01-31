@@ -202,22 +202,22 @@ export default function SalesPage() {
             {/* Key Performance Indicator Metrics Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 {/* Total Sales Metric Card */}
-                <div className="bg-linear-to-br from-[#2c1a0d] to-[#1a1108] rounded-xl p-4 border border-amber-800">
+                <div className="bg-linear-to-br from-[#151515] to-[#070502] rounded-xl p-4 border border-amber-800">
                     <span className="block text-2xl font-semibold text-amber-100">{formatCurrency(report.metrics.totalSales)}</span>
                     <span className="text-sm text-amber-300">Total Sales</span>
                 </div>
                 {/* Average Order Value Metric Card */}
-                <div className="bg-linear-to-br from-[#2c1a0d] to-[#1a1108] rounded-xl p-4 border border-amber-800">
+                <div className="bg-linear-to-br from-[#151515] to-[#070502] rounded-xl p-4 border border-amber-800">
                     <span className="block text-2xl font-semibold text-amber-100">{formatCurrency(report.metrics.avgOrderValue)}</span>
                     <span className="text-sm text-amber-300">Avg Order Value</span>
                 </div>
                 {/* Total Orders Metric Card */}
-                <div className="bg-linear-to-br from-[#2c1a0d] to-[#1a1108] rounded-xl p-4 border border-amber-800">
+                <div className="bg-linear-to-br from-[#151515] to-[#070502] rounded-xl p-4 border border-amber-800">
                     <span className="block text-2xl font-semibold text-amber-100">{report.metrics.totalOrders}</span>
                     <span className="text-sm text-amber-300">Total Orders</span>
                 </div>
                 {/* Total Guests Metric Card */}
-                <div className="bg-linear-to-br from-[#2c1a0d] to-[#1a1108] rounded-xl p-4 border border-amber-800">
+                <div className="bg-linear-to-br from-[#151515] to-[#070502] rounded-xl p-4 border border-amber-800">
                     <span className="block text-2xl font-semibold text-amber-100">{report.metrics.totalGuests}</span>
                     <span className="text-sm text-amber-300">Total Guests</span>
                 </div>

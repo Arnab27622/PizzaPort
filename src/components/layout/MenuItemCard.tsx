@@ -47,7 +47,7 @@ export default function MenuItemCard({ item, onImageClick }: MenuItemCardProps) 
 
     return (
         <>
-            <div className="bg-linear-to-br from-[#2c1a0d] to-[#1a1108] border border-amber-900 rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 h-full flex flex-col">
+            <div className="bg-black border border-amber-900 rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 h-full flex flex-col">
                 <div
                     className="relative h-56 overflow-hidden cursor-pointer group"
                     onClick={onImageClick}

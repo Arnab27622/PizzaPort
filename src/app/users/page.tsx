@@ -183,7 +183,7 @@ function UsersPage() {
                         placeholder="Search by name or email"
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        className="block w-full pl-10 p-2 bg-[#2c1a0d] border border-amber-900 text-amber-100 rounded focus:ring-amber-500 focus:border-amber-500"
+                        className="block w-full pl-10 p-2 bg-[#151515] border border-amber-900 text-amber-100 rounded focus:ring-amber-500 focus:border-amber-500"
                         aria-label="Search users"
                     />
                 </div>
@@ -205,7 +205,7 @@ function UsersPage() {
                 <select
                     value={sortKey}
                     onChange={e => setSortKey(e.target.value as "name" | "createdAt" | "updatedAt")}
-                    className="p-2 bg-[#2c1a0d] border border-amber-900 text-amber-100 rounded"
+                    className="p-2 bg-[#151515] border border-amber-900 text-amber-100 rounded"
                     aria-label="Sort users by"
                 >
                     <option value="name">Sort by name</option>
@@ -215,7 +215,7 @@ function UsersPage() {
             </div>
 
             {/* User List Container */}
-            <div className="bg-[#1a1108]/50 rounded-lg shadow p-4">
+            <div className="bg-[#151515]/50 rounded-lg shadow p-4">
                 {filtered.map(u => (
                     <div key={u._id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-amber-900 py-2">
                         {/* User Identity Section */}

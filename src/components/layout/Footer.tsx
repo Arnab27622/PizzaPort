@@ -12,7 +12,7 @@ function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className='border-t border-amber-900/30 p-8 text-center text-amber-500 bg-[#19120c] w-full'>
+    <footer className='border-t border-amber-900/30 p-8 text-center text-amber-500 bg-black/90 w-full'>
       {/* Copyright information with dynamic year */}
       <p className='text-sm'>
         &copy; {currentYear} PizzaPort. All rights reserved.

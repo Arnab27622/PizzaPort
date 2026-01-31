@@ -67,7 +67,7 @@ export default function OrdersPage() {
                 <BackButton />
             </div>
 
-            <h1 className="text-3xl font-bold heading-border underline mb-6">Your Orders</h1>
+            <h1 className="text-3xl font-bold text-card heading-border underline mb-6">Your Orders</h1>
 
             {sortedOrders.length === 0 ? (
                 <div className="text-center py-12">

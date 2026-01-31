@@ -27,7 +27,7 @@ const MenuSearch: React.FC<MenuSearchProps> = ({ value, onChange }) => {
                 placeholder="Search for pizza..."
                 value={value}
                 onChange={onChange}
-                className="w-full pl-10 pr-4 py-2 rounded-lg bg-[#1a1108] border border-amber-800 text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full pl-10 pr-4 py-2 rounded-lg bg-[#151515] border border-amber-800 text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary"
                 aria-label="Search menu items"
             />
         </div>

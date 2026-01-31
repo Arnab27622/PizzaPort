@@ -27,7 +27,7 @@ export default function UserOrderPage() {
     if (loading) {
         return (
             <div className="max-w-7xl mx-auto mt-10 px-4 py-12 text-amber-100 min-h-[80vh] flex flex-col items-center justify-center">
-                <h1 className="text-3xl font-bold mb-8 text-primary heading-border">Order Details</h1>
+                <h1 className="text-3xl font-bold mb-8 text-card heading-border">Order Details</h1>
                 <LoadingSpinner size="lg" color="text-primary" className="mb-4" />
                 <p className="text-amber-300">Loading order details...</p>
             </div>
@@ -53,7 +53,7 @@ export default function UserOrderPage() {
 
     return (
         <div className="w-full mx-auto mt-15 px-4 sm:px-6 lg:px-8 py-8 text-amber-100">
-            <div className="bg-[#1a1108] border border-amber-900 p-4 sm:p-6 rounded-lg shadow-lg">
+            <div className="bg-[#151515] border border-amber-900 p-4 sm:p-6 rounded-lg shadow-lg">
 
                 <OrderHeader order={order} />
 
@@ -94,7 +94,7 @@ export default function UserOrderPage() {
                 <div className="mt-8 flex justify-center">
                     <button
                         onClick={() => router.push("/user-orders")}
-                        className="w-full sm:w-auto px-6 py-2.5 bg-amber-800 hover:bg-amber-700 text-white rounded-lg font-bold text-sm sm:text-base transition-colors"
+                        className="w-full sm:w-auto px-6 py-2.5 bg-amber-800 hover:bg-amber-700 text-white rounded-lg font-bold text-sm sm:text-base transition-colors cursor-pointer"
                     >
                         Back to Orders
                     </button>

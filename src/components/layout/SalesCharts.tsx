@@ -33,15 +33,6 @@ export default function SalesCharts({ report }: { report: SalesReport }) {
           ...baseScales.ticks,
           maxRotation: 0,
           autoSkip: true,
-          callback: function (val: string | number) {
-            const label = typeof val === 'number' ? String(val) : val;
-            try {
-              const date = new Date(label);
-              return new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short' }).format(date);
-            } catch {
-              return label;
-            }
-          }
         }
       },
       y: {
@@ -110,7 +101,15 @@ export default function SalesCharts({ report }: { report: SalesReport }) {
         <div className="h-64 sm:h-80 w-full relative">
           <Line
             data={{
-              labels: dailyRevenue.map(d => d.date),
+              labels: dailyRevenue.map(d => {
+                try {
+                  const date = new Date(d.date);
+                  if (isNaN(date.getTime())) return d.date;
+                  return new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short' }).format(date);
+                } catch {
+                  return d.date;
+                }
+              }),
               datasets: [{
                 label: 'Revenue',
                 data: dailyRevenue.map(d => d.revenue),

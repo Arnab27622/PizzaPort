@@ -15,7 +15,7 @@ export default function OrderSummary({
     isDisabled
 }: OrderSummaryProps) {
     return (
-        <div className="bg-[#1a1108] border border-amber-900 p-6 rounded-lg shadow-lg space-y-4 mt-6">
+        <div className="bg-[#151515] border border-amber-900 p-6 rounded-lg shadow-lg space-y-4 mt-6">
             <h2 className="text-xl font-bold text-amber-50 border-b border-amber-900/50 pb-2">Order Summary</h2>
             <div className="space-y-2 text-sm font-medium text-amber-100">
                 <div className="flex justify-between">

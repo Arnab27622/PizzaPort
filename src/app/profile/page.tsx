@@ -43,7 +43,7 @@ export default function ProfilePage() {
     const user = session.user as ExtendedUser;
 
     return (
-        <section className="max-w-xl mx-auto mt-20 mb-8 p-6 md:bg-[#1a1108]/60 md:rounded-2xl md:shadow-lg bg-transparent backdrop-blur-xs border border-transparent md:border-amber-900/30">
+        <section className="max-w-xl mx-auto mt-20 mb-8 p-6 md:bg-[#151515]/60 md:rounded-2xl md:shadow-lg bg-transparent backdrop-blur-xs border border-transparent md:border-amber-900/30">
             <div className="mb-6">
                 <BackButton />
             </div>

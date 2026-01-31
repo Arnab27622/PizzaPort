@@ -47,7 +47,7 @@ const UserOrderCard: React.FC<UserOrderCardProps> = ({ order }) => {
     return (
         <Link
             href={`/user-orders/${order.razorpayOrderId}`}
-            className="bg-[#1a1108] border border-amber-900 rounded-lg p-6 hover:bg-[#2c1a0d] transition-colors cursor-block block"
+            className="bg-[#151515] border border-amber-900 rounded-lg p-6 hover:bg-[#2c1a0d] transition-colors cursor-block block"
             aria-label={`View order details for order ${order.razorpayOrderId}`}
         >
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center">

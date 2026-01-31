@@ -40,6 +40,7 @@ export interface Order {
     _id: string;                    // Unique booking ID
     userName: string;               // Name of the customer
     userEmail: string;              // Contact email
+    userImage?: string;             // Customer profile image (optional)
     address: string;                // Delivery location
     cart: OrderItem[];              // List of items bought
     subtotal: number;               // Cost of food only

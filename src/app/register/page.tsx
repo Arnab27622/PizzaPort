@@ -11,7 +11,6 @@ import { toast } from 'react-toastify';
 import Eye from '@/components/icons/Eye';
 import Eyelash from '@/components/icons/Eyelash';
 import CheckIcon from '@/components/icons/CheckIcon';
-import ShieldIcon from '@/components/icons/ShieldIcon';
 import GoogleIcon from '@/components/icons/GoogleIcon';
 import { useRouter } from 'next/navigation';
 
@@ -164,7 +163,7 @@ function RegisterPage() {
      * Improves maintainability and theming consistency
      */
     const inputClasses = `
-    w-full p-3 rounded-xl bg-[#1a1108] border border-amber-900/50 text-amber-100
+    w-full p-3 rounded-xl bg-[#3e3e3e] border border-amber-900/50 text-amber-100
     focus:outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed
   `;
 
@@ -200,19 +199,12 @@ function RegisterPage() {
                                     </div>
                                 ))}
                             </div>
-                            {/* Security Assurance Visual */}
-                            <div className="mt-10 hidden lg:block">
-                                <div className="relative w-48 h-48 mx-auto">
-                                    <div className="absolute inset-0 bg-amber-500/10 rounded-full blur-xl" />
-                                    <ShieldIcon />
-                                </div>
-                            </div>
                         </div>
                     </div>
 
                     {/* Registration Form Column */}
                     <div className="w-full lg:w-3/5">
-                        <div className="bg-linear-to-br from-[#2c1a0d]/80 to-[#1a1108]/80 backdrop-blur-sm border border-amber-900/30 rounded-2xl p-8">
+                        <div className="bg-linear-to-br from-[#2e2e2e] to-[#000000]/80 backdrop-blur-sm border border-amber-900/30 rounded-2xl p-8">
                             <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
                                 {/* Full Name Field */}
                                 <div>

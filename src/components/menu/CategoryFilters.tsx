@@ -29,7 +29,7 @@ const CategoryFilters: React.FC<CategoryFiltersProps> = ({
                 onClick={() => onCategoryChange("")}
                 className={`px-4 py-2 rounded-full border border-amber-800 text-sm transition-all cursor-pointer ${!activeCategory
                     ? "bg-primary text-white"
-                    : "bg-[#1a1108] text-amber-200 hover:bg-amber-900/60"
+                    : "bg-[#151515] text-amber-200 hover:bg-black/50"
                     }`}
             >
                 All Items
@@ -41,7 +41,7 @@ const CategoryFilters: React.FC<CategoryFiltersProps> = ({
                     onClick={() => onCategoryChange(cat)}
                     className={`px-4 py-2 rounded-full border border-amber-800 text-sm transition-all cursor-pointer ${activeCategory === cat
                         ? "bg-primary text-white"
-                        : "bg-[#1a1108] text-amber-200 hover:bg-amber-900/60"
+                        : "bg-[#151515] text-amber-200 hover:bg-black/50"
                         }`}
                 >
                     {cat}
