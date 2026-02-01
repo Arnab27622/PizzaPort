@@ -220,7 +220,7 @@ export const authOptions: NextAuthOptions = {
                 token.name = user.name ?? token.name;
                 token.email = user.email ?? token.email;
                 token.image = user.image ?? token.image;
-                token.phone = (user as any).phone ?? token.phone;
+                token.phone = user.phone ?? token.phone;
                 if (typeof user.admin === 'boolean') token.admin = user.admin;
             }
 
