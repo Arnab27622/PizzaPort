@@ -103,7 +103,7 @@ export const authOptions: NextAuthOptions = {
                 await dbConnect();
 
                 // Find user and include password and admin fields
-                const user = await User.findOne({ email }).select('+password +admin +banned');
+                const user = await User.findOne({ email }).select('+password +admin +banned +phone');
                 if (!user || user.banned) {
                     console.log("User not found or banned");
                     return null;
@@ -125,6 +125,7 @@ export const authOptions: NextAuthOptions = {
                     email: user.email,
                     image: user.image,
                     admin: user.admin ?? false,
+                    phone: user.phone,
                 };
             }
         })
@@ -211,6 +212,7 @@ export const authOptions: NextAuthOptions = {
                     if (found) {
                         token.id = found._id.toString();
                         token.admin = found.admin ?? false;
+                        token.phone = found.phone || "";
                     }
                 }
 
@@ -218,6 +220,7 @@ export const authOptions: NextAuthOptions = {
                 token.name = user.name ?? token.name;
                 token.email = user.email ?? token.email;
                 token.image = user.image ?? token.image;
+                token.phone = (user as any).phone ?? token.phone;
                 if (typeof user.admin === 'boolean') token.admin = user.admin;
             }
 
@@ -226,9 +229,11 @@ export const authOptions: NextAuthOptions = {
                 const u = session.user as {
                     name?: string;
                     image?: string;
+                    phone?: string;
                 };
                 if (u.name) token.name = u.name;
                 if (u.image) token.image = u.image;
+                if (u.phone) token.phone = u.phone;
             }
 
             return token;
@@ -245,7 +250,7 @@ export const authOptions: NextAuthOptions = {
             const db = (await clientPromise).db();
             const found = await db.collection("users").findOne(
                 { email: token.email },
-                { projection: { address: 1, gender: 1, image: 1, admin: 1, banned: 1 } }
+                { projection: { address: 1, gender: 1, phone: 1, image: 1, admin: 1, banned: 1 } }
             );
 
 
@@ -269,6 +274,7 @@ export const authOptions: NextAuthOptions = {
                     image: found.image ?? token.image,
                     address: found.address ?? "",
                     gender: found.gender ?? "",
+                    phone: found.phone ?? "",
                     admin: found.admin ?? token.admin ?? false,
                 };
             }

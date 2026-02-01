@@ -273,9 +273,10 @@ function UsersPage() {
                         {/* User Information Grid */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-amber-100">
                             <div><strong>Email:</strong><p className="text-amber-300 break-all">{selectedUser.email}</p></div>
+                            <div><strong>Phone:</strong><p className="text-amber-300">{selectedUser.phone || '-'}</p></div>
                             <div><strong>Address:</strong><p className="text-amber-300">{selectedUser.address || '-'}</p></div>
                             <div><strong>Gender:</strong><p className="text-amber-300">{selectedUser.gender || '-'}</p></div>
-                            <div><strong>Registered:</strong><p className="text-amber-300">{formatDate(selectedUser.createdAt)}</p></div>
+                            <div className="sm:col-span-2"><strong>Registered:</strong><p className="text-amber-300">{formatDate(selectedUser.createdAt)}</p></div>
                         </div>
 
                         {/* Administrative Controls */}

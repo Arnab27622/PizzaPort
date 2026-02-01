@@ -32,7 +32,7 @@ export default function ProfilePage() {
 
     if (status === 'loading' && !session) {
         return (
-            <div className="max-w-xl mx-auto mt-20 mb-8 p-6 flex items-center justify-center min-h-[50vh]">
+            <div className="flex items-center justify-center min-h-[70vh]">
                 <LoadingSpinner size="lg" color="text-primary" />
             </div>
         );
@@ -43,26 +43,43 @@ export default function ProfilePage() {
     const user = session.user as ExtendedUser;
 
     return (
-        <section className="max-w-xl mx-auto mt-20 mb-8 p-6 md:bg-[#151515]/60 md:rounded-2xl md:shadow-lg bg-transparent backdrop-blur-xs border border-transparent md:border-amber-900/30">
-            <div className="mb-6">
-                <BackButton />
+        <main className="min-h-screen pb-12 pt-20 animate-fade-in">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Header Section */}
+                <div className="relative mb-8 overflow-hidden rounded-3xl bg-linear-to-r from-amber-900/40 to-primary/20 p-8 md:p-12 border border-white/5 shadow-2xl backdrop-blur-md">
+                    <div className="relative z-10">
+                        <div className="mb-4">
+                            <BackButton />
+                        </div>
+                        <h1 className="text-4xl md:text-5xl font-bold text-white mb-2 tracking-tight">
+                            Account <span className="text-primary">Settings</span>
+                        </h1>
+                        <p className="text-amber-100/70 text-lg max-w-md">
+                            Manage your personal information, address, and profile preferences.
+                        </p>
+                    </div>
+                    {/* Decorative element */}
+                    <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary/20 rounded-full blur-3xl" />
+                    <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl" />
+                </div>
+
+                {/* Main Content Card */}
+                <div className="bg-[#151515]/80 backdrop-blur-xl rounded-3xl p-6 md:p-10 border border-white/5 shadow-2xl">
+                    <ProfileForm
+                        form={form}
+                        errors={errors}
+                        register={register}
+                        userImage={user.image}
+                        preview={preview}
+                        saving={saving}
+                        uploadingImage={uploadingImage}
+                        isFetchingLocation={isFetchingLocation}
+                        onFileChange={handleFileChange}
+                        onFetchLocation={fetchUserLocation}
+                        onSubmit={handleSubmit}
+                    />
+                </div>
             </div>
-
-            <h1 className="text-3xl font-semibold text-primary mb-6 heading-border">Your Profile</h1>
-
-            <ProfileForm
-                form={form}
-                errors={errors}
-                register={register}
-                userImage={user.image}
-                preview={preview}
-                saving={saving}
-                uploadingImage={uploadingImage}
-                isFetchingLocation={isFetchingLocation}
-                onFileChange={handleFileChange}
-                onFetchLocation={fetchUserLocation}
-                onSubmit={handleSubmit}
-            />
-        </section>
+        </main>
     );
 }

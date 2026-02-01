@@ -38,6 +38,7 @@ export async function GET() {
         image: 1,       // Profile picture URL
         gender: 1,      // User's gender
         address: 1,     // User's address
+        phone: 1,       // User's phone number
         admin: 1,       // Administrator privilege flag
         banned: 1,      // Account suspension status
         createdAt: 1,   // Account creation timestamp

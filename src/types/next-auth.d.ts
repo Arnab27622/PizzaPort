@@ -16,6 +16,7 @@ declare module "next-auth" {
     interface User {
         id: string;
         admin?: boolean; // True if the user has admin privileges
+        phone?: string;
     }
 
     /**
@@ -30,6 +31,7 @@ declare module "next-auth" {
             image?: string;
             address?: string; // The user's saved delivery address
             gender?: string;  // The user's gender
+            phone?: string;   // The user's phone number
             admin: boolean;   // Whether the user can access the admin dashboard
         };
     }
@@ -46,6 +48,7 @@ declare module "next-auth/jwt" {
         email?: string;
         image?: string;
         admin?: boolean;
+        phone?: string;
     }
 }
 

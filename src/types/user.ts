@@ -16,6 +16,7 @@ export interface IUser {
     image?: string;  // Profile picture URL
     address?: string; // Default delivery address
     gender?: string;
+    phone?: string;
 }
 
 /**
@@ -55,6 +56,7 @@ export interface ProfileFormState {
     email: string;
     address: string;
     gender: string;
+    phone: string;
 }
 
 /**

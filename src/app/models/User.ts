@@ -21,6 +21,7 @@ const UserSchema = new Schema<IUserDoc>(
         image: { type: String },                    // Profile picture URL
         address: { type: String },                  // Saved delivery address
         gender: { type: String },                   // User's gender (optional)
+        phone: { type: String },                    // User's phone number
     },
     { timestamps: true } // Adds createdAt and updatedAt automatically
 );

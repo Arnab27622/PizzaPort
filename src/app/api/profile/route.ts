@@ -9,6 +9,7 @@ const ProfileUpdateSchema = z.object({
     name: z.string().min(1, 'Full Name is required').max(50, 'Name is too long'),
     address: z.string().min(1, 'Address is required').max(200, 'Address is too long'),
     gender: z.string().min(1, 'Gender is required'),
+    phone: z.string().optional(),
 });
 
 cloudinary.config({
@@ -61,6 +62,7 @@ export async function POST(req: Request) {
             name: formData.get('name') as string,
             address: formData.get('address') as string,
             gender: formData.get('gender') as string,
+            phone: formData.get('phone') as string,
         };
 
         const validation = ProfileUpdateSchema.safeParse(rawData);
@@ -71,7 +73,7 @@ export async function POST(req: Request) {
             );
         }
 
-        const { name, address, gender } = validation.data;
+        const { name, address, gender, phone } = validation.data;
 
         // Extract optional profile picture file
         const file = formData.get('profilePic') as File | null;
@@ -84,11 +86,13 @@ export async function POST(req: Request) {
             name: string;
             address: string;
             gender: string;
+            phone?: string;
             image?: string; // Optional profile image URL
         } = {
             name,
             address,
             gender,
+            phone,
         };
 
         /**

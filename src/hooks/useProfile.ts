@@ -20,6 +20,9 @@ import { ExtendedUser, ProfileFormState } from '@/types/user';
 const ProfileSchema = z.object({
     name: z.string().min(1, 'Full Name is required').max(50, 'Name is too long'),
     email: z.string().email('Invalid email address'),
+    phone: z.string().refine(val => val === '' || (val.length >= 10 && val.length <= 15), {
+        message: 'Phone number must be between 10 and 15 digits',
+    }),
     address: z.string().min(1, 'Address is required').max(200, 'Address is too long'),
     gender: z.string().min(1, 'Please select a gender'),
 });
@@ -61,6 +64,7 @@ export function useProfile() {
             reset({
                 name: user.name ?? '',
                 email: user.email ?? '',
+                phone: user.phone ?? '',
                 address: user.address ?? '',
                 gender: user.gender ?? '',
             });
@@ -155,6 +159,7 @@ export function useProfile() {
             body.append('name', data.name.trim());
             body.append('address', data.address.trim());
             body.append('gender', data.gender);
+            body.append('phone', data.phone || '');
 
             if (selectedFile) {
                 setUploadingImage(true);
