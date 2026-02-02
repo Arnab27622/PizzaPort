@@ -69,6 +69,12 @@ const OrderSchema = new mongoose.Schema(
     { timestamps: true } // Automatically adds "createdAt" and "updatedAt"
 );
 
+// Optimize database queries with indexes
+OrderSchema.index({ userEmail: 1 });
+OrderSchema.index({ razorpayOrderId: 1 });
+OrderSchema.index({ status: 1 });
+OrderSchema.index({ createdAt: -1 });
+
 /**
  * The Order model represents the "orders" collection in MongoDB.
  */

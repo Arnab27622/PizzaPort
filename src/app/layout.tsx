@@ -73,7 +73,7 @@ export default function RootLayout({
         {/* Critical resource preloading for performance optimization */}
         <link
           rel="preload"
-          href="/website-background-dark.jpg"
+          href="/website-background-dark.webp"
           as="image"
         />
       </head>

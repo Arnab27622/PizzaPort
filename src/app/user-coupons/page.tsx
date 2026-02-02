@@ -30,7 +30,7 @@ export default function UserCouponsPage() {
 
     if (authStatus === 'loading' || isLoading) {
         return (
-            <div className="max-w-7xl mx-auto mt-24 px-4 py-12 flex flex-col items-center justify-center min-h-[60vh]">
+            <div className="max-w-7xl mx-auto mt-32 px-4 py-12 flex flex-col items-center justify-center min-h-[60vh]">
                 <LoadingSpinner size="lg" color="text-primary" />
                 <p className="mt-4 text-amber-200 animate-pulse">Fetching exclusive deals for you...</p>
             </div>

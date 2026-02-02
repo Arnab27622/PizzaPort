@@ -33,6 +33,9 @@ const MenuItemSchema = new Schema<IMenuItem>(
     { timestamps: true } // Adds createdAt and updatedAt automatically
 );
 
+// Optimize category filtering with an index
+MenuItemSchema.index({ category: 1 });
+
 /**
  * The MenuItem model represents the "menuitems" collection in MongoDB.
  */
