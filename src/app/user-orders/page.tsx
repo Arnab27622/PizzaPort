@@ -36,7 +36,7 @@ export default function OrdersPage() {
                     <BackButton />
                 </div>
                 <h1 className="text-3xl font-bold heading-border underline mb-6">Your Orders</h1>
-                <div className="flex flex-col items-center justify-center mt-32">
+                <div className="flex flex-col items-center justify-center mt-30">
                     <LoadingSpinner size="lg" color="text-primary" />
                     <p className="mt-4 text-amber-200">Loading your orders...</p>
                 </div>

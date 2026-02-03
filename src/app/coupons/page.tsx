@@ -110,7 +110,7 @@ export default function CouponsPage() {
                 <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                     <h1 className="text-3xl font-bold heading-border underline text-amber-50">Manage Coupons</h1>
                 </header>
-                <div className="flex flex-col items-center justify-center mt-32">
+                <div className="flex flex-col items-center justify-center mt-36">
                     <LoadingSpinner size="lg" color="text-primary" />
                     <p className="mt-4 text-amber-200">Loading coupons...</p>
                 </div>

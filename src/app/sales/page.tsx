@@ -107,7 +107,7 @@ export default function SalesPage() {
                 <header className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                     <h1 className="text-3xl font-bold heading-border underline">Sales Analytics</h1>
                 </header>
-                <div className="flex flex-col items-center justify-center mt-32">
+                <div className="flex flex-col items-center justify-center mt-34">
                     <LoadingSpinner size="lg" color="text-primary" />
                     <p className="mt-4 text-amber-300">Loading sales data...</p>
                 </div>

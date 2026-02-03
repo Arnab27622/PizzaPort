@@ -32,8 +32,11 @@ export default function ProfilePage() {
 
     if (status === 'loading' && !session) {
         return (
-            <div className="flex items-center justify-center min-h-[70vh]">
-                <LoadingSpinner size="lg" color="text-primary" />
+            <div className="min-h-[70vh] text-card p-6 lg:py-6 lg:px-15 mt-16 max-w-7xl mx-auto">
+                <div className="flex flex-col items-center justify-center mt-44">
+                    <LoadingSpinner size="lg" color="text-primary" />
+                    <p className="mt-4 text-amber-200">Loading profile...</p>
+                </div>
             </div>
         );
     }
