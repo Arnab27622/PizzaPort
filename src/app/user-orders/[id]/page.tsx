@@ -11,8 +11,8 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
 import LoadingSpinner from '@/components/icons/LoadingSpinner';
+import BackButton from '@/components/layout/BackButton';
 import OrderProgressBar from '@/components/orders/OrderProgressBar';
 import OrderItemList from '@/components/orders/OrderItemList';
 import OrderDeliveryDetails from '@/components/orders/OrderDeliveryDetails';
@@ -21,7 +21,6 @@ import OrderHeader from '@/components/orders/OrderHeader';
 import { useUserOrderDetail } from '@/hooks/useUserOrderDetail';
 
 export default function UserOrderPage() {
-    const router = useRouter();
     const { order, loading, statusText, fetchOrder } = useUserOrderDetail();
 
     if (loading) {
@@ -92,12 +91,7 @@ export default function UserOrderPage() {
                 )}
 
                 <div className="mt-8 flex justify-center">
-                    <button
-                        onClick={() => router.push("/user-orders")}
-                        className="w-full sm:w-auto px-6 py-2.5 bg-amber-800 hover:bg-amber-700 text-white rounded-lg font-bold text-sm sm:text-base transition-colors cursor-pointer"
-                    >
-                        Back to Orders
-                    </button>
+                    <BackButton label="Back to Orders" />
                 </div>
             </div>
         </div>

@@ -152,6 +152,7 @@ function Hero() {
                         alt={"Delicious pizza from PizzaPort"}
                         fill
                         className="object-contain drop-shadow-2xl"
+                        sizes="(max-width: 640px) 288px, (max-width: 768px) 320px, (max-width: 1024px) 384px, (max-width: 1280px) 420px, 480px"
                         priority
                     />
 

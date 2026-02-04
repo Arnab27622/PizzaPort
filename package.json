@@ -19,7 +19,7 @@
     "framer-motion": "^12.23.9",
     "mongodb": "^6.21.0",
     "mongoose": "^8.21.0",
-    "next": "^15.5.9",
+    "next": "^16.1.6",
     "next-auth": "^4.24.11",
     "nextjs-toploader": "^3.8.16",
     "razorpay": "^2.9.6",
@@ -39,8 +39,9 @@
     "@types/node": "^25.0.9",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "critters": "^0.0.23",
     "eslint": "^9",
-    "eslint-config-next": "^15.5.9",
+    "eslint-config-next": "^15.5.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

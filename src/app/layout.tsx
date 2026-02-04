@@ -20,6 +20,8 @@ import AppContext from "@/components/AppContext";
 import Script from "next/script";
 import BackgroundManager from "@/components/layout/BackgroundManager";
 import NextTopLoader from "nextjs-toploader";
+import HashScrollHandler from "@/components/layout/HashScrollHandler";
+import { Suspense } from "react";
 
 
 /**
@@ -96,6 +98,9 @@ export default function RootLayout({
 
         {/* Background Management and Context Providers */}
         <BackgroundManager>
+          <Suspense fallback={null}>
+            <HashScrollHandler />
+          </Suspense>
           <main className="grow flex flex-col">
             <AppContext>
               <Navbar />

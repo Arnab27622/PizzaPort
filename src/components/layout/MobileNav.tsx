@@ -53,6 +53,7 @@ export default function MobileNav({
                                     onNavigate(link.href, e);
                                     onClose();
                                 }}
+                                scroll={!link.href.includes('#')}
                                 className="text-[#FFFAF0] text-xl font-semibold hover:text-primary transition-colors py-2"
                             >
                                 {link.label}

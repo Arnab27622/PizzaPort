@@ -12,7 +12,7 @@
 import Link from "next/link";
 import React, { useState, useEffect, useContext } from "react";
 import { signOut, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { CartContext } from "../CartProvider";
 import DesktopNav from "./DesktopNav";
 import MobileNav from "./MobileNav";
@@ -21,6 +21,7 @@ import { ExtendedUser } from "@/types/user";
 export default function Navbar() {
     const { status, data: session } = useSession({ required: false });
     const router = useRouter();
+    const pathname = usePathname();
     const user = session?.user as ExtendedUser;
 
     // Persistent admin state to prevent flicker during session updates
@@ -67,12 +68,36 @@ export default function Navbar() {
         };
     }, [isOpen]);
 
-    // Helper to secure redirects
+    // Helper to secure redirects and handle anchor links
     const handleNavigation = (href: string, e: React.MouseEvent) => {
+        // Handle same-page navigation
+        if (pathname === '/') {
+            // Case 1: Clicking a hash link while on home page
+            if (href.startsWith('/#')) {
+                const hash = href.split('#')[1];
+                e.preventDefault();
+                const element = document.getElementById(hash);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }
+                setIsOpen(false);
+                return;
+            }
+            // Case 2: Clicking logo or Home link while on home page
+            if (href === '/') {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                setIsOpen(false);
+                return;
+            }
+        }
+
+        // Authentication guard
         if (href === '/login' || href === '/register') return;
-        if (status !== 'authenticated') {
+        if (status !== 'authenticated' && href !== '/' && !href.startsWith('/#')) {
             e.preventDefault();
             router.push('/login');
+            setIsOpen(false);
         }
     };
 

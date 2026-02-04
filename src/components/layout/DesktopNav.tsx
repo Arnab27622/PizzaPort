@@ -39,6 +39,7 @@ export default function DesktopNav({
                     key={link.href}
                     href={link.href}
                     onClick={(e) => onNavigate(link.href, e)}
+                    scroll={!link.href.includes('#')}
                     className="hover:text-primary transition-colors"
                 >
                     {link.label}

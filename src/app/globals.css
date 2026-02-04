@@ -131,6 +131,7 @@ html,
 body {
   overflow-x: hidden;
   max-width: 100vw;
+  scroll-behavior: smooth;
 }
 
 /**
@@ -266,6 +267,7 @@ input[type="file"] {
 }
 
 /* Custom Animations */
+/* Performance: GPU acceleration for smooth animations */
 @keyframes fade-in-up {
   0% {
     opacity: 0;
@@ -290,10 +292,39 @@ input[type="file"] {
 
 .animate-fade-in-up {
   animation: fade-in-up 0.6s ease-out forwards;
+  will-change: opacity, transform;
 }
 
 .animate-fade-in {
   animation: fade-in 0.5s ease-out forwards;
+  will-change: opacity;
+}
+
+/* Respect user preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  .animate-fade-in-up,
+  .animate-fade-in,
+  .animate-fade-in-down,
+  .animate-float-slow,
+  .animate-float-medium,
+  .animate-float-fast,
+  .animate-float-pizza,
+  .animate-float-badge-1,
+  .animate-float-badge-2,
+  .animate-float-badge-3,
+  .animate-steam-1,
+  .animate-steam-2,
+  .animate-steam-3,
+  .animate-gradient-shift,
+  .animate-gradient-shift-reverse,
+  .animate-draw-line,
+  .animate-pulse-slow,
+  .animate-pulse-medium,
+  .animate-spin-slow {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 /* HERO SECTION ANIMATIONS */
@@ -340,14 +371,17 @@ input[type="file"] {
 
 .animate-float-slow {
   animation: float-slow 8s ease-in-out infinite;
+  will-change: transform;
 }
 
 .animate-float-medium {
   animation: float-medium 6s ease-in-out infinite;
+  will-change: transform;
 }
 
 .animate-float-fast {
   animation: float-fast 4s ease-in-out infinite;
+  will-change: transform;
 }
 
 /* Pizza Floating Animation */
@@ -373,6 +407,7 @@ input[type="file"] {
 
 .animate-float-pizza {
   animation: float-pizza 6s ease-in-out infinite;
+  will-change: transform;
 }
 
 /* Ingredient Badge Floating */

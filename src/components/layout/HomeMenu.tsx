@@ -27,6 +27,8 @@ function HomeMenu() {
     const { data: menuItems = [], error, isLoading } = useSWR<MenuItem[]>('/api/menuitem/bestsellers', fetcher, {
         refreshInterval: 120000, // Refresh every 2 minutes
         revalidateOnFocus: false, // Don't refresh just because the user clicked the window
+        dedupingInterval: 60000, // Don't make duplicate requests within 1 minute
+        keepPreviousData: true, // Keep showing old data while fetching new data
     });
 
     const [fullImageUrl, setFullImageUrl] = useState<string | null>(null);

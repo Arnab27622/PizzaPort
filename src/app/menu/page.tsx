@@ -43,6 +43,8 @@ export default function UserMenuPage() {
         fetcher,
         {
             revalidateOnFocus: false,
+            dedupingInterval: 30000, // Don't make duplicate requests within 30 seconds
+            keepPreviousData: true, // Keep showing old data while fetching new data
             onError: (err) => console.error("Menu fetch error:", err)
         }
     );

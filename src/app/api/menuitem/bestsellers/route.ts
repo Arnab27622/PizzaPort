@@ -8,7 +8,12 @@ import { PAYMENT_STATUS } from '@/types/payment';
  * 
  * This endpoint analyzes order history to determine which menu items
  * are most popular and returns their complete details for display
+ * 
+ * Performance: Cached for 2 minutes via ISR
  */
+
+// Enable ISR - revalidate every 2 minutes
+export const revalidate = 120;
 export async function GET() {
     try {
         // Establish database connection

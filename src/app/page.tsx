@@ -21,14 +21,11 @@ import { authOptions } from "./api/auth/[...nextauth]/authOptions";
  * - Unauthenticated -> Login
  * - Admin -> Admin Dashboard
  * - Customer -> Homepage
+ * 
+ * NOTE: For Admin, we use redirect() which Next.js handles.
+ * To avoid history loops, we ensure that navigations to home are handled correctly.
  */
 export default async function Home() {
-  /**
-   * Server-Side Session Validation
-   * 
-   * Checks user authentication status before rendering page content
-   * Essential for protecting authenticated routes and user data
-   */
   const session = await getServerSession(authOptions);
 
   // Automatic redirection for unauthenticated users
@@ -36,20 +33,11 @@ export default async function Home() {
     redirect('/login');
   }
 
-  // Redirect admin users to admin orders page
+  // Redirect admin users to admin orders page using replace behavior if possible
   if (session.user?.admin) {
     redirect('/orders');
   }
 
-  /**
-   * Page Composition
-   * 
-   * Renders complete home page with sequential section components:
-   * 1. Hero - Prominent banner with key value proposition
-   * 2. HomeMenu - Featured menu items and categories
-   * 3. HomepageAbout - Restaurant story and differentiators
-   * 4. HomepageContact - Location and contact information
-   */
   return (
     <>
       <Hero />
