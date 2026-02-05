@@ -71,8 +71,10 @@ const OrderSchema = new mongoose.Schema(
 
 // Optimize database queries with indexes
 OrderSchema.index({ userEmail: 1 });
+OrderSchema.index({ userEmail: 1, createdAt: -1 }); // Optimize user order history query
 OrderSchema.index({ razorpayOrderId: 1 });
 OrderSchema.index({ status: 1 });
+OrderSchema.index({ paymentStatus: 1 }); // Optimize admin order filtering
 OrderSchema.index({ createdAt: -1 });
 
 /**
