@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import Image from "next/image";
 import { toast } from "react-toastify";
+import { useSession } from 'next-auth/react';
 import LoadingSpinner from '@/components/icons/LoadingSpinner';
 import ConfirmModal from '@/components/layout/ConfirmAdmin';
 import { useIsAdmin } from '@/hooks/useAdmin';
@@ -32,6 +33,7 @@ const fetcher = async (url: string) => {
  */
 function UsersPage() {
     const { isAdmin, isLoading } = useIsAdmin();
+    const { data: session } = useSession();
 
     // Fetch all users from the API
     const { data, error: swrError, isLoading: swrLoading, mutate } = useSWR<User[]>('/api/users', fetcher);
@@ -131,14 +133,17 @@ function UsersPage() {
                 }),
             });
 
+            const data = await res.json();
+
             if (res.ok) {
                 toast.success(`${!selectedUser.banned ? 'User is banned' : 'Ban has been revoked from user'}`);
                 mutate();
                 setSelectedUser(prev => prev ? { ...prev, banned: !prev.banned } : null);
             } else {
-                toast.error('Failed to update banned status');
+                toast.error(data.error || 'Failed to update banned status');
             }
-        } catch {
+        } catch (error) {
+            console.error(error);
             toast.error('An error occurred');
         } finally {
             setProcessing(null);
@@ -293,16 +298,31 @@ function UsersPage() {
                             <label htmlFor="admin-checkbox" className="text-amber-100 mr-2">Admin</label>
 
                             {/* Ban/Unban Button */}
-                            <button
-                                onClick={() => setConfirmOpen(true)}
-                                disabled={processing !== null}
-                                className={`px-4 py-2 rounded font-semibold ${selectedUser.banned
-                                    ? 'border border-green-500 text-green-500 hover:bg-green-500/10'
-                                    : 'bg-red-600 text-white hover:bg-red-700'
-                                    }`}>
-                                {processing === 'ban' ? 'Processing...' :
-                                    selectedUser.banned ? 'Unban User' : 'Ban User'}
-                            </button>
+                            {(() => {
+                                const isSelf = session?.user && (session.user as any).id === selectedUser._id;
+                                const isTargetAdmin = selectedUser.admin;
+                                const isBanned = selectedUser.banned;
+                                const canBan = !isSelf && (!isTargetAdmin || isBanned);
+
+                                return (
+                                    <button
+                                        onClick={() => setConfirmOpen(true)}
+                                        disabled={processing !== null || !canBan}
+                                        title={
+                                            isSelf ? "You cannot ban yourself" :
+                                                (isTargetAdmin && !isBanned) ? "Cannot ban an admin" :
+                                                    isBanned ? "Unban User" : "Ban User"
+                                        }
+                                        className={`px-4 py-2 rounded font-semibold transition-colors
+                                            ${isBanned
+                                                ? 'border border-green-500 text-green-500 hover:bg-green-500/10'
+                                                : 'bg-red-600 text-white hover:bg-red-700'
+                                            } ${(!canBan || processing !== null) ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                        {processing === 'ban' ? 'Processing...' :
+                                            isBanned ? 'Unban User' : 'Ban User'}
+                                    </button>
+                                );
+                            })()}
                         </div>
 
                         {/* Modal Actions */}

@@ -4,8 +4,9 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import { Order } from "@/types/order";
 
 /**
@@ -28,18 +29,27 @@ export function useUserOrders() {
             const response = await fetch("/api/user-orders");
 
             if (!response.ok) {
-                throw new Error(`Failed to fetch orders: ${response.status} ${response.statusText}`);
+                const data = await response.json().catch(() => ({}));
+                // Handle banned/unauthorized users specifically
+                if (response.status === 401 || response.status === 403) {
+                    const msg = data.error || "Session expired or unauthorized. Please log in again.";
+                    toast.error(msg);
+                    setError(msg);
+                    setTimeout(() => signOut({ callbackUrl: '/login' }), 2000);
+                    return;
+                }
+                throw new Error(data.error || `Failed to fetch orders: ${response.status}`);
             }
 
             const data = await response.json();
             setOrders(data);
         } catch (error) {
             console.error("Error fetching orders:", error);
-            setError("Failed to load orders. Please try again.");
+            setError((error as Error).message || "Failed to load orders. Please try again.");
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [router]);
 
     /**
      * Automatic Refresh: Every 15 seconds, check for updates.

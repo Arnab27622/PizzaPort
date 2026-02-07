@@ -7,6 +7,7 @@
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import { signOut } from 'next-auth/react';
 import { UseCartPaymentProps } from '@/types/cart';
 import { RazorpayResponse, RazorpayOptions } from '@/types/payment';
 
@@ -64,9 +65,20 @@ export function useCartPayment({
                 }),
             });
 
-            if (!resp.ok) throw new Error("Failed to create order");
+            const data = await resp.json();
 
-            const order = await resp.json();
+            if (!resp.ok) {
+                // Handle banned/unauthorized users specifically
+                if (resp.status === 401 || resp.status === 403) {
+                    toast.error(data.error || "Session expired or unauthorized. Please log in again.");
+                    // Force sign out to clear valid-looking session on client
+                    setTimeout(() => signOut({ callbackUrl: '/login' }), 2000);
+                    return;
+                }
+                throw new Error(data.error || "Failed to create order");
+            }
+
+            const order = data; // Resp body is the order object in success case
 
             // 3. Ensure Razorpay is ready
             if (!order?.razorpayOrderId || typeof order.amount !== "number") {
@@ -131,7 +143,7 @@ export function useCartPayment({
             rzp.open();
         } catch (error) {
             console.error("Order submission error:", error);
-            toast.error("Failed to process your order. Please try again.");
+            toast.error((error as Error).message || "Failed to process your order. Please try again.");
         } finally {
             setIsProcessing(false);
         }

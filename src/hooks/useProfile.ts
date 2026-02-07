@@ -5,7 +5,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { z } from 'zod';
@@ -173,6 +173,15 @@ export function useProfile() {
 
             if (!res.ok) {
                 const errorData = await res.json().catch(() => ({}));
+
+                // Handle banned/unauthorized users specifically
+                if (res.status === 401 || res.status === 403) {
+                    toast.error(errorData.error || "Session expired or unauthorized. Please log in again.");
+                    // Force sign out to clear valid-looking session on client
+                    setTimeout(() => signOut({ callbackUrl: '/login' }), 2000);
+                    return;
+                }
+
                 throw new Error(errorData.error || `Server returned ${res.status}`);
             }
 

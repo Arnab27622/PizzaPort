@@ -23,10 +23,23 @@ import SharedImageModal from "@/components/common/SharedImageModal";
 import { useMenuFiltering } from "@/hooks/useMenuFiltering";
 import { MenuItem } from "@/types/menu";
 
-const fetcher = (url: string) => fetch(url).then((res) => {
-    if (!res.ok) throw new Error("Failed to fetch menu items");
+import { signOut } from "next-auth/react";
+import { toast } from "react-toastify";
+
+const fetcher = async (url: string) => {
+    const res = await fetch(url);
+    if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 401 || res.status === 403) {
+            toast.error(data.error || "Session expired or unauthorized. Please log in again.");
+            setTimeout(() => signOut({ callbackUrl: '/login' }), 2000);
+            // Stop further execution
+            throw new Error("Session expired");
+        }
+        throw new Error(data.error || "Failed to fetch menu items");
+    }
     return res.json();
-});
+};
 
 export default function UserMenuPage() {
     const { data: session, status } = useSession();
