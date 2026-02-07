@@ -36,7 +36,7 @@
 - **Animations**: [Framer Motion](https://www.framer.com/motion/)
 - **Storage**: [Cloudinary](https://cloudinary.com/) (Media/Images)
 - **Forms & Validation**: [React Hook Form](https://react-hook-form.com/), [Zod](https://zod.dev/)
-- **Notifications**: [React Toastify](https://fkhadra.github.io/react-toastify/), [EmailJS](https://www.emailjs.com/)
+- **Notifications**: [React Toastify](https://fkhadra.github.io/react-toastify/)
 
 ---
 
@@ -47,7 +47,7 @@
 - MongoDB Database
 - Cloudinary Account
 - Razorpay Developer Account
-- EmailJS Account
+- Gmail App Password (or other SMTP Service)
 
 ### Installation
 
@@ -77,12 +77,10 @@
    GOOGLE_CLIENT_ID=your_google_client_id
    GOOGLE_CLIENT_SECRET=your_google_client_secret
 
-   # EmailJS Configuration
-   NEXT_PUBLIC_EMAILJS_SERVICE_ID=your_service_id
-   NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=your_template_id
-   NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=your_public_key
-
+   # Contact Form Configuration
    NEXT_PUBLIC_CONTACT_EMAIL=your_contact_email
+   SMTP_EMAIL=your_smtp_email
+   SMTP_PASSWORD=your_smtp_app_password
 
    # Razorpay Configuration
    RAZORPAY_KEY_ID=your_razorpay_key_id
