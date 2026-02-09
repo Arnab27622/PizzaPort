@@ -1,6 +1,8 @@
 {
   "name": "pizza-delivery-app",
   "version": "0.1.0",
+  "author": "Arnab Dey",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "dev": "next dev",
