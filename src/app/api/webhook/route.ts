@@ -5,23 +5,25 @@ import { PAYMENT_STATUS } from "@/types/payment";
 import { ORDER_STATUS } from "@/types/order";
 
 /**
- * Razorpay Webhook Secret from environment variables
- * Used to verify webhook request authenticity
- * 
- * CRITICAL: This secret must be set in environment variables
- * If missing, the application will fail to start
- */
-const WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET;
-
-if (!WEBHOOK_SECRET) {
-    throw new Error('RAZORPAY_WEBHOOK_SECRET environment variable is required for webhook security');
-}
-
-/**
  * POST /api/webhooks/razorpay
  * Handles Razorpay webhook events for real-time payment status updates.
  */
 export async function POST(req: NextRequest) {
+    /**
+     * Razorpay Webhook Secret from environment variables
+     * Used to verify webhook request authenticity
+     * 
+     * CRITICAL: This secret must be set in environment variables
+     */
+    const WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET;
+
+    if (!WEBHOOK_SECRET) {
+        console.error('RAZORPAY_WEBHOOK_SECRET environment variable is missing');
+        return NextResponse.json(
+            { success: false, error: "Server configuration error" },
+            { status: 500 }
+        );
+    }
     /**
      * RAW BODY EXTRACTION
      * 
@@ -61,10 +63,22 @@ export async function POST(req: NextRequest) {
      * Signature Comparison
      * If signatures don't match, the webhook may be spoofed
      */
-    if (signature !== expectedSignature) {
+    try {
+        const isValid = crypto.timingSafeEqual(
+            Buffer.from(signature),
+            Buffer.from(expectedSignature)
+        );
+
+        if (!isValid) {
+            return NextResponse.json(
+                { success: false, error: "Signature mismatch" },
+                { status: 400 } // Bad Request - potential webhook spoofing
+            );
+        }
+    } catch {
         return NextResponse.json(
-            { success: false, error: "Signature mismatch" },
-            { status: 400 } // Bad Request - potential webhook spoofing
+            { success: false, error: "Signature validation error" },
+            { status: 400 }
         );
     }
 
@@ -75,24 +89,55 @@ export async function POST(req: NextRequest) {
      * Parse the JSON payload and handle different event types
      */
     const payload = JSON.parse(rawBody);
+
     const client = await clientPromise;
     const db = client.db();
+
+    // Idempotency: Prevent duplicate webhooks from running the same logic twice
+    // Using atomic upsert to prevent race conditions during simultaneous webhook retries
+    const eventId = req.headers.get("x-razorpay-event-id");
+    
+    if (!eventId) {
+        console.warn("Missing x-razorpay-event-id header in webhook");
+        return NextResponse.json(
+            { success: false, error: "Missing event ID" },
+            { status: 400 }
+        );
+    }
+
+    const result = await db.collection("webhooks").updateOne(
+        { eventId },
+        { $setOnInsert: { createdAt: new Date() } },
+        { upsert: true }
+    );
+
+    // matchedCount > 0 means the document already existed, so this is a duplicate webhook
+    if (result.matchedCount > 0) {
+        return NextResponse.json({ success: true });
+    }
 
     /**
      * Webhook Event Handler
      * Processes different Razorpay webhook events with appropriate business logic
      */
     try {
+        console.log("Event:", payload.event);
+
         switch (payload.event) {
-            case "payment.captured":
+            case "payment.authorized":
+            case "payment.captured": {
                 /**
-                 * PAYMENT CAPTURED EVENT
+                 * PAYMENT CAPTURED/AUTHORIZED EVENT
                  * 
                  * Triggered when Razorpay successfully captures the payment.
                  * This is the final confirmation of successful payment.
                  */
+                if (!payload?.payload?.payment?.entity) {
+                    return NextResponse.json({ success: false, error: "Invalid payload structure" }, { status: 400 });
+                }
                 const payment = payload.payload.payment.entity;
                 const rOrderId = payment.order_id;
+                console.log("Order ID:", rOrderId);
 
                 // Fetch current order state to prevent regression
                 const existingOrder = await db.collection("orders").findOne({ razorpayOrderId: rOrderId });
@@ -140,24 +185,84 @@ export async function POST(req: NextRequest) {
                     }
                 }
                 break;
+            }
 
-            case "payment.failed":
+            case "order.paid": {
+                if (!payload?.payload?.order?.entity) {
+                    return NextResponse.json({ success: false, error: "Invalid payload structure" }, { status: 400 });
+                }
+                const rOrderId = payload.payload.order.entity.id;
+                console.log("Order ID:", rOrderId);
+
+                const existingOrder = await db.collection("orders").findOne({ razorpayOrderId: rOrderId });
+
+                if (existingOrder) {
+                    const updateData: {
+                        paymentStatus: string;
+                        webhookReceived: boolean;
+                        status?: string;
+                    } = {
+                        paymentStatus: PAYMENT_STATUS.COMPLETED,
+                        webhookReceived: true
+                    };
+
+                    if (!existingOrder.status || existingOrder.status === ORDER_STATUS.PLACED) {
+                        updateData.status = ORDER_STATUS.PLACED;
+                    }
+
+                    await db.collection("orders").updateOne(
+                        { _id: existingOrder._id },
+                        { $set: updateData }
+                    );
+
+                    const alreadyProcessed = existingOrder.paymentStatus === PAYMENT_STATUS.VERIFIED ||
+                        existingOrder.paymentStatus === PAYMENT_STATUS.COMPLETED;
+
+                    if (existingOrder.couponCode && !alreadyProcessed) {
+                        await db.collection("coupons").updateOne(
+                            { code: existingOrder.couponCode },
+                            { $inc: { usageCount: 1 } }
+                        );
+                    }
+                }
+                break;
+            }
+
+            case "payment.failed": {
                 /**
                  * PAYMENT FAILED EVENT
                  * 
                  * Triggered when payment attempt fails (insufficient funds, expired card, etc.)
                  * Updates order status to reflect payment failure
                  */
-                await db.collection("orders").updateOne(
-                    { razorpayOrderId: payload.payload.payment.entity.order_id },
-                    {
-                        $set: {
-                            paymentStatus: PAYMENT_STATUS.FAILED, // Payment failure status
-                            webhookReceived: true    // Flag indicating webhook processing
-                        }
+                if (!payload?.payload?.payment?.entity) {
+                    return NextResponse.json({ success: false, error: "Invalid payload structure" }, { status: 400 });
+                }
+                const failedOrderId = payload.payload.payment.entity.order_id;
+                
+                const existingOrderFailed = await db.collection("orders").findOne({ razorpayOrderId: failedOrderId });
+                
+                if (existingOrderFailed) {
+                    // Prevent regression: don't fail an order that has already been verified/completed
+                    if (
+                        existingOrderFailed.paymentStatus === PAYMENT_STATUS.COMPLETED ||
+                        existingOrderFailed.paymentStatus === PAYMENT_STATUS.VERIFIED
+                    ) {
+                        break; // Already paid, ignore the late failed event
                     }
-                );
+
+                    await db.collection("orders").updateOne(
+                        { _id: existingOrderFailed._id },
+                        {
+                            $set: {
+                                paymentStatus: PAYMENT_STATUS.FAILED, // Payment failure status
+                                webhookReceived: true    // Flag indicating webhook processing
+                            }
+                        }
+                    );
+                }
                 break;
+            }
 
             default:
                 /**

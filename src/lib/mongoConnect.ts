@@ -58,3 +58,23 @@ if (process.env.NODE_ENV === "development") {
  */
 export default clientPromise
 
+/**
+ * Initialize critical database indexes for performance and correctness.
+ * Since this file is loaded globally, these will run once on startup.
+ */
+clientPromise.then((client) => {
+    const db = client.db();
+    
+    // Unique index for Webhook Idempotency (prevents race conditions at DB level)
+    db.collection("webhooks")
+        .createIndex({ eventId: 1 }, { unique: true })
+        .catch((err) => console.error("Failed to create webhook eventId index:", err));
+        
+    // TTL index to automatically clean up old webhooks after 30 days
+    db.collection("webhooks")
+        .createIndex(
+            { createdAt: 1 },
+            { expireAfterSeconds: 30 * 24 * 60 * 60 } // 30 days in seconds
+        )
+        .catch((err) => console.error("Failed to create webhook TTL index:", err));
+}).catch(console.error);
