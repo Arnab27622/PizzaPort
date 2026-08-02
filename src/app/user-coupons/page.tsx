@@ -7,7 +7,6 @@
 
 'use client';
 
-import React from 'react';
 import useSWR from 'swr';
 import SectionHeader from '@/components/layout/SectionHeader';
 import LoadingSpinner from '@/components/icons/LoadingSpinner';
@@ -49,7 +48,9 @@ export default function UserCouponsPage() {
             <div className="mt-12">
                 {!coupons || coupons.length === 0 ? (
                     <div className="text-center py-20 bg-[#1a1108]/50 rounded-2xl border border-amber-900/30 backdrop-blur-sm">
-                        <div className="text-5xl mb-4 text-amber-900/50">🎫</div>
+                        <div className="flex justify-center mb-4 text-amber-500/50">
+                            <TicketIcon className="w-16 h-16" />
+                        </div>
                         <p className="text-amber-200 text-xl font-medium">No coupons available right now.</p>
                         <p className="text-amber-400/60 mt-2">Check back soon for special offers!</p>
                     </div>

@@ -39,8 +39,8 @@ const OrderItemList: React.FC<OrderItemListProps> = ({ items }) => {
 
     return (
         <div>
-            <h2 className="text-lg md:text-xl font-bold mb-4 md:mb-6 flex items-center justify-center sm:justify-start gap-2">
-                <span className="text-primary">🍕</span> Order Items
+            <h2 className="text-lg md:text-xl font-bold mb-4 md:mb-6 text-amber-100">
+                Order Items
             </h2>
             <div className="grid gap-3 md:gap-4">
                 {groupedItemsArray.map((group, idx) => (

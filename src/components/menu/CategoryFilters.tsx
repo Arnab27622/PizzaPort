@@ -13,7 +13,7 @@ interface CategoryFiltersProps {
     onCategoryChange: (category: string) => void; // Function to update the selected category
 }
 
-const CategoryFilters: React.FC<CategoryFiltersProps> = ({
+const CategoryFilters: React.FC<CategoryFiltersProps> = React.memo(({
     categories,
     activeCategory,
     onCategoryChange
@@ -27,9 +27,9 @@ const CategoryFilters: React.FC<CategoryFiltersProps> = ({
             <button
                 key="all"
                 onClick={() => onCategoryChange("")}
-                className={`px-4 py-2 rounded-full border border-amber-800 text-sm transition-all cursor-pointer ${!activeCategory
-                    ? "bg-primary text-white"
-                    : "bg-[#151515] text-amber-200 hover:bg-black/50"
+                className={`px-5 py-2.5 rounded-full border text-sm font-semibold transition-all duration-300 cursor-pointer ${!activeCategory
+                    ? "bg-linear-to-r from-red-600 via-orange-600 to-amber-600 text-white font-extrabold shadow-lg shadow-red-950/60 scale-105 border-amber-400/40"
+                    : "bg-[#18120c]/95 text-amber-100 font-bold border-amber-900/60 hover:border-amber-500/60 hover:bg-[#241b12] hover:text-white shadow-md"
                     }`}
             >
                 All Items
@@ -39,9 +39,9 @@ const CategoryFilters: React.FC<CategoryFiltersProps> = ({
                 <button
                     key={cat}
                     onClick={() => onCategoryChange(cat)}
-                    className={`px-4 py-2 rounded-full border border-amber-800 text-sm transition-all cursor-pointer ${activeCategory === cat
-                        ? "bg-primary text-white"
-                        : "bg-[#151515] text-amber-200 hover:bg-black/50"
+                    className={`px-5 py-2.5 rounded-full border text-sm font-semibold transition-all duration-300 cursor-pointer ${activeCategory === cat
+                        ? "bg-linear-to-r from-red-600 via-orange-600 to-amber-600 text-white font-extrabold shadow-lg shadow-red-950/60 scale-105 border-amber-400/40"
+                        : "bg-[#18120c]/95 text-amber-100 font-bold border-amber-900/60 hover:border-amber-500/60 hover:bg-[#241b12] hover:text-white shadow-md"
                         }`}
                 >
                     {cat}
@@ -49,7 +49,9 @@ const CategoryFilters: React.FC<CategoryFiltersProps> = ({
             ))}
         </div>
     );
-};
+});
+
+CategoryFilters.displayName = "CategoryFilters";
 
 export default CategoryFilters;
 

@@ -135,7 +135,7 @@ export default function CartPage() {
             </div>
 
             <div>
-                <h1 className="text-2xl font-bold heading-border underline mb-6 text-card">Your Items</h1>
+                <h1 className="text-2xl font-bold heading-border underline mb-6 text-[#e3b98e]">Your Items</h1>
                 <CartItemList
                     groupedItems={groupedItems}
                     onRemove={removeCartProduct}

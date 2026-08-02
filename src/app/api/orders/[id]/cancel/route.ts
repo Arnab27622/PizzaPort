@@ -55,6 +55,14 @@ export async function PATCH(
             }
         );
 
+        // Broadcast real-time cancellation update via WebSockets
+        try {
+            const { broadcastOrderStatusUpdate } = await import("@/lib/wsServer");
+            broadcastOrderStatusUpdate(orderId, ORDER_STATUS.CANCELED, { razorpayOrderId: order.razorpayOrderId });
+        } catch (err) {
+            console.error("Failed to trigger WS broadcast on cancel:", err);
+        }
+
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error("Error canceling order:", error);

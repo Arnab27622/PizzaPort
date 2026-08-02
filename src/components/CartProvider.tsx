@@ -5,7 +5,7 @@
  * It remembers what items are in the cart even if you refresh the page.
  */
 
-import React, {
+import {
     createContext,
     ReactNode,
     useState,
@@ -49,29 +49,29 @@ export default function CartProvider({ children }: { children: ReactNode }) {
     }, [session?.user?.email, status]);
 
     /**
-     * Load items from the browser's storage when the page loads.
+     * Load items from local storage when storageKey changes
      */
     useEffect(() => {
-        setIsLoaded(false);
-        const saved = localStorage.getItem(storageKey);
-        if (saved) {
-            try {
+        try {
+            const saved = typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null;
+            if (saved) {
                 setCartProducts(JSON.parse(saved));
-            } catch {
-                console.warn("Failed to parse cart data from localStorage");
+            } else {
                 setCartProducts([]);
             }
-        } else {
+        } catch {
+            console.warn("Failed to parse cart data from localStorage");
             setCartProducts([]);
+        } finally {
+            setIsLoaded(true);
         }
-        setIsLoaded(true);
     }, [storageKey]);
 
     /**
-     * Whenever the cart changes, save it back to the browser's storage.
+     * Save cart to local storage whenever cartProducts updates (only after initial load)
      */
     useEffect(() => {
-        if (isLoaded) {
+        if (isLoaded && typeof window !== 'undefined') {
             localStorage.setItem(storageKey, JSON.stringify(cartProducts));
         }
     }, [cartProducts, storageKey, isLoaded]);

@@ -183,6 +183,15 @@ export async function POST(req: NextRequest) {
                             { $inc: { usageCount: 1 } }
                         );
                     }
+
+                    try {
+                        const { broadcastNewOrder, broadcastOrderStatusUpdate } = await import("@/lib/wsServer");
+                        const fullOrder = { ...existingOrder, ...updateData, _id: existingOrder._id.toString() };
+                        broadcastNewOrder(fullOrder);
+                        broadcastOrderStatusUpdate(existingOrder._id.toString(), updateData.status || ORDER_STATUS.PLACED);
+                    } catch (err) {
+                        console.error("Failed to trigger WS broadcast in webhook:", err);
+                    }
                 }
                 break;
             }

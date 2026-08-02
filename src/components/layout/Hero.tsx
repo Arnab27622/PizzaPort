@@ -9,8 +9,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 import Right from "../icons/Right";
+import StarIcon from "../icons/StarIcon";
 
 function Hero() {
     return (
@@ -36,7 +36,7 @@ function Hero() {
                         <span className="animate-ping absolute h-2 w-2 rounded-full bg-green-400 opacity-75"></span>
                         <span className="relative rounded-full h-2 w-2 bg-green-500"></span>
                     </span>
-                    <span className="text-white/90 text-sm font-medium">🍕 Fresh from the oven</span>
+                    <span className="text-white/90 text-sm font-medium">Fresh from the oven</span>
                 </div>
 
                 {/* Main Headline with Gradient Effect */}
@@ -83,18 +83,21 @@ function Hero() {
                 {/* Stats Row */}
                 <div className="flex items-center justify-center lg:justify-start gap-6 md:gap-8 mb-8 animate-fade-in-up animation-delay-300">
                     <div className="text-center">
-                        <div className="text-2xl md:text-3xl font-bold text-white">10k+</div>
-                        <div className="text-xs md:text-sm text-gray-400">Happy Customers</div>
+                        <div className="text-2xl md:text-3xl font-extrabold text-amber-100">15k+</div>
+                        <div className="text-xs md:text-sm text-amber-200/60 font-medium">Happy Foodies</div>
                     </div>
-                    <div className="w-px h-10 bg-white/20" />
+                    <div className="w-px h-10 bg-amber-500/30" />
                     <div className="text-center">
-                        <div className="text-2xl md:text-3xl font-bold text-primary">4.9</div>
-                        <div className="text-xs md:text-sm text-gray-400">Rating ⭐</div>
+                        <div className="text-2xl md:text-3xl font-extrabold text-amber-400 flex items-center justify-center gap-1">
+                            <span>4.9</span>
+                            <StarIcon className="w-5 h-5 text-amber-400 inline" />
+                        </div>
+                        <div className="text-xs md:text-sm text-amber-200/60 font-medium">Top Rated</div>
                     </div>
-                    <div className="w-px h-10 bg-white/20" />
+                    <div className="w-px h-10 bg-amber-500/30" />
                     <div className="text-center">
-                        <div className="text-2xl md:text-3xl font-bold text-white">30</div>
-                        <div className="text-xs md:text-sm text-gray-400">Min Delivery</div>
+                        <div className="text-2xl md:text-3xl font-extrabold text-amber-100">30 Min</div>
+                        <div className="text-xs md:text-sm text-amber-200/60 font-medium">Hot Delivery</div>
                     </div>
                 </div>
 
@@ -103,29 +106,28 @@ function Hero() {
                     {/* Primary CTA - Order Now */}
                     <Link
                         href="/menu"
-                        className="group relative flex items-center gap-2 bg-linear-to-r from-primary via-orange-500 to-primary bg-size-[200%_100%] 
-                        text-white px-8 py-4 rounded-full font-bold text-base md:text-lg
-                        hover:bg-position-[100%_0] transition-all duration-500 
-                        shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:scale-105
-                        overflow-hidden"
+                        className="group relative flex items-center gap-2.5 bg-linear-to-r from-red-600 via-orange-600 to-amber-600 
+                        text-white px-8 py-4 rounded-xl font-extrabold text-base md:text-lg
+                        transition-all duration-300 
+                        shadow-2xl shadow-orange-950/70 hover:shadow-orange-900/90 hover:scale-105
+                        border border-amber-400/30 overflow-hidden"
                         aria-label="Order pizza now"
                     >
                         <span className="relative z-10">Order Now</span>
                         <Right className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                        {/* Shine effect */}
                         <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                     </Link>
 
                     {/* Secondary CTA - View Menu */}
                     <Link
                         href="/menu"
-                        className="group flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/30 
-                        text-white px-8 py-4 rounded-full font-semibold text-base md:text-lg
-                        hover:bg-white/20 hover:border-white/50 transition-all duration-300 hover:scale-105"
+                        className="group flex items-center gap-2 bg-[#18120c]/90 backdrop-blur-md border border-amber-500/50 
+                        text-amber-100 px-8 py-4 rounded-xl font-bold text-base md:text-lg
+                        hover:bg-[#241b12] hover:border-amber-400 hover:text-white transition-all duration-300 hover:scale-105 shadow-xl"
                         aria-label="View our menu"
                     >
-                        <span>View Menu</span>
-                        <Right className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        <span>Explore Menu</span>
+                        <Right className="w-5 h-5 group-hover:translate-x-1 transition-transform text-amber-400" />
                     </Link>
                 </div>
             </div>
@@ -148,7 +150,7 @@ function Hero() {
                 {/* Pizza image with floating animation */}
                 <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-105 lg:h-105 xl:w-120 xl:h-120 animate-float-pizza">
                     <Image
-                        src={"/hero-pizza.png"}
+                        src={"/hero-pizza.webp"}
                         alt={"Delicious pizza from PizzaPort"}
                         fill
                         className="object-contain drop-shadow-2xl"
@@ -163,16 +165,14 @@ function Hero() {
                 </div>
 
                 {/* Floating ingredient badges */}
-                <div className="absolute top-8 right-4 md:right-0 bg-white/95 backdrop-blur-sm rounded-2xl px-3 py-2 shadow-xl animate-float-badge-1 hidden sm:block">
-                    <span className="text-2xl">🧀</span>
-                    <span className="ml-1 text-sm font-semibold text-gray-800">Premium Cheese</span>
+                <div className="absolute top-8 right-4 md:right-0 bg-[#140e08]/95 backdrop-blur-md border border-amber-500/60 rounded-2xl px-4 py-2 shadow-2xl animate-float-badge-1 hidden sm:block">
+                    <span className="text-sm font-extrabold text-amber-200">100% Mozzarella</span>
                 </div>
-                <div className="absolute bottom-16 left-0 md:-left-4 bg-white/95 backdrop-blur-sm rounded-2xl px-3 py-2 shadow-xl animate-float-badge-2 hidden sm:block">
-                    <span className="text-2xl">🍅</span>
-                    <span className="ml-1 text-sm font-semibold text-gray-800">Fresh Toppings</span>
+                <div className="absolute bottom-16 left-0 md:-left-4 bg-[#140e08]/95 backdrop-blur-md border border-amber-500/60 rounded-2xl px-4 py-2 shadow-2xl animate-float-badge-2 hidden sm:block">
+                    <span className="text-sm font-extrabold text-amber-200">Organic Toppings</span>
                 </div>
-                <div className="absolute bottom-8 right-8 bg-linear-to-r from-green-500 to-emerald-600 rounded-2xl px-3 py-2 shadow-xl animate-float-badge-3 hidden sm:block">
-                    <span className="text-white text-sm font-bold">100% Fresh</span>
+                <div className="absolute bottom-8 right-8 bg-linear-to-r from-emerald-600 to-emerald-500 border border-emerald-400/40 rounded-2xl px-4 py-2 shadow-2xl animate-float-badge-3 hidden sm:block">
+                    <span className="text-white text-xs font-black uppercase tracking-wider">Wood-Fired Daily</span>
                 </div>
             </div>
         </section>

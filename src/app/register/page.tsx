@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCallback, useState } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -178,7 +179,16 @@ function RegisterPage() {
      * - Responsive two-column layout
      */
     return (
-        <div className="flex-1 grow flex flex-col" style={{ backgroundImage: "url('/auth-bg.png')", backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+        <div className="relative flex-1 grow flex flex-col overflow-hidden">
+            {/* Optimized Background Image with Next.js Preload */}
+            <Image
+                src="/auth-bg.webp"
+                alt="Background"
+                fill
+                priority
+                className="object-cover -z-10"
+                sizes="100vw"
+            />
             <section className="pt-21 pb-5 px-4">
                 <div className="max-w-6xl mx-auto">
                     <div className="flex flex-col lg:flex-row items-start gap-10">

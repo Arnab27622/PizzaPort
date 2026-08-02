@@ -13,7 +13,7 @@ import { MenuItemDB } from "@/types/menu";
 const RazorpayOrderSchema = z.object({
     name: z.string().min(1, 'Name is required'),
     address: z.string().min(5, 'Address is too short'),
-    cart: z.array(z.any()).min(1, 'Cart is empty'),
+    cart: z.array(z.unknown()).min(1, 'Cart is empty'),
     couponCode: z.string().optional(),
     discountAmount: z.number().optional()
 });
@@ -54,7 +54,8 @@ export async function POST(req: Request) {
         );
     }
 
-    const { name, cart, address, couponCode } = validation.data;
+    const { name, address, couponCode } = validation.data;
+    const cart = validation.data.cart as CartProduct[];
 
     /**
      * SECURE PRICE CALCULATION

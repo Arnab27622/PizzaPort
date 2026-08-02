@@ -82,7 +82,7 @@ export default function AdminOrdersPage() {
 
             {/* Order Summary and Controls */}
             <div className="mb-4 flex justify-between items-center">
-                <p className="text-card">
+                <p className="text-amber-100">
                     {sortedOrders.length} order{sortedOrders.length !== 1 ? 's' : ''} found
                 </p>
                 <button

@@ -39,10 +39,20 @@ export async function PATCH(
         const client = await clientPromise;
         const db = client.db();
 
-        await db.collection("orders").updateOne(
+        const orderDoc = await db.collection("orders").findOneAndUpdate(
             { _id: new ObjectId(orderId) },
-            { $set: { status } }
+            { $set: { status } },
+            { returnDocument: "after" }
         );
+
+        // Broadcast real-time update via WebSockets (including razorpayOrderId for client channel matching)
+        try {
+            const { broadcastOrderStatusUpdate } = await import("@/lib/wsServer");
+            const rOrderId = orderDoc?.razorpayOrderId || "";
+            broadcastOrderStatusUpdate(orderId, status, { razorpayOrderId: rOrderId });
+        } catch (err) {
+            console.error("Failed to trigger WS broadcast:", err);
+        }
 
         return NextResponse.json({ success: true });
     } catch (error) {

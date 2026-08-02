@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -169,7 +170,16 @@ function LoginPage() {
    * - Right: Login form with authentication options
    */
   return (
-    <div className="min-h-[86vh] flex flex-col" style={{ backgroundImage: "url('/auth-bg.png')", backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+    <div className="relative min-h-[86vh] flex flex-col overflow-hidden">
+      {/* Optimized Background Image with Next.js Preload */}
+      <Image
+        src="/auth-bg.webp"
+        alt="Background"
+        fill
+        priority
+        className="object-cover -z-10"
+        sizes="100vw"
+      />
       <section className="pt-21 pb-5 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col lg:flex-row items-start gap-10">

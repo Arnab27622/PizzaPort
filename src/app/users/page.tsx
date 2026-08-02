@@ -299,7 +299,7 @@ function UsersPage() {
 
                             {/* Ban/Unban Button */}
                             {(() => {
-                                const isSelf = session?.user && (session.user as any).id === selectedUser._id;
+                                const isSelf = session?.user && (session.user as { id?: string }).id === selectedUser._id;
                                 const isTargetAdmin = selectedUser.admin;
                                 const isBanned = selectedUser.banned;
                                 const canBan = !isSelf && (!isTargetAdmin || isBanned);

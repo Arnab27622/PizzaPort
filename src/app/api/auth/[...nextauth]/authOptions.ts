@@ -202,38 +202,44 @@ export const authOptions: NextAuthOptions = {
          * - Updates token when session is updated
          */
         async jwt({ token, user, trigger, session }) {
-            // Initial sign in
-            if (user) {
-                // For OAuth providers, the 'user' object might not have the DB ID.
-                // We ensure token.id is the MongoDB _id.
-                if (!token.id || (user.id && user.id.length > 24)) {
-                    const db = (await clientPromise).db();
-                    const found = await db.collection("users").findOne({ email: user.email });
+            // Initial sign in or token setup
+            if (user || !token.id) {
+                const db = (await clientPromise).db();
+                const email = user?.email || token.email;
+                if (email) {
+                    const found = await db.collection("users").findOne({ email });
                     if (found) {
                         token.id = found._id.toString();
+                        token.name = found.name || token.name || "";
+                        token.email = found.email || token.email || "";
+                        token.image = found.image || user?.image || token.image || "";
                         token.admin = found.admin ?? false;
+                        token.banned = found.banned ?? false;
                         token.phone = found.phone || "";
+                        token.address = found.address || "";
+                        token.gender = found.gender || "";
                     }
                 }
 
-                if (user.id && !token.id) token.id = user.id;
-                token.name = user.name ?? token.name;
-                token.email = user.email ?? token.email;
-                token.image = user.image ?? token.image;
-                token.phone = user.phone ?? token.phone;
-                if (typeof user.admin === 'boolean') token.admin = user.admin;
+                if (user?.id && !token.id) token.id = user.id;
             }
 
-            // Handle manual session updates
+            // Handle manual session updates (e.g. from profile page)
             if (trigger === "update" && session?.user) {
                 const u = session.user as {
                     name?: string;
                     image?: string;
                     phone?: string;
+                    address?: string;
+                    gender?: string;
+                    admin?: boolean;
                 };
-                if (u.name) token.name = u.name;
-                if (u.image) token.image = u.image;
-                if (u.phone) token.phone = u.phone;
+                if (u.name !== undefined) token.name = u.name;
+                if (u.image !== undefined) token.image = u.image;
+                if (u.phone !== undefined) token.phone = u.phone;
+                if (u.address !== undefined) token.address = u.address;
+                if (u.gender !== undefined) token.gender = u.gender;
+                if (u.admin !== undefined) token.admin = u.admin;
             }
 
             return token;
@@ -241,41 +247,29 @@ export const authOptions: NextAuthOptions = {
 
         /**
          * Session callback - populates session with user data
-         * - Enhances session with user info from token
-         * - Fetches additional user data from database
-         * - Banned status is checked to invalidate session if user was banned after login
+         * - OPTIMIZED: Populates session directly from JWT token with zero DB queries
+         * - Invalidates session instantly if user is marked banned in token
          */
         async session({ session, token }) {
-            // Fetch additional user data from database
-            const db = (await clientPromise).db();
-            const found = await db.collection("users").findOne(
-                { email: token.email },
-                { projection: { address: 1, gender: 1, phone: 1, image: 1, admin: 1, banned: 1 } }
-            );
-
-
-            // CRITICAL SECURITY: If user is banned or not found, return an empty/invalid session
-            if (!found || found.banned) {
-                if (found?.banned) {
-                    console.log(`Banned user attempted to use session: ${token.email}`);
-                }
+            // CRITICAL SECURITY: If user is banned, invalidate session
+            if (token.banned) {
                 return {
                     ...session,
-                    user: undefined // This will effectively sign out the user on the client-side
+                    user: undefined // Effectively signs out the user on client
                 };
             }
 
-            // Populate session with token data and database values
+            // Populate session with token data (0 DB hits)
             if (session.user) {
                 session.user = {
                     id: token.id as string,
-                    name: token.name ?? session.user.name,
-                    email: token.email ?? session.user.email,
-                    image: found.image ?? token.image,
-                    address: found.address ?? "",
-                    gender: found.gender ?? "",
-                    phone: found.phone ?? "",
-                    admin: found.admin ?? token.admin ?? false,
+                    name: (token.name as string) ?? session.user.name,
+                    email: (token.email as string) ?? session.user.email,
+                    image: (token.image as string) ?? session.user.image,
+                    address: (token.address as string) ?? "",
+                    gender: (token.gender as string) ?? "",
+                    phone: (token.phone as string) ?? "",
+                    admin: (token.admin as boolean) ?? false,
                 };
             }
 

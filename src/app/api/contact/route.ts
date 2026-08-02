@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -13,6 +22,10 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+
+    const safeName = escapeHtml(name);
+    const safeEmail = escapeHtml(email);
+    const safeMessage = escapeHtml(message);
 
     // Configure Nodemailer transporter
     // For Gmail, enable "App Password" if 2FA is on.
@@ -63,12 +76,12 @@ ${message}
                   <table style="width: 100%; border-collapse: collapse;">
                     <tr>
                       <td style="padding: 12px 0; color: #666; font-size: 14px; width: 100px; vertical-align: top;">Name:</td>
-                      <td style="padding: 12px 0; color: #1a1a1a; font-size: 16px; font-weight: 500;">${name}</td>
+                      <td style="padding: 12px 0; color: #1a1a1a; font-size: 16px; font-weight: 500;">${safeName}</td>
                     </tr>
                     <tr>
                       <td style="padding: 12px 0; border-top: 1px solid #f5f5f5; color: #666; font-size: 14px; width: 100px; vertical-align: top;">Email:</td>
                       <td style="padding: 12px 0; border-top: 1px solid #f5f5f5; color: #1a1a1a; font-size: 16px; font-weight: 500;">
-                        <a href="mailto:${email}" style="color: #293380; text-decoration: none;">${email}</a>
+                        <a href="mailto:${safeEmail}" style="color: #293380; text-decoration: none;">${safeEmail}</a>
                       </td>
                     </tr>
                   </table>
@@ -78,7 +91,7 @@ ${message}
                 <div>
                   <h2 style="color: #1a1a1a; font-size: 18px; margin: 0 0 15px 0;">Message</h2>
                   <div style="background-color: #f8f9fa; border-left: 4px solid #293380; padding: 20px; border-radius: 4px; color: #4a4a4a; line-height: 1.6; font-size: 15px;">
-                    ${message.replace(/\n/g, '<br>')}
+                    ${safeMessage.replace(/\n/g, '<br>')}
                   </div>
                 </div>
                 

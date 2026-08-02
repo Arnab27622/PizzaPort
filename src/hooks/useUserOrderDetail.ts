@@ -8,8 +8,9 @@ import { useContext, useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
-import { Order } from "@/types/order";
+import { Order, OrderStatus } from "@/types/order";
 import { CartContext } from "@/components/CartProvider";
+import { useOrderSocket } from "./useOrderSocket";
 
 /**
  * useUserOrderDetail Hook
@@ -26,7 +27,6 @@ export function useUserOrderDetail() {
     const [statusText, setStatusText] = useState<string>(''); // Current status (e.g., "preparing")
 
     const hasClearedCart = useRef(false); // To ensure we only empty the cart once per order
-    const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null); // For the automatic status checker
     const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null); // For retrying if the server is slow
 
     /**
@@ -40,7 +40,10 @@ export function useUserOrderDetail() {
                 setLoadingOrder(true);
             }
 
-            const res = await fetch(`/api/user-orders/${orderId}`);
+            const res = await fetch(`/api/user-orders/${orderId}?t=${Date.now()}`, {
+                cache: "no-store",
+                headers: { "Pragma": "no-cache", "Cache-Control": "no-cache" }
+            });
 
             if (!res.ok) {
                 throw new Error('Failed to fetch order');
@@ -106,43 +109,23 @@ export function useUserOrderDetail() {
     }, [authStatus, session, router, orderId, fetchOrder]);
 
     /**
-     * POLLING: Every 10 seconds, check the server to see if the status has changed.
-     * This stops once the order is "delivered" or "canceled".
+     * REAL-TIME WEBSOCKET: Listen for status updates for this specific order
      */
-    useEffect(() => {
-        if (!order || /^(completed|canceled)$/.test(statusText)) return;
-
-        if (pollingIntervalRef.current) {
-            clearInterval(pollingIntervalRef.current);
-        }
-
-        pollingIntervalRef.current = setInterval(async () => {
-            try {
-                const res = await fetch(`/api/user-orders/${orderId}/status`);
-                if (!res.ok) return;
-
-                const { status: newStatus } = await res.json();
-
-                // If the status changed on the server, update the screen
-                if (newStatus && newStatus !== statusText) {
-                    setStatusText(newStatus);
-
-                    if (newStatus === 'completed') {
-                        toast.info('Order delivered! Redirecting...');
-                        setTimeout(() => router.push('/user-orders'), 2000);
-                    }
+    useOrderSocket({
+        orderId,
+        onOrderStatusUpdate: useCallback((data: { orderId: string; status: string; payload?: Record<string, unknown> }) => {
+            const altId = (data.payload?.razorpayOrderId as string) || "";
+            if (data.status && (data.orderId === orderId || altId === orderId || !orderId)) {
+                setStatusText(data.status);
+                setOrder(prev => prev ? { ...prev, status: data.status as OrderStatus } : prev);
+                fetchOrder(true);
+                if (data.status === 'completed') {
+                    toast.info('Order delivered! Redirecting...');
+                    setTimeout(() => router.push('/user-orders'), 2000);
                 }
-            } catch (err) {
-                console.error('Polling failed', err);
             }
-        }, 10_000); // 10 seconds
-
-        return () => {
-            if (pollingIntervalRef.current) {
-                clearInterval(pollingIntervalRef.current);
-            }
-        };
-    }, [orderId, order, statusText, router]);
+        }, [orderId, fetchOrder, router]),
+    });
 
     return {
         order,

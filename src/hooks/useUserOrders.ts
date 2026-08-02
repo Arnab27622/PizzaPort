@@ -7,7 +7,8 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { Order } from "@/types/order";
+import { Order, OrderStatus } from "@/types/order";
+import { useOrderSocket } from "./useOrderSocket";
 
 /**
  * useUserOrders Hook
@@ -26,7 +27,10 @@ export function useUserOrders() {
     const fetchOrders = useCallback(async () => {
         try {
             setError("");
-            const response = await fetch("/api/user-orders");
+            const response = await fetch(`/api/user-orders?t=${Date.now()}`, {
+                cache: "no-store",
+                headers: { "Pragma": "no-cache", "Cache-Control": "no-cache" }
+            });
 
             if (!response.ok) {
                 const data = await response.json().catch(() => ({}));
@@ -49,17 +53,32 @@ export function useUserOrders() {
         } finally {
             setLoading(false);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [router]);
 
+    // Connect to WebSocket for instant real-time updates on status changes
+    useOrderSocket({
+        subscribeUserOrders: true,
+        onOrderStatusUpdate: useCallback((data: { orderId: string; status: string; payload?: Record<string, unknown> }) => {
+            const altId = (data.payload?.razorpayOrderId as string) || "";
+            if (data.status) {
+                setOrders(prev => prev.map(order =>
+                    (order._id === data.orderId || order.razorpayOrderId === data.orderId || (altId && (order._id === altId || order.razorpayOrderId === altId)))
+                        ? { ...order, status: data.status as OrderStatus }
+                        : order
+                ));
+            }
+            fetchOrders();
+        }, [fetchOrders]),
+    });
+
     /**
-     * Automatic Refresh: Every 15 seconds, check for updates.
-     * Also redirects to login if the user isn't logged in.
+     * Initial Load & Auth handling
+     * Fetches orders once on load. Real-time updates handled via WebSocket.
      */
     useEffect(() => {
         if (status === "authenticated") {
             fetchOrders();
-            const interval = setInterval(fetchOrders, 15000); // 15 seconds
-            return () => clearInterval(interval);
         } else if (status === "unauthenticated") {
             setLoading(false);
             router.push("/login"); // Send guest users to login page

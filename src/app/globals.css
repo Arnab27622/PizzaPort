@@ -85,9 +85,9 @@ body::after {
   left: 0;
   width: 100vw;
   height: 100vh;
-  backdrop-filter: blur(1px);
-  -webkit-backdrop-filter: blur(1px);
-  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  background: radial-gradient(ellipse at top, rgba(234, 88, 12, 0.12) 0%, rgba(12, 10, 9, 0.85) 60%, rgba(8, 6, 4, 0.96) 100%);
   z-index: -10;
   display: block;
 }
@@ -212,10 +212,12 @@ input[type="file"] {
  * Defines brand colors and responsive breakpoints
  */
 @theme {
-  --color-primary: #f13a01;
-  /* Brand orange for primary actions */
-  --color-card: #F8F4E9;
-  /* Off-white for card backgrounds */
+  --color-primary: #ea580c;
+  --color-primary-hover: #c2410c;
+  --color-accent-gold: #f59e0b;
+  --color-accent-red: #dc2626;
+  --color-card: #18120c;
+  --color-card-border: rgba(217, 119, 6, 0.25);
 }
 
 /**
@@ -292,12 +294,10 @@ input[type="file"] {
 
 .animate-fade-in-up {
   animation: fade-in-up 0.6s ease-out forwards;
-  will-change: opacity, transform;
 }
 
 .animate-fade-in {
   animation: fade-in 0.5s ease-out forwards;
-  will-change: opacity;
 }
 
 /* Respect user preference for reduced motion */
@@ -371,17 +371,14 @@ input[type="file"] {
 
 .animate-float-slow {
   animation: float-slow 8s ease-in-out infinite;
-  will-change: transform;
 }
 
 .animate-float-medium {
   animation: float-medium 6s ease-in-out infinite;
-  will-change: transform;
 }
 
 .animate-float-fast {
   animation: float-fast 4s ease-in-out infinite;
-  will-change: transform;
 }
 
 /* Pizza Floating Animation */
@@ -407,7 +404,6 @@ input[type="file"] {
 
 .animate-float-pizza {
   animation: float-pizza 6s ease-in-out infinite;
-  will-change: transform;
 }
 
 /* Ingredient Badge Floating */

@@ -30,20 +30,20 @@ function HomepageAbout() {
                     </div>
 
                     {/* Main content card with glassmorphism effect */}
-                    <div className="relative z-10 bg-black/70 backdrop-blur-sm border border-amber-900/30 rounded-2xl p-8 space-y-6">
+                    <div className="relative z-10 bg-[#16100a]/90 backdrop-blur-md border border-amber-900/50 hover:border-amber-500/40 transition-colors rounded-2xl p-8 md:p-10 space-y-6 shadow-2xl shadow-orange-950/40 text-left">
                         {/* First paragraph - company passion and craftsmanship */}
-                        <p className='text-amber-100 text-lg leading-relaxed'>
-                            At PizzaPort, every slice tells a story — one of passion, flavor, and tradition. From our carefully crafted dough to our house-made sauces, we pay attention to every detail to give you a pizza that&apos;s unforgettable.
+                        <p className='text-amber-100 text-base md:text-lg leading-relaxed'>
+                            At <span className="text-amber-400 font-bold">PizzaPort</span>, every slice tells a story — one of passion, wood-fired flavor, and authentic tradition. From our hand-tossed 48-hour fermented dough to our house-made secret sauces, we pay attention to every detail to give you an unforgettable meal.
                         </p>
 
                         {/* Second paragraph - ingredients and menu diversity */}
-                        <p className='text-amber-100 text-lg leading-relaxed'>
-                            What sets us apart? It&apos;s our commitment to fresh, locally sourced ingredients, eco-friendly practices, and a menu that celebrates both classic and adventurous palates. Whether you&apos;re craving a traditional Margherita or something bolder, we&apos;ve got you covered.
+                        <p className='text-amber-200/90 text-base md:text-lg leading-relaxed'>
+                            What sets us apart? It&apos;s our commitment to 100% fresh, locally sourced ingredients, premium mozzarella, and a menu that celebrates both classic Italian heritages and adventurous gourmet palates.
                         </p>
 
                         {/* Third paragraph - community and service values */}
-                        <p className='text-amber-100 text-lg leading-relaxed'>
-                            We&apos;re more than just a pizza place — we&apos;re a community hub where good food and great memories come together. Fast delivery, friendly service, and consistent quality are what make our loyal customers keep coming back.
+                        <p className='text-amber-200/90 text-base md:text-lg leading-relaxed'>
+                            We&apos;re more than just a pizza delivery service — we&apos;re a passion project dedicated to bringing piping-hot comfort food to your doorstep in under 30 minutes.
                         </p>
                     </div>
 

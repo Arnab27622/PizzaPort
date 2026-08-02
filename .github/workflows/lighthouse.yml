@@ -1,0 +1,43 @@
+name: Lighthouse CWV Performance Gate
+
+on:
+  pull_request:
+    branches: [main, master]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "lighthouserc.cjs"
+      - ".github/workflows/lighthouse.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    name: Lighthouse Core Web Vitals Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web app
+        run: npm run build
+
+      - name: Run Lighthouse CI Gate
+        run: npm run lhci
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: ./.lighthouseci
+          if-no-files-found: ignore

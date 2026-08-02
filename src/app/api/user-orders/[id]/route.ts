@@ -68,8 +68,12 @@ export async function GET(
             canceledAt: order.canceledAt?.toISOString(),  // Handle optional canceled date
         };
 
-        // Return complete order details
-        return NextResponse.json(safeOrder);
+        // Return complete order details with no-store Cache-Control header
+        return NextResponse.json(safeOrder, {
+            headers: {
+                "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            },
+        });
 
     } catch (err) {
         /**

@@ -41,7 +41,7 @@ export default function CouponsPage() {
         mutate,
         error: swrError
     } = useSWR<Coupon[]>("/api/coupon", fetcher, {
-        refreshInterval: 15000, // Refresh every 15 seconds
+        revalidateOnFocus: false,
         onError: (err) => console.error("Failed to fetch coupons:", err)
     });
 

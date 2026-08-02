@@ -38,8 +38,8 @@ export default function MenuItemForm({ item, onClose, onSuccess }: MenuItemFormP
     }, [onClose]);
 
     return (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 pt-28 z-50 backdrop-blur-xs">
-            <div className="bg-[#3A3D40] text-[#F9FBF7] rounded-lg w-full max-w-md sm:max-w-lg p-6 overflow-auto max-h-[90vh] no-scrollbar shadow-2xl border border-gray-700">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 pt-28 z-50 backdrop-blur-md">
+            <div className="bg-[#18120c]/95 text-amber-50 rounded-2xl w-full max-w-md sm:max-w-lg p-6 overflow-auto max-h-[90vh] no-scrollbar shadow-2xl border border-amber-900/60 backdrop-blur-xl">
                 <div className="flex justify-between items-center mb-6 border-b border-gray-600 pb-3">
                     <h3 className="text-2xl font-semibold text-amber-50">
                         {item ? "Edit Item" : "New Menu Item"}

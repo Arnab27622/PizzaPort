@@ -3,24 +3,24 @@
  * It is primarily used by NextAuth to store session data in the database.
  */
 
-import { MongoClient, ServerApiVersion } from "mongodb"
+import { MongoClient, ServerApiVersion } from "mongodb";
 
 // Ensure the MongoDB URL is present in the environment variables
 if (!process.env.MONGO_URL) {
-    throw new Error('Invalid/Missing environment variable: "MONGO_URL"')
+    throw new Error('Invalid/Missing environment variable: "MONGO_URL"');
 }
 
-const uri = process.env.MONGO_URL
+const uri = process.env.MONGO_URL;
 const options = {
     serverApi: {
         version: ServerApiVersion.v1,
         strict: true,
         deprecationErrors: true,
     },
-}
+};
 
-let client: MongoClient
-let clientPromise: Promise<MongoClient>
+let client: MongoClient;
+let clientPromise: Promise<MongoClient>;
 
 /**
  * We handle the connection differently in development vs production.
@@ -33,22 +33,22 @@ if (process.env.NODE_ENV === "development") {
      * every time the code changes.
      */
     const globalWithMongo = global as typeof globalThis & {
-        _mongoClientPromise?: Promise<MongoClient>
-    }
+        _mongoClientPromise?: Promise<MongoClient>;
+    };
 
     if (!globalWithMongo._mongoClientPromise) {
-        client = new MongoClient(uri, options)
-        globalWithMongo._mongoClientPromise = client.connect()
+        client = new MongoClient(uri, options);
+        globalWithMongo._mongoClientPromise = client.connect();
     }
-    clientPromise = globalWithMongo._mongoClientPromise
+    clientPromise = globalWithMongo._mongoClientPromise;
 } else {
     /**
      * In production mode:
      * We don't need global variables because the server instance stays alive.
      * We just create a new client and connect.
      */
-    client = new MongoClient(uri, options)
-    clientPromise = client.connect()
+    client = new MongoClient(uri, options);
+    clientPromise = client.connect();
 }
 
 /**
@@ -56,7 +56,7 @@ if (process.env.NODE_ENV === "development") {
  * Other parts of the app (like NextAuth) will wait for this promise to resolve
  * before trying to talk to the database.
  */
-export default clientPromise
+export default clientPromise;
 
 /**
  * Initialize critical database indexes for performance and correctness.
@@ -77,4 +77,19 @@ clientPromise.then((client) => {
             { expireAfterSeconds: 30 * 24 * 60 * 60 } // 30 days in seconds
         )
         .catch((err) => console.error("Failed to create webhook TTL index:", err));
+
+    // Performance Index: orders by paymentStatus (optimizes bestsellers aggregation & sales reports)
+    db.collection("orders")
+        .createIndex({ paymentStatus: 1, createdAt: -1 })
+        .catch((err) => console.error("Failed to create orders paymentStatus index:", err));
+
+    // Performance Index: orders by userEmail (optimizes user order history listing)
+    db.collection("orders")
+        .createIndex({ userEmail: 1, createdAt: -1 })
+        .catch((err) => console.error("Failed to create orders userEmail index:", err));
+
+    // Performance Index: users by email (optimizes user lookup)
+    db.collection("users")
+        .createIndex({ email: 1 }, { unique: true })
+        .catch((err) => console.error("Failed to create users email index:", err));
 }).catch(console.error);

@@ -48,7 +48,6 @@ export async function POST(request: NextRequest) {
          * Prevent the currently logged-in admin from banning themselves.
          * This ensures admins cannot accidentally lock themselves out.
          */
-        // @ts-ignore
         if (session.user?.id === id && banned) {
             return NextResponse.json(
                 { error: "You cannot ban yourself" },

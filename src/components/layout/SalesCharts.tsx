@@ -15,80 +15,124 @@ Chart.register(...registerables);
 export default function SalesCharts({ report }: { report: SalesReport }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const dailyRevenue = report.dailyRevenue ?? [];
-  const topProducts = report.topProducts ?? [];
+  const lineChartData = React.useMemo(() => {
+    const dailyRevenue = report.dailyRevenue ?? [];
+    return {
+      labels: dailyRevenue.map(d => {
+        try {
+          const date = new Date(d.date);
+          if (isNaN(date.getTime())) return d.date;
+          return new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short' }).format(date);
+        } catch {
+          return d.date;
+        }
+      }),
+      datasets: [{
+        label: 'Revenue',
+        data: dailyRevenue.map(d => d.revenue),
+        borderColor: '#FF5500',
+        backgroundColor: 'rgba(255,85,0,0.2)',
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#FF5500',
+        pointRadius: 4,
+        pointHoverRadius: 6
+      }]
+    };
+  }, [report.dailyRevenue]);
 
-  const baseScales = {
-    ticks: { color: "#fff" },
-    grid: { color: "rgba(255,255,255,0.15)", borderColor: "#fff" }
-  };
+  const barChartData = React.useMemo(() => {
+    const topProducts = report.topProducts ?? [];
+    return {
+      labels: topProducts.map(p => p.name),
+      datasets: [{
+        label: 'Quantity Sold',
+        data: topProducts.map(p => p.quantity),
+        backgroundColor: '#CFB54F',
+        borderRadius: 4,
+        barThickness: 20
+      }]
+    };
+  }, [report.topProducts]);
 
-  const optionsLine = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      x: {
-        ...baseScales,
-        ticks: {
-          ...baseScales.ticks,
-          maxRotation: 0,
-          autoSkip: true,
+  const optionsLine = React.useMemo(() => {
+    const baseScales = {
+      ticks: { color: "#fff" },
+      grid: { color: "rgba(255,255,255,0.15)", borderColor: "#fff" }
+    };
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          ...baseScales,
+          ticks: {
+            ...baseScales.ticks,
+            maxRotation: 0,
+            autoSkip: true,
+          }
+        },
+        y: {
+          ...baseScales,
+          beginAtZero: true,
+          ticks: {
+            ...baseScales.ticks,
+            callback: (value: string | number) => '₹' + Number(value).toLocaleString('en-IN')
+          }
         }
       },
-      y: {
-        ...baseScales,
-        beginAtZero: true,
-        ticks: {
-          ...baseScales.ticks,
-          callback: (value: string | number) => '₹' + Number(value).toLocaleString('en-IN')
-        }
-      }
-    },
-    plugins: {
-      legend: { labels: { color: "#fff" } },
-      tooltip: {
-        callbacks: {
-          label: (context: TooltipItem<'line'>) => `Revenue: ₹${(context.raw as number).toLocaleString('en-IN')}`
-        }
-      }
-    }
-  };
-
-  const optionsBar = {
-    indexAxis: 'y' as const,
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      x: {
-        ...baseScales,
-        beginAtZero: true,
-        grid: { display: true, color: "rgba(255,255,255,0.15)" }
-      },
-      y: {
-        ...baseScales,
-        grid: { display: false },
-        ticks: {
-          ...baseScales.ticks,
-          callback: (val: string | number) => {
-            const label = typeof val === 'number' ? String(val) : val;
-            if (typeof label === 'string' && label.length > 25) {
-              return label.substring(0, 22) + '...';
-            }
-            return label;
+      plugins: {
+        legend: { labels: { color: "#fff" } },
+        tooltip: {
+          callbacks: {
+            label: (context: TooltipItem<'line'>) => `Revenue: ₹${(context.raw as number).toLocaleString('en-IN')}`
           }
         }
       }
-    },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          title: (items: TooltipItem<'bar'>[]) => items[0].label,
-          label: (context: TooltipItem<'bar'>) => `Sold: ${context.raw}`
+    };
+  }, []);
+
+  const optionsBar = React.useMemo(() => {
+    const baseScales = {
+      ticks: { color: "#fff" },
+      grid: { color: "rgba(255,255,255,0.15)", borderColor: "#fff" }
+    };
+    return {
+      indexAxis: 'y' as const,
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          ...baseScales,
+          beginAtZero: true,
+          grid: { display: true, color: "rgba(255,255,255,0.15)" }
+        },
+        y: {
+          ...baseScales,
+          grid: { display: false },
+          ticks: {
+            ...baseScales.ticks,
+            callback: (val: string | number) => {
+              const label = typeof val === 'number' ? String(val) : val;
+              if (typeof label === 'string' && label.length > 25) {
+                return label.substring(0, 22) + '...';
+              }
+              return label;
+            }
+          }
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: (items: TooltipItem<'bar'>[]) => items[0].label,
+            label: (context: TooltipItem<'bar'>) => `Sold: ${context.raw}`
+          }
         }
       }
-    }
-  };
+    };
+  }, []);
 
   return (
     <div ref={containerRef} className="mt-6 space-y-12">
@@ -99,31 +143,7 @@ export default function SalesCharts({ report }: { report: SalesReport }) {
           Revenue Trend
         </h4>
         <div className="h-64 sm:h-80 w-full relative">
-          <Line
-            data={{
-              labels: dailyRevenue.map(d => {
-                try {
-                  const date = new Date(d.date);
-                  if (isNaN(date.getTime())) return d.date;
-                  return new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short' }).format(date);
-                } catch {
-                  return d.date;
-                }
-              }),
-              datasets: [{
-                label: 'Revenue',
-                data: dailyRevenue.map(d => d.revenue),
-                borderColor: '#FF5500',
-                backgroundColor: 'rgba(255,85,0,0.2)',
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: '#FF5500',
-                pointRadius: 4,
-                pointHoverRadius: 6
-              }]
-            }}
-            options={optionsLine}
-          />
+          <Line data={lineChartData} options={optionsLine} />
         </div>
       </div>
 
@@ -134,19 +154,7 @@ export default function SalesCharts({ report }: { report: SalesReport }) {
           Top Selling Items
         </h4>
         <div className="h-112.5 w-full relative">
-          <Bar
-            data={{
-              labels: topProducts.map(p => p.name),
-              datasets: [{
-                label: 'Quantity Sold',
-                data: topProducts.map(p => p.quantity),
-                backgroundColor: '#CFB54F',
-                borderRadius: 4,
-                barThickness: 20
-              }]
-            }}
-            options={optionsBar}
-          />
+          <Bar data={barChartData} options={optionsBar} />
         </div>
       </div>
     </div>

@@ -68,7 +68,7 @@ export default function ProfileForm({
                         <div className="w-40 h-40 rounded-full p-1.5 bg-linear-to-tr from-primary to-amber-500 shadow-2xl transition-transform duration-500 hover:scale-105">
                             <div className="w-full h-full rounded-full overflow-hidden relative ring-4 ring-[#151515] bg-[#1a1108]">
                                 <Image
-                                    src={preview || userImage || '/profile.png'}
+                                    src={preview || userImage || '/profile.webp'}
                                     alt="Profile picture"
                                     fill
                                     className="object-cover transition-opacity duration-300 group-hover:opacity-60"

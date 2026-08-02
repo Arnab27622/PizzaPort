@@ -70,7 +70,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* Critical resource preloading for performance optimization */}
         <link
@@ -110,7 +110,7 @@ export default function RootLayout({
               <Footer />
               {/* Global Toast Notification System */}
               <ToastContainer
-                position="top-center"
+                position="top-right"
                 hideProgressBar
                 autoClose={1500} // Optimal duration for user reading
               />

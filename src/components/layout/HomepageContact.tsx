@@ -16,8 +16,8 @@ import LocationIcon from '../icons/LocationIcon';
  * Clean, accessible styles for form inputs
  * Increased opacity and contrast for better readability against complex backgrounds
  */
-const inputStyles = "w-full px-4 py-3 bg-black/60 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all";
-const labelStyles = "block text-sm font-medium text-gray-200 mb-2";
+const inputStyles = "w-full px-4 py-3.5 bg-[#18120c]/95 border border-amber-900/60 rounded-xl text-white placeholder:text-amber-200/70 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/40 transition-all duration-300 shadow-lg";
+const labelStyles = "block text-sm font-semibold text-amber-200 mb-2";
 
 /**
  * Clock Icon SVG (Inline to avoid creating a new file for a single usage)
@@ -230,7 +230,7 @@ function HomepageContact() {
                                         <button
                                             type="submit"
                                             disabled={loading}
-                                            className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-primary/50 transform hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70 cursor-pointer disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+                                            className="w-full bg-linear-to-r from-red-600 via-orange-600 to-amber-600 hover:from-red-700 hover:to-amber-700 text-white font-extrabold py-4 rounded-xl shadow-xl shadow-orange-950/60 hover:scale-[1.02] active:scale-98 transition-all duration-300 border border-amber-400/20 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                         >
                                             {loading ? (
                                                 <>

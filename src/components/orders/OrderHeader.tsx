@@ -1,6 +1,6 @@
 /**
  * The top section of the Order Detail page.
- * It shows the big "Order #123" title and the current status (e.g., "Preparing").
+ * It shows the big "Order #123" title and the current status badge.
  */
 
 import React from "react";
@@ -15,28 +15,31 @@ interface OrderHeaderProps {
 const OrderHeader: React.FC<OrderHeaderProps> = ({ order }) => {
     return (
         <>
-            <div className="text-center mb-6 md:mb-10">
-                <h3 className="uppercase font-bold tracking-widest text-card text-xs md:text-sm mb-2">Order Tracking</h3>
-                <h1 className="text-xl md:text-3xl lg:text-4xl font-bold text-white break-all max-w-4xl mx-auto px-2">
-                    Order: <span className="text-amber-500">#{order.razorpayOrderId}</span>
+            <div className="text-center mb-6 md:mb-8">
+                <h3 className="uppercase font-extrabold tracking-widest text-amber-400 text-xs md:text-sm mb-2">
+                    Order Tracking
+                </h3>
+                <h1 className="text-2xl md:text-4xl font-extrabold text-white break-all max-w-4xl mx-auto px-2">
+                    Order <span className="text-amber-400 font-mono">#{order.razorpayOrderId}</span>
                 </h1>
-                <div className='w-16 md:w-24 h-1 bg-primary mx-auto rounded-full mt-3 md:mt-4'></div>
+                <div className="w-16 md:w-24 h-1 bg-linear-to-r from-amber-500 to-orange-500 mx-auto rounded-full mt-3 md:mt-4 shadow-lg"></div>
             </div>
 
-            <div className="bg-[#232323]/70 p-4 sm:p-6 md:p-8 border-b rounded border-amber-900/30">
-                <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start md:items-center gap-4 sm:gap-6">
-                    <div className="space-y-1 text-center sm:text-left">
-                        <OrderStatusBadge
-                            status={order.status as OrderStatus}
-                            className="justify-center sm:justify-start"
-                        />
-                        <p className="text-amber-300/80 text-xs md:text-sm max-w-62.5 sm:max-w-none">
+            <div className="bg-[#18120c]/95 p-5 sm:p-7 md:p-8 border border-amber-900/50 rounded-2xl shadow-2xl backdrop-blur-md">
+                <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start md:items-center gap-5 sm:gap-6">
+                    <div className="space-y-2.5 text-center sm:text-left">
+                        <div className="flex justify-center sm:justify-start">
+                            <OrderStatusBadge status={order.status as OrderStatus} />
+                        </div>
+                        <p className="text-amber-100 font-semibold text-sm sm:text-base">
                             Placed on {formatDate(order.createdAt)}
                         </p>
                     </div>
-                    <div className="text-center sm:text-right">
-                        <p className="text-[10px] md:text-xs uppercase text-amber-500 font-bold tracking-widest mb-1">Total Amount</p>
-                        <div className="text-2xl md:text-3xl font-black text-amber-50">
+                    <div className="text-center sm:text-right bg-[#140e08]/90 px-6 py-3.5 rounded-xl border border-amber-900/40 shadow-inner min-w-[160px]">
+                        <p className="text-[11px] md:text-xs uppercase text-amber-400 font-extrabold tracking-widest mb-1">
+                            Total Amount
+                        </p>
+                        <div className="text-2xl sm:text-3xl md:text-4xl font-black text-white">
                             {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(order.total)}
                         </div>
                     </div>

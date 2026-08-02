@@ -1,6 +1,6 @@
 # 🍕 PizzaPort - Premium Pizza Delivery App
 
-![PizzaPort Banner](https://raw.githubusercontent.com/Arnab27622/PizzaPort/main/public/hero-pizza.png)
+![PizzaPort Banner](https://raw.githubusercontent.com/Arnab27622/PizzaPort/main/public/hero-pizza.webp)
 
 **PizzaPort** is a modern, high-performance, full-stack pizza delivery application. Built with **Next.js 15**, it offers a seamless ordering experience for customers and a powerful management suite for administrators. Featuring a stunning dark-mode aesthetic, real-time payment integration, and robust data handling, PizzaPort is designed to make food ordering as delightful as the pizza itself.
 

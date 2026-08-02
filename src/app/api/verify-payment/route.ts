@@ -120,6 +120,16 @@ export async function POST(req: NextRequest) {
         );
     }
 
+    // Broadcast real-time WebSocket notifications to Admin and Customer dashboards
+    try {
+        const { broadcastNewOrder, broadcastOrderStatusUpdate } = await import("@/lib/wsServer");
+        const fullOrder = { ...order, ...updateData, _id: order._id.toString() };
+        broadcastNewOrder(fullOrder);
+        broadcastOrderStatusUpdate(order._id.toString(), updateData.status || ORDER_STATUS.PLACED);
+    } catch (err) {
+        console.error("Failed to trigger WS broadcast on payment verification:", err);
+    }
+
     /**
      * Success Response
      * Client can now safely confirm the order to the user

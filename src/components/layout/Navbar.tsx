@@ -121,9 +121,9 @@ export default function Navbar() {
 
     return (
         <header
-            className={`fixed w-full top-0 z-50 py-4 px-4 transition-all duration-300 ${scrolled
-                ? "bg-[rgba(17,15,13,0.95)] shadow-lg"
-                : "bg-[rgba(17,15,13,0.85)]"
+            className={`fixed w-full top-0 z-50 py-3.5 px-4 transition-all duration-300 ${scrolled
+                ? "bg-[#0c0a09]/90 backdrop-blur-xl border-b border-amber-900/40 shadow-2xl shadow-black/90"
+                : "bg-[#0c0a09]/75 backdrop-blur-lg border-b border-amber-950/40"
                 }`}
             role="banner"
         >

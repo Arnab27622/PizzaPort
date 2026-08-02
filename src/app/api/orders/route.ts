@@ -21,6 +21,14 @@ export async function GET() {
     }
 
     try {
+        // Ensure WebSocket server on port 3001 is running for real-time broadcasts
+        try {
+            const { initWebSocketServer } = await import("@/lib/wsServer");
+            initWebSocketServer();
+        } catch {
+            // WS initialization fallback
+        }
+
         // Establish database connection
         const client = await clientPromise;
         const db = client.db();
@@ -61,7 +69,11 @@ export async function GET() {
             }
         ]).toArray();
 
-        return NextResponse.json(orders);
+        return NextResponse.json(orders, {
+            headers: {
+                "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            },
+        });
     } catch (error) {
         /**
          * Handle database errors and connection issues

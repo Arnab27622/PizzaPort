@@ -26,6 +26,14 @@ export async function GET() {
     }
 
     try {
+        // Ensure WebSocket server on port 3001 is running for real-time broadcasts
+        try {
+            const { initWebSocketServer } = await import("@/lib/wsServer");
+            initWebSocketServer();
+        } catch {
+            // WS initialization fallback
+        }
+
         // Establish database connection
         const client = await clientPromise;
         const db = client.db();
@@ -42,6 +50,7 @@ export async function GET() {
                 paymentStatus: { $in: [PAYMENT_STATUS.VERIFIED, PAYMENT_STATUS.COMPLETED, PAYMENT_STATUS.REFUND_INITIATED] }
             })
             .project({
+                _id: 1,                // MongoDB ObjectId reference
                 razorpayOrderId: 1,    // Payment gateway order reference
                 total: 1,              // Order total amount
                 status: 1,             // Current order status
@@ -65,8 +74,12 @@ export async function GET() {
             createdAt: order.createdAt.toISOString(), // Convert Date to ISO string
         }));
 
-        // Return formatted orders array
-        return NextResponse.json(formattedOrders);
+        // Return formatted orders array with no-store Cache-Control header
+        return NextResponse.json(formattedOrders, {
+            headers: {
+                "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            },
+        });
 
     } catch (error) {
         /**

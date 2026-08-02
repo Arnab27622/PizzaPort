@@ -32,7 +32,7 @@ export default function CartItemList({ groupedItems, onRemove }: CartItemListPro
                     <div className="flex gap-4">
                         <div className="w-24 h-24 relative shrink-0">
                             <Image
-                                src={group.item.imageUrl || "/hero-pizza.png"}
+                                src={group.item.imageUrl || "/hero-pizza.webp"}
                                 alt={group.item.name}
                                 fill
                                 className="object-cover rounded"

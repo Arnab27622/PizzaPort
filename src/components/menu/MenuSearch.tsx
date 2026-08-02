@@ -13,7 +13,7 @@ interface MenuSearchProps {
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; // Function called when text changes
 }
 
-const MenuSearch: React.FC<MenuSearchProps> = ({ value, onChange }) => {
+const MenuSearch: React.FC<MenuSearchProps> = React.memo(({ value, onChange }) => {
     return (
         <div className="mb-6 max-w-md mx-auto relative">
             {/* Search Icon */}
@@ -24,15 +24,17 @@ const MenuSearch: React.FC<MenuSearchProps> = ({ value, onChange }) => {
             {/* Input Field */}
             <input
                 type="text"
-                placeholder="Search for pizza..."
+                placeholder="Search for delicious pizza, drinks, sides..."
                 value={value}
                 onChange={onChange}
-                className="w-full pl-10 pr-4 py-2 rounded-lg bg-[#151515] border border-amber-800 text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#18120c]/95 border border-amber-900/60 text-white placeholder:text-amber-200/60 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/40 transition-all duration-300 shadow-xl"
                 aria-label="Search menu items"
             />
         </div>
     );
-};
+});
+
+MenuSearch.displayName = "MenuSearch";
 
 export default MenuSearch;
 

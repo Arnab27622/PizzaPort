@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { toast } from "react-toastify";
 import { Order, OrderStatus } from "@/types/order";
+import { useOrderSocket } from "./useOrderSocket";
 
 /**
  * useAdminOrders Hook
@@ -22,7 +23,10 @@ export function useAdminOrders(isAdmin: boolean) {
      */
     const fetchOrders = useCallback(async () => {
         try {
-            const response = await fetch("/api/orders");
+            const response = await fetch(`/api/orders?t=${Date.now()}`, {
+                cache: "no-store",
+                headers: { "Pragma": "no-cache", "Cache-Control": "no-cache" }
+            });
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || "Failed to fetch orders");
@@ -38,15 +42,24 @@ export function useAdminOrders(isAdmin: boolean) {
         }
     }, []);
 
+    // Connect to WebSocket for instant real-time notifications on new orders or status updates
+    useOrderSocket({
+        isAdmin,
+        onOrderStatusUpdate: useCallback(() => {
+            fetchOrders();
+        }, [fetchOrders]),
+        onNewOrder: useCallback(() => {
+            toast.info("New order received!");
+            fetchOrders();
+        }, [fetchOrders]),
+    });
+
     /**
-     * Set up an automatic refresh.
-     * Every 15 seconds, the list will update so the admin sees new orders immediately.
+     * Initial Load when Admin page mounts
      */
     useEffect(() => {
         if (isAdmin) {
             fetchOrders();
-            const interval = setInterval(fetchOrders, 15000); // 15 seconds
-            return () => clearInterval(interval); // Stop refreshing when the user leaves the page
         }
     }, [isAdmin, fetchOrders]);
 
